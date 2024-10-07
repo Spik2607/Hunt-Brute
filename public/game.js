@@ -1,6 +1,10 @@
 const socket = io('https://hunt-brute-server.onrender.com');
 
 // Initialisation du jeu
+function showGameArea(areaId) {
+    document.querySelectorAll('.game-area').forEach(area => area.style.display = 'none');
+    document.getElementById(areaId).style.display = 'block';
+}
 document.addEventListener('DOMContentLoaded', () => {
     showGameArea('main-menu'); // Ajoutez cette ligne au début
     
@@ -39,7 +43,7 @@ class Character {
         this.maxEnergy = 100;
         this.abilities = [];
     }
-    levelUp() {
+   levelUp() {
     this.level++;
     this.maxHp += 10;
     this.hp = this.maxHp;
@@ -47,8 +51,8 @@ class Character {
     this.defense += 1;
     this.experience -= this.level * 100;
     this.energy = this.maxEnergy;
-    this.learnRandomAbility();
-    console.log("Level up:", this); // Pour le débogage
+    learnRandomAbility(this); // Appel de la fonction globale
+    console.log("Level up:", this);
     showLevelUpModal();
 }
     takeDamage(damage) {
@@ -76,7 +80,7 @@ class Character {
             return ability.use(this, target);
         }
         return 0;
-    }
+    
 }
 
 class Mission {
