@@ -62,6 +62,26 @@ class Fighter {
         updateStats();
         return true;
     }
+
+    toJSON() {
+        return {
+            name: this.name,
+            maxHealth: this.maxHealth,
+            health: this.health,
+            attack: this.attack,
+            defense: this.defense,
+            level: this.level,
+            experience: this.experience,
+            nextLevelExp: this.nextLevelExp,
+            availablePoints: this.availablePoints
+        };
+    }
+
+    static fromJSON(json) {
+        const fighter = new Fighter(json.name);
+        Object.assign(fighter, json);
+        return fighter;
+    }
 }
 
 class Enemy extends Fighter {
@@ -133,6 +153,7 @@ document.getElementById('create-fighter').addEventListener('click', () => {
     updateStats();
     updateHealthBars();
     log("Le combat commence !");
+    saveGame();
 });
 
 function createNewEnemy() {
@@ -222,6 +243,7 @@ attackButtons.forEach(button => {
 
         updateStats();
         updateHealthBars();
+        saveGame();
     });
 });
 
@@ -281,7 +303,47 @@ document.getElementById('confirm-level-up').addEventListener('click', () => {
         document.getElementById('level-up-modal').style.display = 'none';
         log(`Statistiques améliorées ! Santé: +${healthPoints*10}, Attaque: +${attackPoints}, Défense: +${defensePoints}`);
         updateStats();
+        saveGame();
     } else {
         alert("Points invalides. Veuillez réessayer.");
+    }
+});
+
+function saveGame() {
+    localStorage.setItem('playerData', JSON.stringify(player));
+}
+
+function loadGame() {
+    const savedData = localStorage.getItem('playerData');
+    if (savedData) {
+        player = Fighter.fromJSON(JSON.parse(savedData));
+        document.getElementById('character-creation').style.display = 'none';
+        document.getElementById('battle-area').style.display = 'block';
+        createNewEnemy();
+        updateStats();
+        updateHealthBars();
+        log("Partie chargée. Le combat continue !");
+    }
+}
+
+// Ajouter un bouton de sauvegarde manuelle
+const saveButton = document.createElement('button');
+saveButton.textContent = 'Sauvegarder';
+saveButton.addEventListener('click', () => {
+    saveGame();
+    alert('Partie sauvegardée !');
+});
+document.getElementById('game-container').appendChild(saveButton);
+
+// Ajouter un bouton de chargement
+const loadButton = document.createElement('button');
+loadButton.textContent = 'Charger';
+loadButton.addEventListener('click', loadGame);
+document.getElementById('game-container').appendChild(loadButton);
+
+// Charger la partie au démarrage du jeu si une sauvegarde existe
+window.addEventListener('load', () => {
+    if (localStorage.getItem('playerData')) {
+        loadGame();
     }
 });
