@@ -357,6 +357,32 @@ style.textContent = `
 document.head.appendChild(style);
 
 // Code pour le mode multijoueur (à conserver si vous souhaitez garder cette fonctionnalité)
+document.getElementById('open-multiplayer').addEventListener('click', () => {
+    showGameArea('multiplayer-options');
+});
+
+document.getElementById('back-to-solo').addEventListener('click', () => {
+    showGameArea('solo-menu');
+});
+
+document.getElementById('create-room').addEventListener('click', () => {
+    const roomId = document.getElementById('room-id').value;
+    if (roomId) {
+        socket.emit('createRoom', roomId);
+    } else {
+        alert("Veuillez entrer un ID de salle.");
+    }
+});
+
+document.getElementById('join-room').addEventListener('click', () => {
+    const roomId = document.getElementById('room-id').value;
+    if (roomId) {
+        socket.emit('joinRoom', roomId);
+    } else {
+        alert("Veuillez entrer un ID de salle.");
+    }
+});
+
 createRoomBtn.addEventListener('click', () => {
     roomId = roomIdInput.value;
     socket.emit('createRoom', roomId);
