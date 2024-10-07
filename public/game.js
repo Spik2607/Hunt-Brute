@@ -44,12 +44,6 @@ class Character {
             this.levelUp();
         }
     }
-function learnRandomAbility() {
-    const newAbility = abilities[Math.floor(Math.random() * abilities.length)];
-    if (!player.abilities.some(a => a.name === newAbility.name)) {
-        player.abilities.push(newAbility);
-        console.log(`${player.name} a appris une nouvelle capacité : ${newAbility.name}!`);
-    }
 }
    levelUp() {
     this.level++;
@@ -92,6 +86,12 @@ const missions = [
     new Mission("Explorer une grotte hantée", 5, 150, 150, 'Difficile')
 ];
 
+function learnRandomAbility() {
+    const newAbility = abilities[Math.floor(Math.random() * abilities.length)];
+    if (!player.abilities.some(a => a.name === newAbility.name)) {
+        player.abilities.push(newAbility);
+        console.log(`${player.name} a appris une nouvelle capacité : ${newAbility.name}!`);
+    }
 const abilities = [
     {
         name: "Frappe puissante",
@@ -129,10 +129,11 @@ let roomId = null;
 
 // Initialisation du jeu
 document.addEventListener('DOMContentLoaded', () => {
+    showGameArea('main-menu'); // Ajoutez cette ligne au début
+    
     document.getElementById('start-solo').addEventListener('click', () => {
         gameMode = 'solo';
         showGameArea('character-creation');
-        showGameArea('main-menu');
     });
     document.getElementById('create-character').addEventListener('click', createCharacter);
     document.getElementById('start-mission').addEventListener('click', startRandomMission);
