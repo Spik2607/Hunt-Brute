@@ -23,8 +23,12 @@ h1, h2, h3 {
     text-align: center;
 }
 
+
 .game-area {
     display: none;
+}
+#main-menu {
+    display: block; /* Ceci devrait être géré par JavaScript, mais peut aider pour le débogage */
 }
 
 button {
