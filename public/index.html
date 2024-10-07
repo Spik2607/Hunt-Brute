@@ -8,12 +8,13 @@
         body { font-family: Arial, sans-serif; text-align: center; }
         #battle-log { height: 200px; overflow-y: scroll; border: 1px solid #ccc; margin: 10px; padding: 10px; text-align: left; }
         .stats { display: inline-block; margin: 10px; padding: 10px; border: 1px solid #ccc; }
+        .game-area { display: none; }
     </style>
 </head>
 <body>
     <h1>Hunt Brute</h1>
     
-    <div id="game-area">
+    <div id="main-menu" class="game-area">
         <h2>Choisissez votre mode de jeu</h2>
         <button id="start-solo">Mode Solo</button>
         <h3>Ou créez/rejoignez une partie multijoueur</h3>
@@ -22,15 +23,51 @@
         <button id="join-room">Rejoindre une salle</button>
     </div>
 
-    <div id="waiting-area" style="display:none;">
-        <h2>En attente d'un autre joueur...</h2>
+    <div id="character-creation" class="game-area">
+        <h2>Création du personnage</h2>
+        <input type="text" id="hero-name" placeholder="Nom du héros">
+        <div>
+            <label>Points disponibles: <span id="available-points">15</span></label>
+        </div>
+        <div>
+            <label for="stat-hp">PV: </label>
+            <input type="number" id="stat-hp" min="0" value="0">
+        </div>
+        <div>
+            <label for="stat-attack">Attaque: </label>
+            <input type="number" id="stat-attack" min="0" value="0">
+        </div>
+        <div>
+            <label for="stat-defense">Défense: </label>
+            <input type="number" id="stat-defense" min="0" value="0">
+        </div>
+        <button id="create-character">Créer le personnage</button>
     </div>
 
-    <div id="battle-area" style="display:none;">
+    <div id="solo-menu" class="game-area">
+        <h2>Menu Solo</h2>
+        <button id="start-mission">Commencer une mission</button>
+        <button id="open-shop">Ouvrir la boutique</button>
+        <div id="player-info"></div>
+    </div>
+
+    <div id="mission-area" class="game-area">
+        <h2>Mission en cours</h2>
+        <div id="mission-description"></div>
         <div class="stats" id="player-stats"></div>
         <div class="stats" id="enemy-stats"></div>
         <div id="battle-log"></div>
         <button id="attack-button">Attaquer</button>
+    </div>
+
+    <div id="shop" class="game-area">
+        <h2>Boutique</h2>
+        <div id="shop-items"></div>
+        <button id="leave-shop">Quitter la boutique</button>
+    </div>
+
+    <div id="waiting-area" class="game-area">
+        <h2>En attente d'un autre joueur...</h2>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.js"></script>
