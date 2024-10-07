@@ -239,28 +239,36 @@ document.getElementById('close-inventory').addEventListener('click', () => showG
 document.getElementById('attack-button').addEventListener('click', playerAttack);
 
 // Fonctions pour la création de personnage
+let availablePoints = 15;
+
 function updateAvailablePoints() {
-    const totalPoints = 15;
-    const usedPoints = ['hp', 'attack', 'defense'].reduce((sum, stat) => {
-        return sum + parseInt(document.getElementById(`stat-${stat}`).value || 0);
-    }, 0);
-    document.getElementById('available-points').textContent = totalPoints - usedPoints;
+    const usedPoints = parseInt(document.getElementById('stat-hp').value) +
+                       parseInt(document.getElementById('stat-attack').value) +
+                       parseInt(document.getElementById('stat-defense').value);
+    availablePoints = 15 - usedPoints;
+    document.getElementById('available-points').textContent = availablePoints;
 }
+
+// Ajoutez des écouteurs d'événements pour chaque champ de statistique
+['stat-hp', 'stat-attack', 'stat-defense'].forEach(id => {
+    document.getElementById(id).addEventListener('change', updateAvailablePoints);
+});
 
 function createCharacter() {
-    const name = document.getElementById('hero-name').value;
-    const hp = parseInt(document.getElementById('stat-hp').value) * 10 + 100;
-    const attack = parseInt(document.getElementById('stat-attack').value) + 10;
-    const defense = parseInt(document.getElementById('stat-defense').value) + 5;
+   document.getElementById('create-character').addEventListener('click', () => {
+    const name = document.getElementById('hero-name').value.trim();
+    const hp = parseInt(document.getElementById('stat-hp').value);
+    const attack = parseInt(document.getElementById('stat-attack').value);
+    const defense = parseInt(document.getElementById('stat-defense').value);
 
-    if (name && hp && attack && defense) {
-        player = new Character(name, hp, attack, defense);
-        showGameArea('soloMenu');
+    if (name && hp && attack && defense && availablePoints === 0) {
+        player = new Character(name, hp * 10 + 100, attack + 10, defense + 5);
+        showGameArea('solo-menu');
         updatePlayerInfo();
     } else {
-        alert("Veuillez remplir tous les champs correctement.");
+        alert("Veuillez remplir tous les champs et utiliser tous les points disponibles.");
     }
-}
+});
 
 // Fonctions pour le menu solo
 function updatePlayerInfo() {
@@ -391,9 +399,9 @@ function endMission(playerWon) {
 }
 
 // Fonctions utilitaires
-function showGameArea(areaName) {
-    Object.values(gameAreas).forEach(area => area.style.display = 'none');
-    gameAreas[areaName].style.display = 'block';
+function showGameArea(areaId) {
+    document.querySelectorAll('.game-area').forEach(area => area.style.display = 'none');
+    document.getElementById(areaId).style.display = 'block';
 }
 
 function updateStats() {
