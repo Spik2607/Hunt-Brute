@@ -1,5 +1,5 @@
 const socket = io('https://hunt-brute-server.onrender.com');
-let player = null;
+
 class Character {
     constructor(name, hp, attack, defense) {
         this.name = name;
@@ -102,7 +102,7 @@ const abilities = [
         }
     }
 ];
-
+let player = null;
 let player, enemy;
 let currentMission;
 let gameMode = 'solo';
