@@ -3,25 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jeu de Combat avec Ennemis Variés</title>
+    <title>Jeu de Combat Avancé</title>
     <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <div id="game-container">
-        <h1>Jeu de Combat avec Ennemis Variés</h1>
+        <h1>Jeu de Combat Avancé</h1>
         <div id="character-creation">
             <h2>Créez votre combattant</h2>
             <input type="text" id="fighter-name" placeholder="Nom du combattant">
             <button id="create-fighter">Créer</button>
         </div>
         <div id="battle-area" style="display:none;">
+            <div id="battle-scene">
+                <div id="player-character">
+                    <i class="fas fa-user-ninja fa-3x"></i>
+                    <div id="player-health-bar" class="health-bar">
+                        <div class="health-bar-fill"></div>
+                    </div>
+                </div>
+                <div id="enemy-character">
+                    <i class="fas fa-dragon fa-3x"></i>
+                    <div id="enemy-health-bar" class="health-bar">
+                        <div class="health-bar-fill"></div>
+                    </div>
+                </div>
+            </div>
             <div id="player-stats"></div>
             <div id="enemy-stats"></div>
             <div id="battle-log"></div>
             <div id="attack-buttons">
-                <button id="quick-attack" class="attack-button">Attaque Rapide</button>
-                <button id="powerful-attack" class="attack-button">Attaque Puissante</button>
-                <button id="defensive-stance" class="attack-button">Posture Défensive</button>
+                <button id="quick-attack" class="attack-button"><i class="fas fa-bolt"></i> Attaque Rapide</button>
+                <button id="powerful-attack" class="attack-button"><i class="fas fa-fist-raised"></i> Attaque Puissante</button>
+                <button id="defensive-stance" class="attack-button"><i class="fas fa-shield-alt"></i> Posture Défensive</button>
             </div>
         </div>
     </div>
