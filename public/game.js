@@ -16,19 +16,31 @@ class Character {
         this.energy = 100;
         this.maxEnergy = 100;
         this.abilities = [];
+        updateAbilityButtons()
     }
-   levelUp() {
-    this.level++;
-    this.maxHp += 10;
-    this.hp = this.maxHp;
-    this.attack += 2;
-    this.defense += 1;
-    this.experience -= this.level * 100;
-    this.energy = this.maxEnergy;
-    learnRandomAbility(this); // Appel de la fonction globale
-    console.log("Level up:", this);
-    showLevelUpModal();
+ levelUp() {
+        this.level++;
+        this.maxHp += 10;
+        this.hp = this.maxHp;
+        this.attack += 2;
+        this.defense += 1;
+        this.experience -= this.level * 100;
+        this.energy = this.maxEnergy;
+        learnRandomAbility(this);
+        console.log("Level up:", this);
+        showLevelUpModal();
+    }
+
+    useAbility(abilityIndex, target) {
+        const ability = this.abilities[abilityIndex];
+        if (this.energy >= ability.energyCost) {
+            this.energy -= ability.energyCost;
+            return ability.use(this, target);
+        }
+        return 0;
+    }
 }
+
     takeDamage(damage) {
         this.hp = Math.max(this.hp - Math.max(damage - this.defense, 0), 0);
         return this.hp <= 0;
@@ -38,22 +50,15 @@ class Character {
         this.hp = Math.min(this.hp + amount, this.maxHp);
     }
 
-    gainExperience(amount) {
+ gainExperience(amount) {
         this.experience += amount;
         if (this.experience >= this.level * 100) {
             this.levelUp();
         }
     }
-        useAbility(abilityIndex, target) {
-        const ability = this.abilities[abilityIndex];
-        if (this.energy >= ability.energyCost) {
-            this.energy -= ability.energyCost;
-            return ability.use(this, target);
-        }
-        return 0;
-    
-}
-}
+} // Fermez la classe ici
+
+// ... autres fonctions ...
  
 
 class Mission {
@@ -175,7 +180,17 @@ function endMission(victory) {
     }, 3000);
 }
 
-     
+     function updateAbilityButtons() {
+    if (!player) return;
+    const abilitiesContainer = document.getElementById('player-abilities');
+    abilitiesContainer.innerHTML = '';
+    player.abilities.forEach((ability, index) => {
+        const abilityButton = document.createElement('button');
+        abilityButton.textContent = `${ability.name} (${ability.energyCost} énergie)`;
+        abilityButton.onclick = () => useAbility(index);
+        abilitiesContainer.appendChild(abilityButton);
+    });
+}
 function updateBattleInfo() {
     document.getElementById('player-stats').innerHTML = `
         ${player.name} - Niveau ${player.level}<br>
@@ -460,6 +475,7 @@ function loadGame() {
         player.gold = gameState.gold;
         player.inventory = gameState.inventory;
         player.abilities = gameState.abilities;
+        updateAbilityButtons()
         updatePlayerInfo();
         showGameArea('solo-menu');
         alert('Partie chargée !');
