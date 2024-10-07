@@ -94,6 +94,7 @@ const gameAreas = {
     soloMenu: document.getElementById('solo-menu'),
     missionArea: document.getElementById('mission-area'),
     shop: document.getElementById('shop'),
+    inventory: document.getElementById('inventory'),
     waitingArea: document.getElementById('waiting-area')
 };
 
@@ -118,7 +119,9 @@ document.querySelectorAll('#character-creation input[type="number"]').forEach(in
 // Événements pour le menu solo
 document.getElementById('start-mission').addEventListener('click', startRandomMission);
 document.getElementById('open-shop').addEventListener('click', openShop);
+document.getElementById('open-inventory').addEventListener('click', openInventory);
 document.getElementById('leave-shop').addEventListener('click', () => showGameArea('soloMenu'));
+document.getElementById('leave-inventory').addEventListener('click', () => showGameArea('soloMenu'));
 
 // Événements pour le combat
 document.getElementById('attack-button').addEventListener('click', playerAttack);
@@ -154,9 +157,15 @@ function updatePlayerInfo() {
         <h3>${player.name}</h3>
         <p>Niveau: ${player.level}</p>
         <p>PV: ${player.hp}/${player.maxHp}</p>
+        <div class="progress-bar">
+            <div class="progress-bar-fill" style="width: ${(player.hp / player.maxHp) * 100}%;"></div>
+        </div>
         <p>Attaque: ${player.attack}</p>
         <p>Défense: ${player.defense}</p>
         <p>Expérience: ${player.experience}/${player.level * 100}</p>
+        <div class="progress-bar">
+            <div class="progress-bar-fill" style="width: ${(player.experience / (player.level * 100)) * 100}%;"></div>
+        </div>
         <p>Or: ${player.gold}</p>
     `;
 }
@@ -179,16 +188,38 @@ function openShop() {
     const shopItemsDiv = document.getElementById('shop-items');
     shopItemsDiv.innerHTML = '';
     shopItems.forEach(item => {
-        const itemButton = document.createElement('button');
-        itemButton.textContent = `${item.name} - ${item.cost} or`;
-        itemButton.onclick = () => buyItem(item);
-        shopItemsDiv.appendChild(itemButton);
+        const itemElement = document.createElement('div');
+        itemElement.className = 'shop-item';
+        itemElement.innerHTML = `
+            <h3>${item.name}</h3>
+            <p>Coût: ${item.cost} or</p>
+            <p>${item.statBoost}: +${item.statValue}</p>
+            <button onclick="buyItem(${shopItems.indexOf(item)})">Acheter</button>
+        `;
+        shopItemsDiv.appendChild(itemElement);
     });
 }
 
-function buyItem(item) {
+function openInventory() {
+    showGameArea('inventory');
+    const inventoryItemsDiv = document.getElementById('inventory-items');
+    inventoryItemsDiv.innerHTML = '';
+    player.inventory.forEach(item => {
+        const itemElement = document.createElement('div');
+        itemElement.className = 'inventory-item';
+        itemElement.innerHTML = `
+            <h3>${item.name}</h3>
+            <p>${item.statBoost}: +${item.statValue}</p>
+        `;
+        inventoryItemsDiv.appendChild(itemElement);
+    });
+}
+
+function buyItem(index) {
+    const item = shopItems[index];
     if (player.buyItem(item)) {
         log(`Vous avez acheté ${item.name} pour ${item.cost} or.`);
+        openShop(); // Rafraîchir l'affichage de la boutique
     } else {
         log("Vous n'avez pas assez d'or pour cet objet.");
     }
@@ -200,73 +231,9 @@ function playerAttack() {
 
     const damage = player.attackEnemy(enemy);
     log(`${player.name} inflige ${damage} dégâts à ${enemy.name}`);
+    animateAttack('player-character', 'enemy-character');
 
     if (enemy.isDefeated()) {
         endMission(true);
     } else {
-        enemyAttack();
-    }
-
-    updateStats();
-}
-
-function enemyAttack() {
-    const damage = enemy.attackEnemy(player);
-    log(`${enemy.name} inflige ${damage} dégâts à ${player.name}`);
-
-    if (player.isDefeated()) {
-        endMission(false);
-    }
-
-    updateStats();
-}
-
-function endMission(playerWon) {
-    if (playerWon) {
-        log(`Vous avez vaincu ${enemy.name}! Mission accomplie!`);
-        player.gainExperience(currentMission.expReward);
-        player.gainGold(currentMission.goldReward);
-        log(`Vous gagnez ${currentMission.expReward} points d'expérience et ${currentMission.goldReward} or.`);
-    } else {
-        log("Vous avez été vaincu... La mission est un échec.");
-    }
-    setTimeout(() => showGameArea('soloMenu'), 3000);
-}
-
-// Fonctions utilitaires
-function showGameArea(areaName) {
-    Object.values(gameAreas).forEach(area => area.style.display = 'none');
-    gameAreas[areaName].style.display = 'block';
-}
-
-function updateStats() {
-    document.getElementById('player-stats').innerHTML = `
-        ${player.name} (Niveau ${player.level})<br>
-        PV: ${player.hp}/${player.maxHp}<br>
-        ATT: ${player.attack} | DEF: ${player.defense}
-    `;
-    document.getElementById('enemy-stats').innerHTML = `
-        ${enemy.name}<br>
-        PV: ${enemy.hp}/${enemy.maxHp}<br>
-        ATT: ${enemy.attack} | DEF: ${enemy.defense}
-    `;
-}
-
-function log(message) {
-    const battleLog = document.getElementById('battle-log');
-    battleLog.innerHTML += `<p>${message}</p>`;
-    battleLog.scrollTop = battleLog.scrollHeight;
-}
-
-// Initialisation
-document.getElementById('start-solo').addEventListener('click', () => {
-    gameMode = 'solo';
-    showGameArea('characterCreation');
-});
-
-// Initialisation au chargement de la page
-document.addEventListener('DOMContentLoaded', () => {
-    showGameArea('mainMenu');
-});
-
-// ... (garder le code existant pour le mode multijoueur)
+        setTimeo
