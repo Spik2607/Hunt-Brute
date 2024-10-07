@@ -5,7 +5,8 @@
     "main": "server.js",
     "scripts": {
         "start": "node server.js"
-    },
-    "author": "Ton nom",
-    "license": "ISC"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
