@@ -248,6 +248,17 @@ function setupLevelUpListeners() {
         const hpPoints = parseInt(document.getElementById('level-up-hp').value) || 0;
         const attackPoints = parseInt(document.getElementById('level-up-attack').value) || 0;
         const defensePoints = parseInt(document.getElementById('level-up-defense').value) || 0;
+
+{
+    if (!player || player === null) {
+        console.error("Player is not initialized or is null");
+        return;
+    }
+    
+    if (!player.maxHp) {
+        console.error("Player maxHp is missing");
+        return;
+    }
         
         if (hpPoints + attackPoints + defensePoints === 5) {
             player.maxHp += hpPoints * 10;
