@@ -22,7 +22,7 @@ class Character {
     }
 
     heal(amount) {
-        this.hp = Math.min(this.hp + amount, this.maxHp);
+        this.hp = Math.min(this.hp + amount, this.maxhp);
     }
 
     gainExperience(amount) {
@@ -34,8 +34,8 @@ class Character {
 
     levelUp() {
         this.level++;
-        this.maxHp += 10;
-        this.hp = this.maxHp;
+        this.maxhp += 10;
+        this.hp = this.maxhp;
         this.attack += 2;
         this.defense += 1;
         this.experience -= this.level * 100;
