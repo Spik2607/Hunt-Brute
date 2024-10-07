@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jeu de Combat</title>
+    <title>Jeu de Combat Amélioré</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div id="game-container">
-        <h1>Jeu de Combat</h1>
+        <h1>Jeu de Combat Amélioré</h1>
         <div id="character-creation">
             <h2>Créez votre combattant</h2>
             <input type="text" id="fighter-name" placeholder="Nom du combattant">
@@ -18,7 +18,11 @@
             <div id="player-stats"></div>
             <div id="enemy-stats"></div>
             <div id="battle-log"></div>
-            <button id="attack-button">Attaquer</button>
+            <div id="attack-buttons">
+                <button id="quick-attack" class="attack-button">Attaque Rapide</button>
+                <button id="powerful-attack" class="attack-button">Attaque Puissante</button>
+                <button id="defensive-stance" class="attack-button">Posture Défensive</button>
+            </div>
         </div>
     </div>
     <script src="game.js"></script>
