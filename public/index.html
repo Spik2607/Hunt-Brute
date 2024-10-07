@@ -4,39 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hunt Brute</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        .game-area { display: none; }
+        #main-menu { display: block; }
+    </style>
 </head>
 <body>
-    <div class="game-container">
-        <h1>Hunt Brute</h1>
-
+    <div id="game-container">
         <div id="main-menu" class="game-area">
-            <h2>Menu Principal</h2>
+            <h1>Hunt Brute</h1>
             <button id="start-solo">Mode Solo</button>
-            <h3>Mode Multijoueur</h3>
-            <input type="text" id="main-room-id" placeholder="ID de la salle">
-            <button id="main-create-room">Créer une salle</button>
-            <button id="main-join-room">Rejoindre une salle</button>
+            <h2>Mode Multijoueur</h2>
+            <input type="text" id="room-id" placeholder="ID de la salle">
+            <button id="create-room">Créer une salle</button>
+            <button id="join-room">Rejoindre une salle</button>
         </div>
 
         <div id="character-creation" class="game-area">
             <h2>Création du personnage</h2>
             <input type="text" id="hero-name" placeholder="Nom du héros">
-            <div>
-                <label>Points disponibles: <span id="available-points">15</span></label>
-            </div>
-            <div>
-                <label for="stat-hp">PV: </label>
-                <input type="number" id="stat-hp" min="0" value="0">
-            </div>
-            <div>
-                <label for="stat-attack">Attaque: </label>
-                <input type="number" id="stat-attack" min="0" value="0">
-            </div>
-            <div>
-                <label for="stat-defense">Défense: </label>
-                <input type="number" id="stat-defense" min="0" value="0">
-            </div>
+            <input type="number" id="stat-hp" placeholder="PV">
+            <input type="number" id="stat-attack" placeholder="Attaque">
+            <input type="number" id="stat-defense" placeholder="Défense">
             <button id="create-character">Créer le personnage</button>
         </div>
 
@@ -46,43 +35,22 @@
             <button id="start-mission">Commencer une mission</button>
             <button id="open-shop">Ouvrir la boutique</button>
             <button id="open-inventory">Ouvrir l'inventaire</button>
-            <button id="open-multiplayer">Options Multijoueur</button>
-            <div id="daily-quests-container">
-                <h3>Quêtes journalières</h3>
-                <ul id="daily-quests"></ul>
-            </div>
             <button id="save-game">Sauvegarder la partie</button>
             <button id="load-game">Charger la partie</button>
         </div>
 
-        <div id="multiplayer-options" class="game-area">
-            <h2>Options Multijoueur</h2>
-            <input type="text" id="room-id" placeholder="ID de la salle">
-            <button id="create-room">Créer une salle</button>
-            <button id="join-room">Rejoindre une salle</button>
-            <button id="back-to-solo">Retour au menu solo</button>
-        </div>
-
-  <h1>Hunt Brute</h1>
-  <p>Si vous voyez ce message, la page est chargée mais le JavaScript pourrait ne pas fonctionner correctement.</p>
-        <div id="waiting-area" class="game-area">
-            <h2>En attente d'un autre joueur...</h2>
-            <p>ID de la salle: <span id="room-id-display"></span></p>
-        </div>
-
         <div id="mission-choice-area" class="game-area">
-            <h2>Choix de mission</h2>
+            <h2>Choisissez une mission</h2>
             <div id="mission-choices"></div>
         </div>
 
         <div id="mission-area" class="game-area">
             <h2>Mission en cours</h2>
-            <div id="mission-description"></div>
-            <div class="stats" id="player-stats"></div>
-            <div id="player-abilities"></div>
-            <div class="stats" id="enemy-stats"></div>
+            <div id="player-stats"></div>
+            <div id="enemy-stats"></div>
             <div id="battle-log"></div>
-            <button id="attack-button">Attaque basique</button>
+            <button id="attack-button">Attaquer</button>
+            <div id="player-abilities"></div>
         </div>
 
         <div id="shop" class="game-area">
@@ -97,25 +65,19 @@
             <button id="close-inventory">Fermer l'inventaire</button>
         </div>
 
-        <div id="level-up-modal" class="modal">
-            <div class="modal-content">
-                <h2>Niveau Supérieur !</h2>
-                <p>Vous avez atteint le niveau <span id="new-level"></span> !</p>
-                <p>Points à distribuer : <span id="stat-points"></span></p>
-                <div>
-                    <label for="level-up-hp">PV : </label>
-                    <input type="number" id="level-up-hp" min="0" value="0">
-                </div>
-                <div>
-                    <label for="level-up-attack">Attaque : </label>
-                    <input type="number" id="level-up-attack" min="0" value="0">
-                </div>
-                <div>
-                    <label for="level-up-defense">Défense : </label>
-                    <input type="number" id="level-up-defense" min="0" value="0">
-                </div>
-                <button id="confirm-level-up">Confirmer</button>
-            </div>
+        <div id="waiting-area" class="game-area">
+            <h2>En attente d'un autre joueur...</h2>
+            <p>ID de la salle: <span id="room-id-display"></span></p>
+        </div>
+
+        <div id="level-up-modal" class="game-area">
+            <h2>Niveau Supérieur !</h2>
+            <p>Vous avez atteint le niveau <span id="new-level"></span> !</p>
+            <p>Points à distribuer : <span id="stat-points"></span></p>
+            <input type="number" id="level-up-hp" placeholder="PV">
+            <input type="number" id="level-up-attack" placeholder="Attaque">
+            <input type="number" id="level-up-defense" placeholder="Défense">
+            <button id="confirm-level-up">Confirmer</button>
         </div>
     </div>
 
