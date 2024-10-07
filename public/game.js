@@ -72,19 +72,15 @@ class Mission {
 }
 
 function showGameArea(areaId) {
-    console.log(`Attempting to show game area: ${areaId}`);
-    const areas = document.querySelectorAll('.game-area');
-    console.log(`Found ${areas.length} game areas`);
-    areas.forEach(area => {
-        console.log(`Setting display: none for ${area.id}`);
+    console.log(`Showing area: ${areaId}`);
+    document.querySelectorAll('.game-area').forEach(area => {
         area.style.display = 'none';
     });
     const areaToShow = document.getElementById(areaId);
     if (areaToShow) {
-        console.log(`Setting display: block for ${areaId}`);
         areaToShow.style.display = 'block';
     } else {
-        console.error(`Could not find element with id: ${areaId}`);
+        console.error(`Area ${areaId} not found`);
     }
 }
 
