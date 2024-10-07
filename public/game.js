@@ -506,7 +506,7 @@ document.getElementById('load-game').addEventListener('click', loadGame);
         abilityButton.onclick = () => useAbility(index);
         abilitiesContainer.appendChild(abilityButton);
     });
-}
+
 
  
       
