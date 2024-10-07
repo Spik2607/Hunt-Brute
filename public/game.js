@@ -11,6 +11,67 @@ class Character {
         this.experience = 0;
         this.gold = 0;
         this.inventory = [];
+        this.energy = 100;
+        this.maxEnergy = 100;
+        this.abilities = [];
+    }
+
+    useAbility(abilityIndex, target) {
+        const ability = this.abilities[abilityIndex];
+        if (this.energy >= ability.energyCost) {
+            this.energy -= ability.energyCost;
+            return ability.use(this, target);
+        }
+        return 0; // Pas assez d'énergie
+    }
+
+    restoreEnergy(amount) {
+        this.energy = Math.min(this.energy + amount, this.maxEnergy);
+    }
+
+    levelUp() {
+        // ... code existant ...
+        this.learnRandomAbility();
+    }
+
+    learnRandomAbility() {
+        const newAbility = abilities[Math.floor(Math.random() * abilities.length)];
+        if (!this.abilities.some(a => a.name === newAbility.name)) {
+            this.abilities.push(newAbility);
+            log(`${this.name} a appris une nouvelle capacité : ${newAbility.name}!`);
+        }
+    }
+}
+
+const abilities = [
+    {
+        name: "Frappe puissante",
+        energyCost: 20,
+        use: (user, target) => {
+            const damage = user.attack * 1.5;
+            target.takeDamage(damage);
+            return damage;
+        }
+    },
+    {
+        name: "Bouclier énergétique",
+        energyCost: 15,
+        use: (user, target) => {
+            user.defense += 5;
+            return 0;
+        }
+    },
+    {
+        name: "Drain de vie",
+        energyCost: 25,
+        use: (user, target) => {
+            const damage = user.attack * 0.8;
+            target.takeDamage(damage);
+            user.hp = Math.min(user.hp + damage / 2, user.maxHp);
+            return damage;
+        }
+    }
+];
     }
 
     attackEnemy(enemy) {
@@ -92,12 +153,46 @@ class Item {
 }
 
 class Mission {
-    constructor(description, enemyLevel, goldReward, expReward) {
+    constructor(description, enemyLevel, goldReward, expReward, difficulty) {
         this.description = description;
         this.enemyLevel = enemyLevel;
         this.goldReward = goldReward;
         this.expReward = expReward;
+        this.difficulty = difficulty; // 'Facile', 'Moyenne', 'Difficile'
     }
+}
+
+const missions = [
+    new Mission("Éliminer des gobelins", 1, 20, 30, 'Facile'),
+    new Mission("Chasser un loup géant", 2, 40, 50, 'Moyenne'),
+    new Mission("Vaincre un bandit", 3, 60, 70, 'Moyenne'),
+    new Mission("Affronter un ogre", 4, 100, 100, 'Difficile'),
+    new Mission("Explorer une grotte hantée", 5, 150, 150, 'Difficile')
+];
+
+function startRandomMission() {
+    const availableMissions = missions.filter(m => m.enemyLevel <= player.level + 2);
+    const missionChoices = availableMissions.slice(0, 3); // Proposer 3 missions au choix
+    
+    let missionHTML = "<h3>Choisissez une mission :</h3>";
+    missionChoices.forEach((mission, index) => {
+        missionHTML += `<button class="mission-choice" data-index="${index}">
+            ${mission.description} (${mission.difficulty})
+            <br>Récompenses : ${mission.goldReward} or, ${mission.expReward} exp
+        </button>`;
+    });
+    
+    document.getElementById('mission-choices').innerHTML = missionHTML;
+    showGameArea('mission-choice-area');
+}
+
+// Ajoutez des écouteurs d'événements pour les choix de mission
+document.getElementById('mission-choices').addEventListener('click', (e) => {
+    if (e.target.classList.contains('mission-choice')) {
+        const missionIndex = e.target.getAttribute('data-index');
+        startMission(missionChoices[missionIndex]);
+    }
+});
 }
 
 let player, enemy;
@@ -308,17 +403,35 @@ function updateStats() {
             <div class="progress-bar-fill" style="width: ${(player.hp / player.maxHp) * 100}%"></div>
         </div>
         PV: ${player.hp}/${player.maxHp}<br>
+        <div class="progress-bar">
+            <div class="progress-bar-fill" style="width: ${(player.energy / player.maxEnergy) * 100}%"></div>
+        </div>
+        Énergie: ${player.energy}/${player.maxEnergy}<br>
         ATT: ${player.attack} | DEF: ${player.defense}
     `;
-    document.getElementById('enemy-stats').innerHTML = `
-        ${enemy.name}<br>
-        <div class="progress-bar">
-            <div class="progress-bar-fill" style="width: ${(enemy.hp / enemy.maxHp) * 100}%"></div>
-        </div>
-        PV: ${enemy.hp}/${enemy.maxHp}<br>
-        ATT: ${enemy.attack} | DEF: ${enemy.defense}
+
+    let abilitiesHTML = "<h3>Capacités :</h3>";
+    player.abilities.forEach((ability, index) => {
+        abilitiesHTML += `<button class="ability-button" data-index="${index}">
+            ${ability.name} (Énergie : ${ability.energyCost})
+        </button>`;
+    });
+    document.getElementById('player-abilities').innerHTML = abilitiesHTML;
     `;
 }
+document.getElementById('player-abilities').addEventListener('click', (e) => {
+    if (e.target.classList.contains('ability-button')) {
+        const abilityIndex = e.target.getAttribute('data-index');
+        const damage = player.useAbility(abilityIndex, enemy);
+        log(`${player.name} utilise ${player.abilities[abilityIndex].name} et inflige ${damage} dégâts à ${enemy.name}`);
+        updateStats();
+        if (enemy.isDefeated()) {
+            endMission(true);
+        } else {
+            setTimeout(enemyAttack, 1000);
+        }
+    }
+});
 
 function log(message) {
     const battleLog = document.getElementById('battle-log');
