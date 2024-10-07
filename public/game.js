@@ -11,15 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('close-inventory').addEventListener('click', () => showGameArea('solo-menu'));
 });
 
-let player = {
-
-    level: 1,
-    hp: 100,
-    maxHp: 100,
-    attack: 10,
-    defense: 5,
-    
-};
+let player = null;
 
 class Character {
     constructor(name, hp, attack, defense) {
