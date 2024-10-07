@@ -444,12 +444,17 @@ function loadGame() {
     const savedState = localStorage.getItem('huntBruteGameState');
     if (savedState) {
         const gameState = JSON.parse(savedState);
-        player = new Character(gameState.player.name, gameState.player.maxHp, gameState.player.attack, gameState.player.defense);
-        player.inventory = gameState.inventory;
-        player.abilities = gameState.abilities;
-        player.gold = gameState.gold;
+        player = new Character(
+            gameState.player.name, 
+            gameState.player.maxHp, 
+            gameState.player.attack, 
+            gameState.player.defense
+        );
         player.level = gameState.level;
         player.experience = gameState.experience;
+        player.gold = gameState.gold;
+        player.inventory = gameState.inventory;
+        player.abilities = gameState.abilities;
         updatePlayerInfo();
         showGameArea('solo-menu');
         alert('Partie chargée !');
