@@ -45,18 +45,7 @@ class Character {
         }
     }
 }
-   levelUp() {
-    this.level++;
-    this.maxHp += 10;
-    this.hp = this.maxHp;
-    this.attack += 2;
-    this.defense += 1;
-    this.experience -= this.level * 100;
-    this.energy = this.maxEnergy;
-    this.learnRandomAbility();
-    console.log("Level up:", this); // Pour le débogage
-    showLevelUpModal();
-}
+ 
 
     useAbility(abilityIndex, target) {
         const ability = this.abilities[abilityIndex];
@@ -201,6 +190,18 @@ function endMission(victory) {
     }, 3000);
 }
 
+      levelUp() {
+    this.level++;
+    this.maxHp += 10;
+    this.hp = this.maxHp;
+    this.attack += 2;
+    this.defense += 1;
+    this.experience -= this.level * 100;
+    this.energy = this.maxEnergy;
+    this.learnRandomAbility();
+    console.log("Level up:", this); // Pour le débogage
+    showLevelUpModal();
+}
 function updateBattleInfo() {
     document.getElementById('player-stats').innerHTML = `
         ${player.name} - Niveau ${player.level}<br>
