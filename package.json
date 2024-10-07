@@ -2,7 +2,7 @@
     "name": "Hunt Brute",
     "version": "1.0.0",
     "description": "Description du projet",
-    "main": "index.js",
+    "main": "server.js",
     "scripts": {
         "start": "node server.js"
     },
