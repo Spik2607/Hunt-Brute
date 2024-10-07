@@ -68,13 +68,19 @@
             <p>ID de la salle: <span id="room-id-display"></span></p>
         </div>
 
+        <div id="mission-choice-area" class="game-area">
+            <h2>Choix de mission</h2>
+            <div id="mission-choices"></div>
+        </div>
+
         <div id="mission-area" class="game-area">
             <h2>Mission en cours</h2>
             <div id="mission-description"></div>
             <div class="stats" id="player-stats"></div>
+            <div id="player-abilities"></div>
             <div class="stats" id="enemy-stats"></div>
             <div id="battle-log"></div>
-            <button id="attack-button">Attaquer</button>
+            <button id="attack-button">Attaque basique</button>
         </div>
 
         <div id="shop" class="game-area">
@@ -87,6 +93,27 @@
             <h2>Inventaire</h2>
             <div id="inventory"></div>
             <button id="close-inventory">Fermer l'inventaire</button>
+        </div>
+
+        <div id="level-up-modal" class="modal">
+            <div class="modal-content">
+                <h2>Niveau Supérieur !</h2>
+                <p>Vous avez atteint le niveau <span id="new-level"></span> !</p>
+                <p>Points à distribuer : <span id="stat-points"></span></p>
+                <div>
+                    <label for="level-up-hp">PV : </label>
+                    <input type="number" id="level-up-hp" min="0" value="0">
+                </div>
+                <div>
+                    <label for="level-up-attack">Attaque : </label>
+                    <input type="number" id="level-up-attack" min="0" value="0">
+                </div>
+                <div>
+                    <label for="level-up-defense">Défense : </label>
+                    <input type="number" id="level-up-defense" min="0" value="0">
+                </div>
+                <button id="confirm-level-up">Confirmer</button>
+            </div>
         </div>
     </div>
 
