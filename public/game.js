@@ -152,23 +152,6 @@ function startRandomMission() {
     updateBattleInfo();
 }
 
-function playerAttack()
-      if (!player) {
-        console.error("Player is not initialized");
-        return;
-    }{
-    const damage = Math.max(player.attack - enemy.defense, 0);
-    const enemyDefeated = enemy.takeDamage(damage);
-    updateBattleLog(`${player.name} inflige ${damage} dégâts à l'ennemi.`);
-    
-    if (enemyDefeated) {
-        endMission(true);
-    } else {
-        enemyAttack();
-    }
-    
-    updateBattleInfo();
-}
 
 function enemyAttack() {
     const damage = Math.max(enemy.attack - player.defense, 0);
@@ -388,11 +371,11 @@ function useItem(index) {
 }
 
 // Amélioration du système de combat
-function playerAttack() 
-  if (!player) {
+function playerAttack() {
+    if (!player) {
         console.error("Player is not initialized");
         return;
-    }{
+    }
     if (player.energy < 10) {
         alert("Pas assez d'énergie pour attaquer !");
         return;
