@@ -97,12 +97,14 @@ const missions = [
     new Mission("Explorer une grotte hantée", 5, 150, 150, 'Difficile')
 ];
 
-function learnRandomAbility() {
+function learnRandomAbility(player) {
     const newAbility = abilities[Math.floor(Math.random() * abilities.length)];
     if (!player.abilities.some(a => a.name === newAbility.name)) {
         player.abilities.push(newAbility);
         console.log(`${player.name} a appris une nouvelle capacité : ${newAbility.name}!`);
     }
+}
+
 const abilities = [
     {
         name: "Frappe puissante",
