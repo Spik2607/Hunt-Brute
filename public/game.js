@@ -1,6 +1,10 @@
 const socket = io('https://hunt-brute-server.onrender.com');
 
 // Initialisation du jeu
+function showGameArea(areaId) {
+    document.querySelectorAll('.game-area').forEach(area => area.style.display = 'none');
+    document.getElementById(areaId).style.display = 'block';
+}
 document.addEventListener('DOMContentLoaded', () => {
     
     document.getElementById('leave-shop').addEventListener('click', () => showGameArea('solo-menu'));
@@ -130,6 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('start-solo').addEventListener('click', () => {
         gameMode = 'solo';
         showGameArea('character-creation');
+        showGameArea('main-menu');
     });
     document.getElementById('create-character').addEventListener('click', createCharacter);
     document.getElementById('start-mission').addEventListener('click', startRandomMission);
@@ -234,14 +239,10 @@ function updateBattleLog(message) {
     `;
 }
 
-function showGameArea(areaId) {
-    document.querySelectorAll('.game-area').forEach(area => area.style.display = 'none');
-    document.getElementById(areaId).style.display = 'block';
-}
+
 
 function showLevelUpModal() {
-    if (!player) return; // Ajoutez cette vérification
-     if (!player) {
+    if (!player) {
         console.error("Player is not initialized");
         return;
     }
