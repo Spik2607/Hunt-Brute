@@ -103,7 +103,6 @@ const abilities = [
     }
 ];
 let player = null;
-let player, enemy;
 let currentMission;
 let gameMode = 'solo';
 let roomId = null;
