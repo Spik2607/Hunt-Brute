@@ -249,29 +249,31 @@ function setupLevelUpListeners() {
         const attackPoints = parseInt(document.getElementById('level-up-attack').value) || 0;
         const defensePoints = parseInt(document.getElementById('level-up-defense').value) || 0;
 
-{
-    if (!player || player === null) {
-        console.error("Player is not initialized or is null");
-        return;
-    }
-    
-    if (!player.maxHp) {
-        console.error("Player maxHp is missing");
-        return;
-    }
-        
-       if (hpPoints + attackPoints + defensePoints <= 5) {
-             // Actions si les points sont corrects
-             } else {
-           alert("Vous avez attribué trop de points. Veuillez en redistribuer.");
-           } {
+        // Vérifier si le joueur est bien initialisé
+        if (!player || player === null) {
+            console.error("Player is not initialized or is null");
+            return;
+        }
+
+        // Vérifier si maxHp du joueur existe
+        if (!player.maxHp) {
+            console.error("Player maxHp is missing");
+            return;
+        }
+
+        // Vérifier si la somme des points ne dépasse pas 5
+        if (hpPoints + attackPoints + defensePoints <= 5) {
+            // Appliquer les points au joueur
             player.maxHp += hpPoints * 10;
             player.attack += attackPoints;
             player.defense += defensePoints;
+            // Fermer la fenêtre de mise à niveau
             document.getElementById('level-up-modal').style.display = 'none';
+            // Mettre à jour les infos du joueur
             updatePlayerInfo();
         } else {
-            alert("Veuillez distribuer exactement 5 points.");
+            // Alerte si plus de 5 points ont été attribués
+            alert("Vous avez attribué trop de points. Veuillez en redistribuer.");
         }
     });
 }
