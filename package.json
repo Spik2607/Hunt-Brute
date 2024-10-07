@@ -1,3 +1,11 @@
-"scripts": {
-  "start": "node server.js"
+{
+    "name": "Hunt Brute",
+    "version": "1.0.0",
+    "description": "Description du projet",
+    "main": "index.js",
+    "scripts": {
+        "start": "node server.js"
+    },
+    "author": "Ton nom",
+    "license": "ISC"
 }
