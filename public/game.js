@@ -73,7 +73,6 @@ const abilities = [
     }
 ];
     
-
     attackEnemy(enemy) {
         const damage = Math.max(this.attack - enemy.defense, 0);
         enemy.takeDamage(damage);
@@ -93,7 +92,7 @@ const abilities = [
         if (this.experience >= this.level * 100) {
             this.levelUp();
         }
-    }
+    
 
     levelUp() {
         this.level++;
