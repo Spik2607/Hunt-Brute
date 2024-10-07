@@ -3,76 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hunt Brute - Jeu de Combat en Ligne</title>
+    <title>Hunt Brute</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-        }
-        #game-container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-        input, button {
-            margin: 10px 0;
-            padding: 5px;
-        }
-        #battle-log {
-            height: 150px;
-            overflow-y: scroll;
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin: 10px 0;
-            text-align: left;
-        }
-        .attack-button {
-            margin: 5px;
-            padding: 10px;
-            cursor: pointer;
-        }
+        body { font-family: Arial, sans-serif; text-align: center; }
+        #battle-log { height: 200px; overflow-y: scroll; border: 1px solid #ccc; margin: 10px; padding: 10px; text-align: left; }
+        .stats { display: inline-block; margin: 10px; padding: 10px; border: 1px solid #ccc; }
     </style>
 </head>
 <body>
-    <div id="game-container">
-        <h1>Hunt Brute</h1>
-        
-        <div id="game-area">
-            <h2>Créer ou rejoindre une salle</h2>
-            <input type="text" id="room-id" placeholder="ID de la salle">
-            <button id="create-room">Créer une salle</button>
-            <button id="join-room">Rejoindre une salle</button>
-        </div>
-        
-        <div id="waiting-area" style="display:none;">
-            <h2>En attente d'un autre joueur...</h2>
-            <p>ID de la salle: <span id="room-id-display"></span></p>
-        </div>
-        
-        <div id="battle-area" style="display:none;">
-            <h2>Combat en cours</h2>
-            <div id="player-stats"></div>
-            <div id="enemy-stats"></div>
-            <div id="battle-log"></div>
-            <div id="attack-buttons">
-                <button id="quick-attack" class="attack-button">Attaque Rapide</button>
-                <button id="powerful-attack" class="attack-button">Attaque Puissante</button>
-                <button id="defensive-stance" class="attack-button">Posture Défensive</button>
-            </div>
-        </div>
+    <h1>Hunt Brute</h1>
+    
+    <div id="game-area">
+        <h2>Choisissez votre mode de jeu</h2>
+        <button id="start-solo">Mode Solo</button>
+        <h3>Ou créez/rejoignez une partie multijoueur</h3>
+        <input type="text" id="room-id" placeholder="ID de la salle">
+        <button id="create-room">Créer une salle</button>
+        <button id="join-room">Rejoindre une salle</button>
     </div>
 
-    <!-- Inclusion de Socket.IO -->
+    <div id="waiting-area" style="display:none;">
+        <h2>En attente d'un autre joueur...</h2>
+    </div>
+
+    <div id="battle-area" style="display:none;">
+        <div class="stats" id="player-stats"></div>
+        <div class="stats" id="enemy-stats"></div>
+        <div id="battle-log"></div>
+        <button id="attack-button">Attaquer</button>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.js"></script>
-    
-    <!-- Votre script de jeu -->
     <script src="game.js"></script>
 </body>
 </html>
