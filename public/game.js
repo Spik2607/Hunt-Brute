@@ -16,7 +16,7 @@ class Character {
         this.energy = 100;
         this.maxEnergy = 100;
         this.abilities = [];
-        updateAbilityButtons()
+        
     }
  levelUp() {
         this.level++;
@@ -28,7 +28,7 @@ class Character {
         this.energy = this.maxEnergy;
         learnRandomAbility(this);
         console.log("Level up:", this);
-        showLevelUpModal();
+        
     }
 
     useAbility(abilityIndex, target) {
