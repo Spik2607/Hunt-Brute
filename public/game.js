@@ -307,15 +307,6 @@ function setupMultiplayerListeners() {
     });
 }
 
-// Fonctions pour la boutique et l'inventaire à implémenter
-function openShop() {
-    // Implémentation de la boutique
-}
-
-function openInventory() {
-    // Implémentation de l'inventaire
-}
-// ... (le code précédent reste inchangé)
 
 // Définition des objets du jeu
 const items = [
