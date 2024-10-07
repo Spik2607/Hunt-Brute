@@ -5,10 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hunt Brute</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; }
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #f0f0f0; }
+        .game-area { display: none; background-color: white; max-width: 800px; margin: 20px auto; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
         #battle-log { height: 200px; overflow-y: scroll; border: 1px solid #ccc; margin: 10px; padding: 10px; text-align: left; }
-        .stats { display: inline-block; margin: 10px; padding: 10px; border: 1px solid #ccc; }
-        .game-area { display: none; }
+        .stats { display: inline-block; margin: 10px; padding: 10px; border: 1px solid #ccc; width: 45%; }
+        .progress-bar { width: 100%; background-color: #e0e0e0; border-radius: 5px; }
+        .progress-bar-fill { height: 20px; background-color: #4CAF50; border-radius: 5px; transition: width 0.5s ease-in-out; }
+        .inventory-item, .shop-item { display: inline-block; margin: 5px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; }
+        #battle-animation { height: 200px; position: relative; overflow: hidden; }
+        .character { position: absolute; width: 50px; height: 50px; transition: all 0.5s ease-in-out; }
+        #player-character { left: 10%; bottom: 20%; background-color: blue; }
+        #enemy-character { right: 10%; bottom: 20%; background-color: red; }
+        button { margin: 5px; padding: 10px; cursor: pointer; background-color: #4CAF50; color: white; border: none; border-radius: 5px; }
+        button:hover { background-color: #45a049; }
     </style>
 </head>
 <body>
@@ -48,12 +57,17 @@
         <h2>Menu Solo</h2>
         <button id="start-mission">Commencer une mission</button>
         <button id="open-shop">Ouvrir la boutique</button>
+        <button id="open-inventory">Ouvrir l'inventaire</button>
         <div id="player-info"></div>
     </div>
 
     <div id="mission-area" class="game-area">
         <h2>Mission en cours</h2>
         <div id="mission-description"></div>
+        <div id="battle-animation">
+            <div id="player-character" class="character"></div>
+            <div id="enemy-character" class="character"></div>
+        </div>
         <div class="stats" id="player-stats"></div>
         <div class="stats" id="enemy-stats"></div>
         <div id="battle-log"></div>
@@ -64,6 +78,12 @@
         <h2>Boutique</h2>
         <div id="shop-items"></div>
         <button id="leave-shop">Quitter la boutique</button>
+    </div>
+
+    <div id="inventory" class="game-area">
+        <h2>Inventaire</h2>
+        <div id="inventory-items"></div>
+        <button id="leave-inventory">Fermer l'inventaire</button>
     </div>
 
     <div id="waiting-area" class="game-area">
