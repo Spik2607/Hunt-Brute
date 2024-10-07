@@ -15,11 +15,24 @@ class Fighter {
     isDefeated() {
         return this.health <= 0;
     }
+
+    quickAttack() {
+        return Math.floor(Math.random() * (this.attack - 2)) + 1;
+    }
+
+    powerfulAttack() {
+        return Math.floor(Math.random() * (this.attack + 5)) + this.attack / 2;
+    }
+
+    defensiveStance() {
+        this.defense += 2;
+        return 0;  // No damage dealt
+    }
 }
 
 let player, enemy;
 const battleLog = document.getElementById('battle-log');
-const attackButton = document.getElementById('attack-button');
+const attackButtons = document.querySelectorAll('.attack-button');
 
 document.getElementById('create-fighter').addEventListener('click', () => {
     const name = document.getElementById('fighter-name').value;
@@ -31,36 +44,57 @@ document.getElementById('create-fighter').addEventListener('click', () => {
     log("Le combat commence !");
 });
 
-attackButton.addEventListener('click', () => {
-    if (player.isDefeated() || enemy.isDefeated()) return;
+attackButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        if (player.isDefeated() || enemy.isDefeated()) return;
 
-    const playerDamage = Math.floor(Math.random() * player.attack) + 1;
-    const enemyDamage = enemy.takeDamage(playerDamage);
-    log(`${player.name} inflige ${enemyDamage} dégâts à l'ennemi.`);
-
-    if (enemy.isDefeated()) {
-        log("Vous avez gagné !");
-        attackButton.disabled = true;
-    } else {
-        const enemyAttack = Math.floor(Math.random() * enemy.attack) + 1;
-        const playerDamage = player.takeDamage(enemyAttack);
-        log(`L'ennemi inflige ${playerDamage} dégâts à ${player.name}.`);
-
-        if (player.isDefeated()) {
-            log("Vous avez perdu !");
-            attackButton.disabled = true;
+        let playerDamage, attackType;
+        switch(button.id) {
+            case 'quick-attack':
+                playerDamage = player.quickAttack();
+                attackType = "rapide";
+                break;
+            case 'powerful-attack':
+                playerDamage = player.powerfulAttack();
+                attackType = "puissante";
+                break;
+            case 'defensive-stance':
+                playerDamage = player.defensiveStance();
+                attackType = "défensive";
+                break;
         }
-    }
 
-    updateStats();
+        const enemyDamage = enemy.takeDamage(playerDamage);
+        log(`${player.name} utilise une attaque ${attackType} et inflige ${enemyDamage} dégâts à l'ennemi.`);
+
+        if (enemy.isDefeated()) {
+            log("Vous avez gagné !");
+            disableAttackButtons();
+        } else {
+            const enemyAttack = Math.floor(Math.random() * enemy.attack) + 1;
+            const playerDamage = player.takeDamage(enemyAttack);
+            log(`L'ennemi inflige ${playerDamage} dégâts à ${player.name}.`);
+
+            if (player.isDefeated()) {
+                log("Vous avez perdu !");
+                disableAttackButtons();
+            }
+        }
+
+        updateStats();
+    });
 });
 
 function updateStats() {
-    document.getElementById('player-stats').innerText = `${player.name}: ${player.health} PV`;
-    document.getElementById('enemy-stats').innerText = `Ennemi: ${enemy.health} PV`;
+    document.getElementById('player-stats').innerText = `${player.name}: ${player.health} PV, Attaque: ${player.attack}, Défense: ${player.defense}`;
+    document.getElementById('enemy-stats').innerText = `Ennemi: ${enemy.health} PV, Attaque: ${enemy.attack}, Défense: ${enemy.defense}`;
 }
 
 function log(message) {
     battleLog.innerHTML += message + '<br>';
     battleLog.scrollTop = battleLog.scrollHeight;
+}
+
+function disableAttackButtons() {
+    attackButtons.forEach(button => button.disabled = true);
 }
