@@ -4,92 +4,82 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hunt Brute</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; background-color: #f0f0f0; }
-        .game-area { display: none; background-color: white; max-width: 800px; margin: 20px auto; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        #battle-log { height: 200px; overflow-y: scroll; border: 1px solid #ccc; margin: 10px; padding: 10px; text-align: left; }
-        .stats { display: inline-block; margin: 10px; padding: 10px; border: 1px solid #ccc; width: 45%; }
-        .progress-bar { width: 100%; background-color: #e0e0e0; border-radius: 5px; }
-        .progress-bar-fill { height: 20px; background-color: #4CAF50; border-radius: 5px; transition: width 0.5s ease-in-out; }
-        .inventory-item, .shop-item { display: inline-block; margin: 5px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; }
-        #battle-animation { height: 200px; position: relative; overflow: hidden; }
-        .character { position: absolute; width: 50px; height: 50px; transition: all 0.5s ease-in-out; }
-        #player-character { left: 10%; bottom: 20%; background-color: blue; }
-        #enemy-character { right: 10%; bottom: 20%; background-color: red; }
-        button { margin: 5px; padding: 10px; cursor: pointer; background-color: #4CAF50; color: white; border: none; border-radius: 5px; }
-        button:hover { background-color: #45a049; }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Hunt Brute</h1>
-    
-    <div id="main-menu" class="game-area">
-        <h2>Choisissez votre mode de jeu</h2>
-        <button id="start-solo">Mode Solo</button>
-        <h3>Ou créez/rejoignez une partie multijoueur</h3>
-        <input type="text" id="room-id" placeholder="ID de la salle">
-        <button id="create-room">Créer une salle</button>
-        <button id="join-room">Rejoindre une salle</button>
-    </div>
+    <div class="game-container">
+        <h1>Hunt Brute</h1>
 
-    <div id="character-creation" class="game-area">
-        <h2>Création du personnage</h2>
-        <input type="text" id="hero-name" placeholder="Nom du héros">
-        <div>
-            <label>Points disponibles: <span id="available-points">15</span></label>
+        <div id="main-menu" class="game-area">
+            <h2>Menu Principal</h2>
+            <button id="start-solo">Mode Solo</button>
+            <h3>Mode Multijoueur</h3>
+            <input type="text" id="room-id" placeholder="ID de la salle">
+            <button id="create-room">Créer une salle</button>
+            <button id="join-room">Rejoindre une salle</button>
         </div>
-        <div>
-            <label for="stat-hp">PV: </label>
-            <input type="number" id="stat-hp" min="0" value="0">
+
+        <div id="character-creation" class="game-area">
+            <h2>Création du personnage</h2>
+            <input type="text" id="hero-name" placeholder="Nom du héros">
+            <div>
+                <label>Points disponibles: <span id="available-points">15</span></label>
+            </div>
+            <div>
+                <label for="stat-hp">PV: </label>
+                <input type="number" id="stat-hp" min="0" value="0">
+            </div>
+            <div>
+                <label for="stat-attack">Attaque: </label>
+                <input type="number" id="stat-attack" min="0" value="0">
+            </div>
+            <div>
+                <label for="stat-defense">Défense: </label>
+                <input type="number" id="stat-defense" min="0" value="0">
+            </div>
+            <button id="create-character">Créer le personnage</button>
         </div>
-        <div>
-            <label for="stat-attack">Attaque: </label>
-            <input type="number" id="stat-attack" min="0" value="0">
+
+        <div id="waiting-area" class="game-area">
+            <h2>En attente d'un autre joueur...</h2>
+            <p>ID de la salle: <span id="room-id-display"></span></p>
         </div>
-        <div>
-            <label for="stat-defense">Défense: </label>
-            <input type="number" id="stat-defense" min="0" value="0">
+
+        <div id="solo-menu" class="game-area">
+            <h2>Menu Solo</h2>
+            <div id="player-info"></div>
+            <button id="start-mission">Commencer une mission</button>
+            <button id="open-shop">Ouvrir la boutique</button>
+            <button id="open-inventory">Ouvrir l'inventaire</button>
+            <div id="daily-quests-container">
+                <h3>Quêtes journalières</h3>
+                <ul id="daily-quests"></ul>
+            </div>
         </div>
-        <button id="create-character">Créer le personnage</button>
-    </div>
 
-    <div id="solo-menu" class="game-area">
-        <h2>Menu Solo</h2>
-        
-</div>
-        <button id="start-mission">Commencer une mission</button>
-        <button id="open-shop">Ouvrir la boutique</button>
-        <button id="open-inventory">Ouvrir l'inventaire</button>
-        <div id="player-info"></div>
-    </div>
-
-    <div id="mission-area" class="game-area">
-        <h2>Mission en cours</h2>
-        <div id="mission-description"></div>
-        <div id="battle-animation">
-            <div id="player-character" class="character"></div>
-            <div id="enemy-character" class="character"></div>
+        <div id="mission-area" class="game-area">
+            <h2>Mission en cours</h2>
+            <div id="mission-description"></div>
+            <div class="stats" id="player-stats"></div>
+            <div class="stats" id="enemy-stats"></div>
+            <div id="battle-log"></div>
+            <button id="attack-button">Attaquer</button>
         </div>
-        <div class="stats" id="player-stats"></div>
-        <div class="stats" id="enemy-stats"></div>
-        <div id="battle-log"></div>
-        <button id="attack-button">Attaquer</button>
-    </div>
 
-    <div id="shop" class="game-area">
-        <h2>Boutique</h2>
-        <div id="shop-items"></div>
-        <button id="leave-shop">Quitter la boutique</button>
-    </div>
+        <div id="shop" class="game-area">
+            <h2>Boutique</h2>
+            <div id="shop-items"></div>
+            <button id="leave-shop">Quitter la boutique</button>
+        </div>
 
-    <div id="inventory" class="game-area">
-        <h2>Inventaire</h2>
-        <div id="inventory-items"></div>
-        <button id="leave-inventory">Fermer l'inventaire</button>
-    </div>
+        <div id="inventory-area" class="game-area">
+            <h2>Inventaire</h2>
+            <div id="inventory"></div>
+            <button id="close-inventory">Fermer l'inventaire</button>
+        </div>
 
-    <div id="waiting-area" class="game-area">
-        <h2>En attente d'un autre joueur...</h2>
+        <button id="save-game">Sauvegarder la partie</button>
+        <button id="load-game">Charger la partie</button>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.js"></script>
