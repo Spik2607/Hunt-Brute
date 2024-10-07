@@ -28,7 +28,7 @@ class Character {
         this.energy = this.maxEnergy;
         learnRandomAbility(this);
         console.log("Level up:", this);
-        
+        showLevelUpModal()
     }
 
     useAbility(abilityIndex, target) {
