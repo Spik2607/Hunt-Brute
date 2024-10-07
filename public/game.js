@@ -1,31 +1,5 @@
 const socket = io('https://hunt-brute-server.onrender.com');
 
-// Initialisation du jeu
-function showGameArea(areaId) {
-    document.querySelectorAll('.game-area').forEach(area => area.style.display = 'none');
-    document.getElementById(areaId).style.display = 'block';
-}
-document.addEventListener('DOMContentLoaded', () => {
-    showGameArea('main-menu'); // Ajoutez cette ligne au début
-    
-    document.getElementById('start-solo').addEventListener('click', () => {
-        gameMode = 'solo';
-        showGameArea('character-creation');
-    });
-    document.getElementById('create-character').addEventListener('click', createCharacter);
-    document.getElementById('start-mission').addEventListener('click', startRandomMission);
-    document.getElementById('attack-button').addEventListener('click', playerAttack);
-    document.getElementById('open-shop').addEventListener('click', openShop);
-    document.getElementById('open-inventory').addEventListener('click', openInventory);
-    document.getElementById('open-multiplayer').addEventListener('click', () => showGameArea('multiplayer-options'));
-    document.getElementById('create-room').addEventListener('click', createRoom);
-    document.getElementById('join-room').addEventListener('click', joinRoom);
-    document.getElementById('back-to-solo').addEventListener('click', () => showGameArea('solo-menu'));
-    
-    setupLevelUpListeners();
-    setupMultiplayerListeners();
-});
-
 let player = null;
 
 class Character {
@@ -506,4 +480,28 @@ document.getElementById('load-game').addEventListener('click', loadGame);
     });
 }
 
-// ... (le reste du code existant reste inchangé)
+// Initialisation du jeu
+function showGameArea(areaId) {
+    document.querySelectorAll('.game-area').forEach(area => area.style.display = 'none');
+    document.getElementById(areaId).style.display = 'block';
+}
+document.addEventListener('DOMContentLoaded', () => {
+    showGameArea('main-menu'); // Ajoutez cette ligne au début
+    
+    document.getElementById('start-solo').addEventListener('click', () => {
+        gameMode = 'solo';
+        showGameArea('character-creation');
+    });
+    document.getElementById('create-character').addEventListener('click', createCharacter);
+    document.getElementById('start-mission').addEventListener('click', startRandomMission);
+    document.getElementById('attack-button').addEventListener('click', playerAttack);
+    document.getElementById('open-shop').addEventListener('click', openShop);
+    document.getElementById('open-inventory').addEventListener('click', openInventory);
+    document.getElementById('open-multiplayer').addEventListener('click', () => showGameArea('multiplayer-options'));
+    document.getElementById('create-room').addEventListener('click', createRoom);
+    document.getElementById('join-room').addEventListener('click', joinRoom);
+    document.getElementById('back-to-solo').addEventListener('click', () => showGameArea('solo-menu'));
+    
+    setupLevelUpListeners();
+    setupMultiplayerListeners();
+});
