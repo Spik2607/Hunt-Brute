@@ -14,9 +14,9 @@
             <h2>Menu Principal</h2>
             <button id="start-solo">Mode Solo</button>
             <h3>Mode Multijoueur</h3>
-            <input type="text" id="room-id" placeholder="ID de la salle">
-            <button id="create-room">Créer une salle</button>
-            <button id="join-room">Rejoindre une salle</button>
+            <input type="text" id="main-room-id" placeholder="ID de la salle">
+            <button id="main-create-room">Créer une salle</button>
+            <button id="main-join-room">Rejoindre une salle</button>
         </div>
 
         <div id="character-creation" class="game-area">
@@ -40,31 +40,32 @@
             <button id="create-character">Créer le personnage</button>
         </div>
 
-        <div id="waiting-area" class="game-area">
-            <h2>En attente d'un autre joueur...</h2>
-            <p>ID de la salle: <span id="room-id-display"></span></p>
-        </div>
-
         <div id="solo-menu" class="game-area">
             <h2>Menu Solo</h2>
             <div id="player-info"></div>
             <button id="start-mission">Commencer une mission</button>
             <button id="open-shop">Ouvrir la boutique</button>
             <button id="open-inventory">Ouvrir l'inventaire</button>
+            <button id="open-multiplayer">Options Multijoueur</button>
             <div id="daily-quests-container">
                 <h3>Quêtes journalières</h3>
                 <ul id="daily-quests"></ul>
             </div>
-            <div id="multiplayer-options" class="game-area">
-            <button id="open-multiplayer">Options Multijoueur</button>
-                </div>
-            <div id="multiplayer-options" class="game-area">
-    <h2>Options Multijoueur</h2>
-    <input type="text" id="room-id" placeholder="ID de la salle">
-    <button id="create-room">Créer une salle</button>
-    <button id="join-room">Rejoindre une salle</button>
-    <button id="back-to-solo">Retour au menu solo</button>
-</div>
+            <button id="save-game">Sauvegarder la partie</button>
+            <button id="load-game">Charger la partie</button>
+        </div>
+
+        <div id="multiplayer-options" class="game-area">
+            <h2>Options Multijoueur</h2>
+            <input type="text" id="room-id" placeholder="ID de la salle">
+            <button id="create-room">Créer une salle</button>
+            <button id="join-room">Rejoindre une salle</button>
+            <button id="back-to-solo">Retour au menu solo</button>
+        </div>
+
+        <div id="waiting-area" class="game-area">
+            <h2>En attente d'un autre joueur...</h2>
+            <p>ID de la salle: <span id="room-id-display"></span></p>
         </div>
 
         <div id="mission-area" class="game-area">
@@ -87,9 +88,6 @@
             <div id="inventory"></div>
             <button id="close-inventory">Fermer l'inventaire</button>
         </div>
-
-        <button id="save-game">Sauvegarder la partie</button>
-        <button id="load-game">Charger la partie</button>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.js"></script>
