@@ -72,8 +72,20 @@ class Mission {
 }
 
 function showGameArea(areaId) {
-    document.querySelectorAll('.game-area').forEach(area => area.style.display = 'none');
-    document.getElementById(areaId).style.display = 'block';
+    console.log(`Attempting to show game area: ${areaId}`);
+    const areas = document.querySelectorAll('.game-area');
+    console.log(`Found ${areas.length} game areas`);
+    areas.forEach(area => {
+        console.log(`Setting display: none for ${area.id}`);
+        area.style.display = 'none';
+    });
+    const areaToShow = document.getElementById(areaId);
+    if (areaToShow) {
+        console.log(`Setting display: block for ${areaId}`);
+        areaToShow.style.display = 'block';
+    } else {
+        console.error(`Could not find element with id: ${areaId}`);
+    }
 }
 
 const missions = [
@@ -505,7 +517,13 @@ document.getElementById('load-game').addEventListener('click', loadGame);
 // Initialisation du jeu
 
 document.addEventListener('DOMContentLoaded', () => {
-    showGameArea('main-menu'); // Ajoutez cette ligne au début
+    console.log("DOM fully loaded");
+    showGameArea('main-menu');
+    console.log("Attempted to show main menu");
+    
+    // Log pour vérifier si les éléments existent
+    console.log("Start solo button:", document.getElementById('start-solo'));
+    console.log("Create character button:", document.getElementById('create-character'));
     
     document.getElementById('start-solo').addEventListener('click', () => {
         gameMode = 'solo';
