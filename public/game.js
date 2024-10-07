@@ -17,7 +17,17 @@ class Character {
         this.maxEnergy = 100;
         this.abilities = [];
     }
-  
+   levelUp() {
+    this.level++;
+    this.maxHp += 10;
+    this.hp = this.maxHp;
+    this.attack += 2;
+    this.defense += 1;
+    this.experience -= this.level * 100;
+    this.energy = this.maxEnergy;
+    learnRandomAbility(this); // Appel de la fonction globale
+    console.log("Level up:", this);
+    showLevelUpModal();
 }
     takeDamage(damage) {
         this.hp = Math.max(this.hp - Math.max(damage - this.defense, 0), 0);
@@ -34,10 +44,7 @@ class Character {
             this.levelUp();
         }
     }
-}
- 
-
-    useAbility(abilityIndex, target) {
+        useAbility(abilityIndex, target) {
         const ability = this.abilities[abilityIndex];
         if (this.energy >= ability.energyCost) {
             this.energy -= ability.energyCost;
@@ -46,6 +53,8 @@ class Character {
         return 0;
     
 }
+}
+ 
 
 class Mission {
     constructor(description, enemyLevel, goldReward, expReward, difficulty) {
@@ -55,6 +64,11 @@ class Mission {
         this.expReward = expReward;
         this.difficulty = difficulty;
     }
+}
+
+function showGameArea(areaId) {
+    document.querySelectorAll('.game-area').forEach(area => area.style.display = 'none');
+    document.getElementById(areaId).style.display = 'block';
 }
 
 const missions = [
@@ -470,23 +484,10 @@ document.getElementById('load-game').addEventListener('click', loadGame);
     });
 }
 
-  levelUp() {
-    this.level++;
-    this.maxHp += 10;
-    this.hp = this.maxHp;
-    this.attack += 2;
-    this.defense += 1;
-    this.experience -= this.level * 100;
-    this.energy = this.maxEnergy;
-    learnRandomAbility(this); // Appel de la fonction globale
-    console.log("Level up:", this);
-    showLevelUpModal();
+ 
       
 // Initialisation du jeu
-function showGameArea(areaId) {
-    document.querySelectorAll('.game-area').forEach(area => area.style.display = 'none');
-    document.getElementById(areaId).style.display = 'block';
-}
+
 document.addEventListener('DOMContentLoaded', () => {
     showGameArea('main-menu'); // Ajoutez cette ligne au début
     
