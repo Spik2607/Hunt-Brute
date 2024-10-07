@@ -4,7 +4,7 @@ class Character {
     constructor(name, hp, attack, defense) {
         this.name = name;
         this.level = 1;
-        this.maxHp = hp;
+        this.maxhp = hp;
         this.hp = hp;
         this.attack = attack;
         this.defense = defense;
