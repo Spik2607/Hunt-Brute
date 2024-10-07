@@ -1,66 +1,58 @@
 class Fighter {
-    constructor(name, health = 100, attack = 10, defense = 5) {
-        this.name = name;
-        this.maxHealth = health;
-        this.health = health;
-        this.attack = attack;
-        this.defense = defense;
-        this.level = 1;
-        this.experience = 0;
-        this.nextLevelExp = 100;
-        this.availablePoints = 0;
+    // ... (garder le code existant de la classe Fighter) ...
+}
+
+class Enemy extends Fighter {
+    constructor(name, health, attack, defense, level) {
+        super(name, health, attack, defense);
+        this.level = level;
+        this.specialAbility = null;
     }
 
-    takeDamage(damage) {
-        const actualDamage = Math.max(damage - this.defense, 0);
-        this.health = Math.max(this.health - actualDamage, 0);
-        return actualDamage;
-    }
-
-    isDefeated() {
-        return this.health <= 0;
-    }
-
-    quickAttack() {
-        return Math.floor(Math.random() * (this.attack - 2)) + 1;
-    }
-
-    powerfulAttack() {
-        return Math.floor(Math.random() * (this.attack + 5)) + this.attack / 2;
-    }
-
-    defensiveStance() {
-        this.defense += 2;
-        return 0;  // No damage dealt
-    }
-
-    gainExperience(amount) {
-        this.experience += amount;
-        while (this.experience >= this.nextLevelExp) {
-            this.levelUp();
+    useSpecialAbility() {
+        if (this.specialAbility) {
+            return this.specialAbility();
         }
+        return null;
+    }
+}
+
+class Goblin extends Enemy {
+    constructor(level) {
+        super("Goblin", 80 + level * 10, 8 + level * 2, 3 + level, level);
+        this.specialAbility = this.sneakAttack;
     }
 
-    levelUp() {
-        this.level++;
-        this.availablePoints += 3;
-        this.nextLevelExp = Math.floor(this.nextLevelExp * 1.5);
-        log(`${this.name} est monté au niveau ${this.level}!`);
-        updateStats();
-        showLevelUpModal();
+    sneakAttack() {
+        const damage = this.attack * 1.5;
+        log(`Le Goblin utilise Attaque Sournoise pour ${damage} dégâts!`);
+        return damage;
+    }
+}
+
+class Orc extends Enemy {
+    constructor(level) {
+        super("Orc", 120 + level * 15, 12 + level * 3, 5 + level, level);
+        this.specialAbility = this.rageBerserk;
     }
 
-    improveStats(health, attack, defense) {
-        if (health + attack + defense > this.availablePoints) {
-            return false;
-        }
-        this.maxHealth += health * 10;
-        this.health = this.maxHealth;
-        this.attack += attack;
-        this.defense += defense;
-        this.availablePoints -= (health + attack + defense);
-        updateStats();
-        return true;
+    rageBerserk() {
+        this.attack += 5;
+        log(`L'Orc entre dans une Rage Berserk! Son attaque augmente de 5.`);
+        return 0;
+    }
+}
+
+class Skeleton extends Enemy {
+    constructor(level) {
+        super("Squelette", 60 + level * 8, 10 + level * 2, 2 + level, level);
+        this.specialAbility = this.boneShield;
+    }
+
+    boneShield() {
+        this.defense += 3;
+        log(`Le Squelette crée un Bouclier d'Os! Sa défense augmente de 3.`);
+        return 0;
     }
 }
 
@@ -68,20 +60,21 @@ let player, enemy;
 const battleLog = document.getElementById('battle-log');
 const attackButtons = document.querySelectorAll('.attack-button');
 
-document.getElementById('create-fighter').addEventListener('click', () => {
-    const name = document.getElementById('fighter-name').value;
-    player = new Fighter(name);
-    createNewEnemy();
-    document.getElementById('character-creation').style.display = 'none';
-    document.getElementById('battle-area').style.display = 'block';
-    updateStats();
-    log("Le combat commence !");
-});
+// ... (garder le code existant pour la création du joueur) ...
 
 function createNewEnemy() {
     const enemyLevel = Math.max(1, player.level - 1 + Math.floor(Math.random() * 3));
-    const baseStats = 10 + (enemyLevel - 1) * 3;
-    enemy = new Fighter(`Ennemi Niv.${enemyLevel}`, baseStats * 10, baseStats, Math.floor(baseStats / 2));
+    const enemyType = Math.random();
+    
+    if (enemyType < 0.4) {
+        enemy = new Goblin(enemyLevel);
+    } else if (enemyType < 0.7) {
+        enemy = new Orc(enemyLevel);
+    } else {
+        enemy = new Skeleton(enemyLevel);
+    }
+    
+    log(`Un ${enemy.name} de niveau ${enemy.level} apparaît!`);
 }
 
 attackButtons.forEach(button => {
@@ -110,18 +103,24 @@ attackButtons.forEach(button => {
         if (enemy.isDefeated()) {
             const expGained = enemy.level * 20;
             player.gainExperience(expGained);
-            log(`Vous avez gagné! Vous gagnez ${expGained} points d'expérience.`);
+            log(`Vous avez vaincu le ${enemy.name}! Vous gagnez ${expGained} points d'expérience.`);
             disableAttackButtons();
             setTimeout(() => {
                 createNewEnemy();
                 enableAttackButtons();
                 updateStats();
-                log("Un nouvel ennemi apparaît!");
             }, 3000);
         } else {
-            const enemyAttack = Math.floor(Math.random() * enemy.attack) + 1;
-            const playerDamage = player.takeDamage(enemyAttack);
-            log(`L'ennemi inflige ${playerDamage} dégâts à ${player.name}.`);
+            if (Math.random() < 0.2) { // 20% de chance d'utiliser une capacité spéciale
+                const specialDamage = enemy.useSpecialAbility();
+                if (specialDamage > 0) {
+                    player.takeDamage(specialDamage);
+                }
+            } else {
+                const enemyAttack = Math.floor(Math.random() * enemy.attack) + 1;
+                const playerDamage = player.takeDamage(enemyAttack);
+                log(`L'ennemi inflige ${playerDamage} dégâts à ${player.name}.`);
+            }
 
             if (player.isDefeated()) {
                 log("Vous avez perdu !");
@@ -141,45 +140,18 @@ function updateStats() {
         EXP: ${player.experience}/${player.nextLevelExp}
     `;
     document.getElementById('enemy-stats').innerHTML = `
-        ${enemy.name}<br>
+        ${enemy.name} (Niveau ${enemy.level})<br>
         PV: ${enemy.health}/${enemy.maxHealth}<br>
-        Attaque: ${enemy.attack}, Défense: ${enemy.defense}
+        Attaque: ${enemy.attack}, Défense: ${enemy.defense}<br>
+        Capacité spéciale: ${getSpecialAbilityName(enemy)}
     `;
 }
 
-function log(message) {
-    battleLog.innerHTML += message + '<br>';
-    battleLog.scrollTop = battleLog.scrollHeight;
+function getSpecialAbilityName(enemy) {
+    if (enemy instanceof Goblin) return "Attaque Sournoise";
+    if (enemy instanceof Orc) return "Rage Berserk";
+    if (enemy instanceof Skeleton) return "Bouclier d'Os";
+    return "Aucune";
 }
 
-function disableAttackButtons() {
-    attackButtons.forEach(button => button.disabled = true);
-}
-
-function enableAttackButtons() {
-    attackButtons.forEach(button => button.disabled = false);
-}
-
-function showLevelUpModal() {
-    const modal = document.getElementById('level-up-modal');
-    modal.style.display = 'block';
-    updateAvailablePoints();
-}
-
-function updateAvailablePoints() {
-    document.getElementById('available-points').textContent = player.availablePoints;
-}
-
-document.getElementById('confirm-level-up').addEventListener('click', () => {
-    const healthPoints = parseInt(document.getElementById('health-points').value) || 0;
-    const attackPoints = parseInt(document.getElementById('attack-points').value) || 0;
-    const defensePoints = parseInt(document.getElementById('defense-points').value) || 0;
-
-    if (player.improveStats(healthPoints, attackPoints, defensePoints)) {
-        document.getElementById('level-up-modal').style.display = 'none';
-        log(`Statistiques améliorées ! Santé: +${healthPoints*10}, Attaque: +${attackPoints}, Défense: +${defensePoints}`);
-        updateStats();
-    } else {
-        alert("Points invalides. Veuillez réessayer.");
-    }
-});
+// ... (garder le reste du code existant) ...
