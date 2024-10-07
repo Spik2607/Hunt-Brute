@@ -72,7 +72,7 @@ const abilities = [
         }
     }
 ];
-    }
+    
 
     attackEnemy(enemy) {
         const damage = Math.max(this.attack - enemy.defense, 0);
