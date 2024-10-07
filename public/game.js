@@ -1,5 +1,15 @@
 const socket = io('https://hunt-brute-server.onrender.com');
 
+let player = {
+
+    level: 1,
+    hp: 100,
+    maxHp: 100,
+    attack: 10,
+    defense: 5,
+    
+};
+
 class Character {
     constructor(name, hp, attack, defense) {
         this.name = name;
