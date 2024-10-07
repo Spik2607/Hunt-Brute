@@ -239,7 +239,7 @@ function setupLevelUpListeners() {
         const defensePoints = parseInt(document.getElementById('level-up-defense').value) || 0;
         
         if (hpPoints + attackPoints + defensePoints === 5) {
-            player.maxHp += hpPoints * 10;
+            player.maxhp += hpPoints * 10;
             player.attack += attackPoints;
             player.defense += defensePoints;
             document.getElementById('level-up-modal').style.display = 'none';
