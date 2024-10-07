@@ -260,7 +260,11 @@ function setupLevelUpListeners() {
         return;
     }
         
-        if (hpPoints + attackPoints + defensePoints === 5) {
+       if (hpPoints + attackPoints + defensePoints <= 5) {
+             // Actions si les points sont corrects
+             } else {
+           alert("Vous avez attribué trop de points. Veuillez en redistribuer.");
+           } {
             player.maxHp += hpPoints * 10;
             player.attack += attackPoints;
             player.defense += defensePoints;
