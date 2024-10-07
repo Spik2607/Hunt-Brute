@@ -201,12 +201,8 @@ function updateBattleLog(message) {
     battleLog.scrollTop = battleLog.scrollHeight;
 }
 
-function updatePlayerInfo()
-     if (!player) {
-        console.error("Player is not initialized");
-        return;
-    }
-{
+
+
     function updatePlayerInfo() {
     if (!player) {
         console.error("Player is not initialized");
