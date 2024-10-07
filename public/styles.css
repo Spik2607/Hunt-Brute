@@ -1,176 +1,126 @@
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    margin: 0;
-    background-color: #f0f0f0;
-    background-image: url('https://img.freepik.com/free-vector/geometric-background-blue-beige-tones_23-2148812633.jpg');
-    background-size: cover;
+    min-height: 100vh;
 }
 
-#game-container {
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 20px;
+.game-container {
+    background-color: white;
     border-radius: 10px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.2);
-    text-align: center;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    padding: 20px;
     max-width: 800px;
     width: 100%;
 }
 
-h1, h2 {
+h1, h2, h3 {
     color: #333;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    text-align: center;
 }
 
-input, button {
-    margin: 10px 0;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
+.game-area {
+    display: none;
 }
 
 button {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    border-radius: 5px;
+    transition: background-color 0.3s;
 }
 
 button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    background-color: #45a049;
 }
 
-#battle-area {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-#battle-scene {
-    display: flex;
-    justify-content: space-around;
+input[type="text"], input[type="number"] {
     width: 100%;
-    margin-bottom: 20px;
+    padding: 10px;
+    margin: 5px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
 }
 
-#player-character, #enemy-character {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.stats {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
 }
 
-.health-bar {
-    width: 100px;
-    height: 10px;
+.progress-bar {
+    width: 100%;
     background-color: #e0e0e0;
     border-radius: 5px;
-    margin-top: 10px;
-    overflow: hidden;
+    margin: 5px 0;
 }
 
-.health-bar-fill {
-    height: 100%;
+.progress-bar-fill {
+    height: 20px;
     background-color: #4CAF50;
-    transition: width 0.3s ease;
-}
-
-#player-stats, #enemy-stats {
-    margin: 10px 0;
-    padding: 10px;
-    border: 1px solid #ccc;
     border-radius: 5px;
-    width: 100%;
-    text-align: left;
-    background-color: rgba(255, 255, 255, 0.7);
+    transition: width 0.5s ease-out;
 }
 
 #battle-log {
-    height: 150px;
+    height: 200px;
     overflow-y: scroll;
     border: 1px solid #ccc;
     padding: 10px;
     margin: 10px 0;
-    width: 100%;
-    text-align: left;
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: #f9f9f9;
 }
 
-#attack-buttons {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
+#inventory {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 10px;
 }
 
-.attack-button {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    flex-grow: 1;
-    margin: 0 5px;
+.inventory-item {
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+#shop-items {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+}
+
+#daily-quests-container {
+    margin-top: 20px;
+    border: 1px solid #ddd;
+    padding: 10px;
     border-radius: 5px;
 }
 
-.attack-button:hover {
-    background-color: #45a049;
-    transform: translateY(-2px);
+#daily-quests {
+    list-style-type: none;
+    padding: 0;
 }
 
-#quick-attack { background-color: #2196F3; }
-#quick-attack:hover { background-color: #1e87db; }
-
-#powerful-attack { background-color: #f44336; }
-#powerful-attack:hover { background-color: #da190b; }
-
-#defensive-stance { background-color: #ffc107; }
-#defensive-stance:hover { background-color: #e5ac00; }
-
-.attack-button:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-    transform: none;
-}
-
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.4);
-}
-
-.modal-content {
-    background-color: #fefefe;
-    margin: 15% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    max-width: 400px;
-    border-radius: 10px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.2);
-}
-
-#confirm-level-up {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: all 0.3s ease;
-}
-
-#confirm-level-up:hover {
-    background-color: #45a049;
-    transform: translateY(-2px);
+#daily-quests li {
+    margin-bottom: 10px;
 }
 
 @keyframes shake {
@@ -192,12 +142,17 @@ button:hover {
     animation-iteration-count: 1;
 }
 
-@keyframes flash {
-    0% {opacity: 1;}
-    50% {opacity: 0.5;}
-    100% {opacity: 1;}
-}
+@media (max-width: 600px) {
+    .game-container {
+        padding: 10px;
+    }
 
-.flash {
-    animation: flash 0.5s;
+    button {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+
+    #inventory, #shop-items {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
