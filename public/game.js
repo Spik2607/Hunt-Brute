@@ -1,3 +1,7 @@
+// Connexion à Socket.IO
+const socket = io('https://hunt-brute-server.onrender.com');
+
+// Classes pour les combattants
 class Fighter {
     constructor(name, health = 100, attack = 10, defense = 5) {
         this.name = name;
@@ -5,10 +9,6 @@ class Fighter {
         this.health = health;
         this.attack = attack;
         this.defense = defense;
-        this.level = 1;
-        this.experience = 0;
-        this.nextLevelExp = 100;
-        this.availablePoints = 0;
     }
 
     takeDamage(damage) {
@@ -31,319 +31,154 @@ class Fighter {
 
     defensiveStance() {
         this.defense += 2;
-        return 0;  // No damage dealt
-    }
-
-    gainExperience(amount) {
-        this.experience += amount;
-        while (this.experience >= this.nextLevelExp) {
-            this.levelUp();
-        }
-    }
-
-    levelUp() {
-        this.level++;
-        this.availablePoints += 3;
-        this.nextLevelExp = Math.floor(this.nextLevelExp * 1.5);
-        log(`${this.name} est monté au niveau ${this.level}!`);
-        updateStats();
-        showLevelUpModal();
-    }
-
-    improveStats(health, attack, defense) {
-        if (health + attack + defense > this.availablePoints) {
-            return false;
-        }
-        this.maxHealth += health * 10;
-        this.health = this.maxHealth;
-        this.attack += attack;
-        this.defense += defense;
-        this.availablePoints -= (health + attack + defense);
-        updateStats();
-        return true;
-    }
-
-    toJSON() {
-        return {
-            name: this.name,
-            maxHealth: this.maxHealth,
-            health: this.health,
-            attack: this.attack,
-            defense: this.defense,
-            level: this.level,
-            experience: this.experience,
-            nextLevelExp: this.nextLevelExp,
-            availablePoints: this.availablePoints
-        };
-    }
-
-    static fromJSON(json) {
-        const fighter = new Fighter(json.name);
-        Object.assign(fighter, json);
-        return fighter;
-    }
-}
-
-class Enemy extends Fighter {
-    constructor(name, health, attack, defense, level) {
-        super(name, health, attack, defense);
-        this.level = level;
-        this.specialAbility = null;
-    }
-
-    useSpecialAbility() {
-        if (this.specialAbility) {
-            return this.specialAbility();
-        }
-        return null;
-    }
-}
-
-class Goblin extends Enemy {
-    constructor(level) {
-        super("Goblin", 80 + level * 10, 8 + level * 2, 3 + level, level);
-        this.specialAbility = this.sneakAttack;
-    }
-
-    sneakAttack() {
-        const damage = this.attack * 1.5;
-        log(`Le Goblin utilise Attaque Sournoise pour ${damage} dégâts!`);
-        return damage;
-    }
-}
-
-class Orc extends Enemy {
-    constructor(level) {
-        super("Orc", 120 + level * 15, 12 + level * 3, 5 + level, level);
-        this.specialAbility = this.rageBerserk;
-    }
-
-    rageBerserk() {
-        this.attack += 5;
-        log(`L'Orc entre dans une Rage Berserk! Son attaque augmente de 5.`);
-        return 0;
-    }
-}
-
-class Skeleton extends Enemy {
-    constructor(level) {
-        super("Squelette", 60 + level * 8, 10 + level * 2, 2 + level, level);
-        this.specialAbility = this.boneShield;
-    }
-
-    boneShield() {
-        this.defense += 3;
-        log(`Le Squelette crée un Bouclier d'Os! Sa défense augmente de 3.`);
         return 0;
     }
 }
 
 let player, enemy;
-const battleLog = document.getElementById('battle-log');
+let roomId = null;
+
+// Éléments du DOM
+const createRoomBtn = document.getElementById('create-room');
+const joinRoomBtn = document.getElementById('join-room');
+const roomIdInput = document.getElementById('room-id');
+const gameArea = document.getElementById('game-area');
+const waitingArea = document.getElementById('waiting-area');
+const battleArea = document.getElementById('battle-area');
+const playerStats = document.getElementById('player-stats');
+const enemyStats = document.getElementById('enemy-stats');
 const attackButtons = document.querySelectorAll('.attack-button');
-const playerCharacter = document.getElementById('player-character');
-const enemyCharacter = document.getElementById('enemy-character');
+const battleLog = document.getElementById('battle-log');
 
-document.getElementById('create-fighter').addEventListener('click', () => {
-    const name = document.getElementById('fighter-name').value;
-    player = new Fighter(name);
-    createNewEnemy();
-    document.getElementById('character-creation').style.display = 'none';
-    document.getElementById('battle-area').style.display = 'block';
-    updateStats();
-    updateHealthBars();
-    log("Le combat commence !");
-    saveGame();
+// Événements pour la création et la jointure de salles
+createRoomBtn.addEventListener('click', () => {
+    roomId = roomIdInput.value;
+    socket.emit('createRoom', roomId);
 });
 
-function createNewEnemy() {
-    const enemyLevel = Math.max(1, player.level - 1 + Math.floor(Math.random() * 3));
-    const enemyType = Math.random();
-    
-    if (enemyType < 0.4) {
-        enemy = new Goblin(enemyLevel);
-    } else if (enemyType < 0.7) {
-        enemy = new Orc(enemyLevel);
-    } else {
-        enemy = new Skeleton(enemyLevel);
+joinRoomBtn.addEventListener('click', () => {
+    roomId = roomIdInput.value;
+    socket.emit('joinRoom', roomId);
+});
+
+// Gestion des événements Socket.IO
+socket.on('roomCreated', (createdRoomId) => {
+    console.log(`Salle créée: ${createdRoomId}`);
+    gameArea.style.display = 'none';
+    waitingArea.style.display = 'block';
+});
+
+socket.on('roomJoined', (joinedRoomId) => {
+    console.log(`Salle rejointe: ${joinedRoomId}`);
+    gameArea.style.display = 'none';
+    waitingArea.style.display = 'block';
+});
+
+socket.on('roomError', (error) => {
+    alert(error);
+});
+
+socket.on('gameReady', () => {
+    console.log('La partie est prête à commencer');
+    waitingArea.style.display = 'none';
+    battleArea.style.display = 'block';
+    startGame();
+});
+
+socket.on('enemyAttack', (attackType) => {
+    console.log(`L'ennemi utilise une attaque ${attackType}`);
+    let damage;
+    switch(attackType) {
+        case 'quick':
+            damage = enemy.quickAttack();
+            break;
+        case 'powerful':
+            damage = enemy.powerfulAttack();
+            break;
+        case 'defensive':
+            damage = enemy.defensiveStance();
+            break;
     }
-    
-    log(`Un ${enemy.name} de niveau ${enemy.level} apparaît!`);
-    updateHealthBars();
-}
-
-function updateHealthBars() {
-    const playerHealthBar = document.querySelector('#player-health-bar .health-bar-fill');
-    const enemyHealthBar = document.querySelector('#enemy-health-bar .health-bar-fill');
-    
-    playerHealthBar.style.width = `${(player.health / player.maxHealth) * 100}%`;
-    enemyHealthBar.style.width = `${(enemy.health / enemy.maxHealth) * 100}%`;
-}
-
-attackButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        if (player.isDefeated() || enemy.isDefeated()) return;
-
-        let playerDamage, attackType;
-        switch(button.id) {
-            case 'quick-attack':
-                playerDamage = player.quickAttack();
-                attackType = "rapide";
-                break;
-            case 'powerful-attack':
-                playerDamage = player.powerfulAttack();
-                attackType = "puissante";
-                break;
-            case 'defensive-stance':
-                playerDamage = player.defensiveStance();
-                attackType = "défensive";
-                break;
-        }
-
-        const enemyDamage = enemy.takeDamage(playerDamage);
-        log(`${player.name} utilise une attaque ${attackType} et inflige ${enemyDamage} dégâts à l'ennemi.`);
-        
-        enemyCharacter.classList.add('shake');
-        setTimeout(() => enemyCharacter.classList.remove('shake'), 500);
-
-        if (enemy.isDefeated()) {
-            const expGained = enemy.level * 20;
-            player.gainExperience(expGained);
-            log(`Vous avez vaincu le ${enemy.name}! Vous gagnez ${expGained} points d'expérience.`);
-            disableAttackButtons();
-            enemyCharacter.classList.add('flash');
-            setTimeout(() => {
-                createNewEnemy();
-                enableAttackButtons();
-                updateStats();
-                enemyCharacter.classList.remove('flash');
-            }, 3000);
-        } else {
-            if (Math.random() < 0.2) {
-                const specialDamage = enemy.useSpecialAbility();
-                if (specialDamage > 0) {
-                    player.takeDamage(specialDamage);
-                    playerCharacter.classList.add('shake');
-                    setTimeout(() => playerCharacter.classList.remove('shake'), 500);
-                }
-            } else {
-                const enemyAttack = Math.floor(Math.random() * enemy.attack) + 1;
-                const playerDamage = player.takeDamage(enemyAttack);
-                log(`L'ennemi inflige ${playerDamage} dégâts à ${player.name}.`);
-                playerCharacter.classList.add('shake');
-                setTimeout(() => playerCharacter.classList.remove('shake'), 500);
-            }
-
-            if (player.isDefeated()) {
-                log("Vous avez perdu !");
-                disableAttackButtons();
-                playerCharacter.classList.add('flash');
-            }
-        }
-
-        updateStats();
-        updateHealthBars();
-        saveGame();
-    });
+    const actualDamage = player.takeDamage(damage);
+    updateBattleLog(`L'ennemi vous inflige ${actualDamage} dégâts avec une attaque ${attackType}.`);
+    updateStats();
+    checkGameOver();
 });
+
+socket.on('playerDisconnected', () => {
+    alert("L'autre joueur s'est déconnecté. La partie est terminée.");
+    resetGame();
+});
+
+// Fonctions du jeu
+function startGame() {
+    player = new Fighter("Joueur");
+    enemy = new Fighter("Ennemi");
+    updateStats();
+    enableAttackButtons();
+}
 
 function updateStats() {
-    document.getElementById('player-stats').innerHTML = `
-        ${player.name} (Niveau ${player.level})<br>
-        PV: ${player.health}/${player.maxHealth}<br>
-        Attaque: ${player.attack}, Défense: ${player.defense}<br>
-        EXP: ${player.experience}/${player.nextLevelExp}
-    `;
-    document.getElementById('enemy-stats').innerHTML = `
-        ${enemy.name} (Niveau ${enemy.level})<br>
-        PV: ${enemy.health}/${enemy.maxHealth}<br>
-        Attaque: ${enemy.attack}, Défense: ${enemy.defense}<br>
-        Capacité spéciale: ${getSpecialAbilityName(enemy)}
-    `;
-}
-
-function getSpecialAbilityName(enemy) {
-    if (enemy instanceof Goblin) return "Attaque Sournoise";
-    if (enemy instanceof Orc) return "Rage Berserk";
-    if (enemy instanceof Skeleton) return "Bouclier d'Os";
-    return "Aucune";
-}
-
-function log(message) {
-    battleLog.innerHTML += message + '<br>';
-    battleLog.scrollTop = battleLog.scrollHeight;
-}
-
-function disableAttackButtons() {
-    attackButtons.forEach(button => button.disabled = true);
+    playerStats.textContent = `${player.name} - PV: ${player.health}/${player.maxHealth}, ATT: ${player.attack}, DEF: ${player.defense}`;
+    enemyStats.textContent = `${enemy.name} - PV: ${enemy.health}/${enemy.maxHealth}, ATT: ${enemy.attack}, DEF: ${enemy.defense}`;
 }
 
 function enableAttackButtons() {
     attackButtons.forEach(button => button.disabled = false);
 }
 
-function showLevelUpModal() {
-    const modal = document.getElementById('level-up-modal');
-    modal.style.display = 'block';
-    updateAvailablePoints();
-    playerCharacter.classList.add('flash');
-    setTimeout(() => playerCharacter.classList.remove('flash'), 1000);
+function disableAttackButtons() {
+    attackButtons.forEach(button => button.disabled = true);
 }
 
-function updateAvailablePoints() {
-    document.getElementById('available-points').textContent = player.availablePoints;
+function updateBattleLog(message) {
+    battleLog.innerHTML += `<p>${message}</p>`;
+    battleLog.scrollTop = battleLog.scrollHeight;
 }
 
-document.getElementById('confirm-level-up').addEventListener('click', () => {
-    const healthPoints = parseInt(document.getElementById('health-points').value) || 0;
-    const attackPoints = parseInt(document.getElementById('attack-points').value) || 0;
-    const defensePoints = parseInt(document.getElementById('defense-points').value) || 0;
+function checkGameOver() {
+    if (player.isDefeated()) {
+        updateBattleLog("Vous avez perdu !");
+        disableAttackButtons();
+    } else if (enemy.isDefeated()) {
+        updateBattleLog("Vous avez gagné !");
+        disableAttackButtons();
+    }
+}
 
-    if (player.improveStats(healthPoints, attackPoints, defensePoints)) {
-        document.getElementById('level-up-modal').style.display = 'none';
-        log(`Statistiques améliorées ! Santé: +${healthPoints*10}, Attaque: +${attackPoints}, Défense: +${defensePoints}`);
+function resetGame() {
+    gameArea.style.display = 'block';
+    waitingArea.style.display = 'none';
+    battleArea.style.display = 'none';
+    battleLog.innerHTML = '';
+    roomIdInput.value = '';
+}
+
+// Gestion des attaques
+attackButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        if (player.isDefeated() || enemy.isDefeated()) return;
+
+        let damage, attackType;
+        switch(button.id) {
+            case 'quick-attack':
+                damage = player.quickAttack();
+                attackType = 'quick';
+                break;
+            case 'powerful-attack':
+                damage = player.powerfulAttack();
+                attackType = 'powerful';
+                break;
+            case 'defensive-stance':
+                damage = player.defensiveStance();
+                attackType = 'defensive';
+                break;
+        }
+
+        const actualDamage = enemy.takeDamage(damage);
+        updateBattleLog(`Vous infligez ${actualDamage} dégâts à l'ennemi avec une attaque ${attackType}.`);
+        socket.emit('attack', { roomId, attack: attackType });
         updateStats();
-        saveGame();
-    } else {
-        alert("Points invalides. Veuillez réessayer.");
-    }
-});
-
-function saveGame() {
-    localStorage.setItem('playerData', JSON.stringify(player));
-}
-
-function loadGame() {
-    const savedData = localStorage.getItem('playerData');
-    if (savedData) {
-        player = Fighter.fromJSON(JSON.parse(savedData));
-        document.getElementById('character-creation').style.display = 'none';
-        document.getElementById('battle-area').style.display = 'block';
-        createNewEnemy();
-        updateStats();
-        updateHealthBars();
-        log("Partie chargée. Le combat continue !");
-    }
-}
-
-// Ajouter un bouton de sauvegarde manuelle
-const saveButton = document.createElement('button');
-saveButton.textContent = 'Sauvegarder';
-saveButton.addEventListener('click', () => {
-    saveGame();
-    alert('Partie sauvegardée !');
-});
-document.getElementById('game-container').appendChild(saveButton);
-
-// Ajouter un bouton de chargement
-const loadButton = document.createElement('button');
-loadButton.textContent = 'Charger';
-loadButton.addEventListener('click', loadGame);
-document.getElementById('game-container').appendChild(loadButton);
-
-// Charger la partie au démarrage du jeu si une sauvegarde existe
-window.addEventListener('load', () => {
-    if (localStorage.getItem('playerData')) {
-        loadGame();
-    }
+        checkGameOver();
+    });
 });
