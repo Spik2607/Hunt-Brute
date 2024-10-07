@@ -52,7 +52,13 @@ class Character {
             this.levelUp();
         }
     }
-
+function learnRandomAbility() {
+    const newAbility = abilities[Math.floor(Math.random() * abilities.length)];
+    if (!player.abilities.some(a => a.name === newAbility.name)) {
+        player.abilities.push(newAbility);
+        console.log(`${player.name} a appris une nouvelle capacité : ${newAbility.name}!`);
+    }
+}
    levelUp() {
     this.level++;
     this.maxHp += 10;
