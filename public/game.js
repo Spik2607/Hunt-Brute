@@ -16,6 +16,7 @@ class Character {
         this.energy = 100;
         this.maxEnergy = 100;
         this.abilities = [];
+        updateAbilityButtons();
         
     }
  levelUp() {
@@ -188,8 +189,11 @@ function endMission(victory) {
     }, 3000);
 }
 
-     function updateAbilityButtons() {
-    if (!player) return;
+    function updateAbilityButtons() {
+    if (!player || !player.abilities) {
+        console.log("Player or player abilities not initialized");
+        return;
+    }
     const abilitiesContainer = document.getElementById('player-abilities');
     abilitiesContainer.innerHTML = '';
     player.abilities.forEach((ability, index) => {
