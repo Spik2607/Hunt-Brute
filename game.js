@@ -1,5 +1,67 @@
 class Fighter {
-    // ... (garder le code existant de la classe Fighter) ...
+    constructor(name, health = 100, attack = 10, defense = 5) {
+        this.name = name;
+        this.maxHealth = health;
+        this.health = health;
+        this.attack = attack;
+        this.defense = defense;
+        this.level = 1;
+        this.experience = 0;
+        this.nextLevelExp = 100;
+        this.availablePoints = 0;
+    }
+
+    takeDamage(damage) {
+        const actualDamage = Math.max(damage - this.defense, 0);
+        this.health = Math.max(this.health - actualDamage, 0);
+        return actualDamage;
+    }
+
+    isDefeated() {
+        return this.health <= 0;
+    }
+
+    quickAttack() {
+        return Math.floor(Math.random() * (this.attack - 2)) + 1;
+    }
+
+    powerfulAttack() {
+        return Math.floor(Math.random() * (this.attack + 5)) + this.attack / 2;
+    }
+
+    defensiveStance() {
+        this.defense += 2;
+        return 0;  // No damage dealt
+    }
+
+    gainExperience(amount) {
+        this.experience += amount;
+        while (this.experience >= this.nextLevelExp) {
+            this.levelUp();
+        }
+    }
+
+    levelUp() {
+        this.level++;
+        this.availablePoints += 3;
+        this.nextLevelExp = Math.floor(this.nextLevelExp * 1.5);
+        log(`${this.name} est monté au niveau ${this.level}!`);
+        updateStats();
+        showLevelUpModal();
+    }
+
+    improveStats(health, attack, defense) {
+        if (health + attack + defense > this.availablePoints) {
+            return false;
+        }
+        this.maxHealth += health * 10;
+        this.health = this.maxHealth;
+        this.attack += attack;
+        this.defense += defense;
+        this.availablePoints -= (health + attack + defense);
+        updateStats();
+        return true;
+    }
 }
 
 class Enemy extends Fighter {
@@ -59,8 +121,19 @@ class Skeleton extends Enemy {
 let player, enemy;
 const battleLog = document.getElementById('battle-log');
 const attackButtons = document.querySelectorAll('.attack-button');
+const playerCharacter = document.getElementById('player-character');
+const enemyCharacter = document.getElementById('enemy-character');
 
-// ... (garder le code existant pour la création du joueur) ...
+document.getElementById('create-fighter').addEventListener('click', () => {
+    const name = document.getElementById('fighter-name').value;
+    player = new Fighter(name);
+    createNewEnemy();
+    document.getElementById('character-creation').style.display = 'none';
+    document.getElementById('battle-area').style.display = 'block';
+    updateStats();
+    updateHealthBars();
+    log("Le combat commence !");
+});
 
 function createNewEnemy() {
     const enemyLevel = Math.max(1, player.level - 1 + Math.floor(Math.random() * 3));
@@ -75,6 +148,15 @@ function createNewEnemy() {
     }
     
     log(`Un ${enemy.name} de niveau ${enemy.level} apparaît!`);
+    updateHealthBars();
+}
+
+function updateHealthBars() {
+    const playerHealthBar = document.querySelector('#player-health-bar .health-bar-fill');
+    const enemyHealthBar = document.querySelector('#enemy-health-bar .health-bar-fill');
+    
+    playerHealthBar.style.width = `${(player.health / player.maxHealth) * 100}%`;
+    enemyHealthBar.style.width = `${(enemy.health / enemy.maxHealth) * 100}%`;
 }
 
 attackButtons.forEach(button => {
@@ -99,36 +181,47 @@ attackButtons.forEach(button => {
 
         const enemyDamage = enemy.takeDamage(playerDamage);
         log(`${player.name} utilise une attaque ${attackType} et inflige ${enemyDamage} dégâts à l'ennemi.`);
+        
+        enemyCharacter.classList.add('shake');
+        setTimeout(() => enemyCharacter.classList.remove('shake'), 500);
 
         if (enemy.isDefeated()) {
             const expGained = enemy.level * 20;
             player.gainExperience(expGained);
             log(`Vous avez vaincu le ${enemy.name}! Vous gagnez ${expGained} points d'expérience.`);
             disableAttackButtons();
+            enemyCharacter.classList.add('flash');
             setTimeout(() => {
                 createNewEnemy();
                 enableAttackButtons();
                 updateStats();
+                enemyCharacter.classList.remove('flash');
             }, 3000);
         } else {
-            if (Math.random() < 0.2) { // 20% de chance d'utiliser une capacité spéciale
+            if (Math.random() < 0.2) {
                 const specialDamage = enemy.useSpecialAbility();
                 if (specialDamage > 0) {
                     player.takeDamage(specialDamage);
+                    playerCharacter.classList.add('shake');
+                    setTimeout(() => playerCharacter.classList.remove('shake'), 500);
                 }
             } else {
                 const enemyAttack = Math.floor(Math.random() * enemy.attack) + 1;
                 const playerDamage = player.takeDamage(enemyAttack);
                 log(`L'ennemi inflige ${playerDamage} dégâts à ${player.name}.`);
+                playerCharacter.classList.add('shake');
+                setTimeout(() => playerCharacter.classList.remove('shake'), 500);
             }
 
             if (player.isDefeated()) {
                 log("Vous avez perdu !");
                 disableAttackButtons();
+                playerCharacter.classList.add('flash');
             }
         }
 
         updateStats();
+        updateHealthBars();
     });
 });
 
@@ -154,4 +247,41 @@ function getSpecialAbilityName(enemy) {
     return "Aucune";
 }
 
-// ... (garder le reste du code existant) ...
+function log(message) {
+    battleLog.innerHTML += message + '<br>';
+    battleLog.scrollTop = battleLog.scrollHeight;
+}
+
+function disableAttackButtons() {
+    attackButtons.forEach(button => button.disabled = true);
+}
+
+function enableAttackButtons() {
+    attackButtons.forEach(button => button.disabled = false);
+}
+
+function showLevelUpModal() {
+    const modal = document.getElementById('level-up-modal');
+    modal.style.display = 'block';
+    updateAvailablePoints();
+    playerCharacter.classList.add('flash');
+    setTimeout(() => playerCharacter.classList.remove('flash'), 1000);
+}
+
+function updateAvailablePoints() {
+    document.getElementById('available-points').textContent = player.availablePoints;
+}
+
+document.getElementById('confirm-level-up').addEventListener('click', () => {
+    const healthPoints = parseInt(document.getElementById('health-points').value) || 0;
+    const attackPoints = parseInt(document.getElementById('attack-points').value) || 0;
+    const defensePoints = parseInt(document.getElementById('defense-points').value) || 0;
+
+    if (player.improveStats(healthPoints, attackPoints, defensePoints)) {
+        document.getElementById('level-up-modal').style.display = 'none';
+        log(`Statistiques améliorées ! Santé: +${healthPoints*10}, Attaque: +${attackPoints}, Défense: +${defensePoints}`);
+        updateStats();
+    } else {
+        alert("Points invalides. Veuillez réessayer.");
+    }
+});
