@@ -39,7 +39,7 @@ class Character {
         }
         return 0;
     }
-}
+
 
     takeDamage(damage) {
         this.hp = Math.max(this.hp - Math.max(damage - this.defense, 0), 0);
