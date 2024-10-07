@@ -1,5 +1,12 @@
 const socket = io('https://hunt-brute-server.onrender.com');
 
+// Initialisation du jeu
+document.addEventListener('DOMContentLoaded', () => {
+    
+    document.getElementById('leave-shop').addEventListener('click', () => showGameArea('solo-menu'));
+    document.getElementById('close-inventory').addEventListener('click', () => showGameArea('solo-menu'));
+});
+
 let player = {
 
     level: 1,
@@ -501,13 +508,5 @@ document.getElementById('load-game').addEventListener('click', loadGame);
         abilitiesContainer.appendChild(abilityButton);
     });
 }
-
-// Initialisation du jeu
-document.addEventListener('DOMContentLoaded', () => {
-    // ... (les écouteurs d'événements existants restent inchangés)
-    
-    document.getElementById('leave-shop').addEventListener('click', () => showGameArea('solo-menu'));
-    document.getElementById('close-inventory').addEventListener('click', () => showGameArea('solo-menu'));
-});
 
 // ... (le reste du code existant reste inchangé)
