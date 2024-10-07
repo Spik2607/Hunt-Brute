@@ -1,5 +1,5 @@
 const socket = io('https://hunt-brute-server.onrender.com');
-
+let player = null;
 class Character {
     constructor(name, hp, attack, defense) {
         this.name = name;
@@ -32,16 +32,18 @@ class Character {
         }
     }
 
-    levelUp() {
-        this.level++;
-        this.maxhp += 10;
-        this.hp = this.maxhp;
-        this.attack += 2;
-        this.defense += 1;
-        this.experience -= this.level * 100;
-        this.energy = this.maxEnergy;
-        showLevelUpModal();
-    }
+   levelUp() {
+    this.level++;
+    this.maxHp += 10;
+    this.hp = this.maxHp;
+    this.attack += 2;
+    this.defense += 1;
+    this.experience -= this.level * 100;
+    this.energy = this.maxEnergy;
+    this.learnRandomAbility();
+    console.log("Level up:", this); // Pour le débogage
+    showLevelUpModal();
+}
 
     useAbility(abilityIndex, target) {
         const ability = this.abilities[abilityIndex];
@@ -132,8 +134,9 @@ function createCharacter() {
     const attack = parseInt(document.getElementById('stat-attack').value) + 10;
     const defense = parseInt(document.getElementById('stat-defense').value) + 5;
 
-    if (name && hp && attack && defense) {
+    if (name && !isNaN(hp) && !isNaN(attack) && !isNaN(defense)) {
         player = new Character(name, hp, attack, defense);
+        console.log("Personnage créé:", player); // Pour le débogage
         showGameArea('solo-menu');
         updatePlayerInfo();
     } else {
@@ -211,7 +214,12 @@ function updateBattleLog(message) {
     battleLog.scrollTop = battleLog.scrollHeight;
 }
 
-function updatePlayerInfo() {
+function updatePlayerInfo()
+     if (!player) {
+        console.error("Player is not initialized");
+        return;
+    }
+{
     if (!player) return; // Ajoutez cette vérification
     document.getElementById('player-info').innerHTML = `
         ${player.name} - Niveau ${player.level}<br>
@@ -229,6 +237,10 @@ function showGameArea(areaId) {
 
 function showLevelUpModal() {
     if (!player) return; // Ajoutez cette vérification
+     if (!player) {
+        console.error("Player is not initialized");
+        return;
+    }
     document.getElementById('new-level').textContent = player.level;
     document.getElementById('stat-points').textContent = '5';
     document.getElementById('level-up-modal').style.display = 'block';
