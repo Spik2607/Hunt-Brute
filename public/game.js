@@ -212,6 +212,7 @@ function updateBattleLog(message) {
 }
 
 function updatePlayerInfo() {
+    if (!player) return; // Ajoutez cette vérification
     document.getElementById('player-info').innerHTML = `
         ${player.name} - Niveau ${player.level}<br>
         PV: ${player.hp}/${player.maxHp}<br>
