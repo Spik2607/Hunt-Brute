@@ -17,7 +17,7 @@ class Character {
         this.maxEnergy = 100;
         this.abilities = [];
     }
- 
+  
 }
     takeDamage(damage) {
         this.hp = Math.max(this.hp - Math.max(damage - this.defense, 0), 0);
