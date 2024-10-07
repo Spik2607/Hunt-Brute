@@ -228,6 +228,7 @@ function showGameArea(areaId) {
 }
 
 function showLevelUpModal() {
+    if (!player) return; // Ajoutez cette vérification
     document.getElementById('new-level').textContent = player.level;
     document.getElementById('stat-points').textContent = '5';
     document.getElementById('level-up-modal').style.display = 'block';
