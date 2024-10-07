@@ -29,6 +29,7 @@ input, button {
 
 #player-stats, #enemy-stats {
     margin: 10px 0;
+    font-weight: bold;
 }
 
 #battle-log {
@@ -37,16 +38,39 @@ input, button {
     border: 1px solid #ccc;
     padding: 10px;
     margin: 10px 0;
+    width: 100%;
+    text-align: left;
 }
 
-#attack-button {
-    background-color: #ff4444;
+#attack-buttons {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.attack-button {
+    background-color: #4CAF50;
     color: white;
     border: none;
     padding: 10px 20px;
     cursor: pointer;
+    transition: background-color 0.3s;
 }
 
-#attack-button:hover {
-    background-color: #cc0000;
+.attack-button:hover {
+    background-color: #45a049;
+}
+
+#quick-attack { background-color: #2196F3; }
+#quick-attack:hover { background-color: #1e87db; }
+
+#powerful-attack { background-color: #f44336; }
+#powerful-attack:hover { background-color: #da190b; }
+
+#defensive-stance { background-color: #ffc107; }
+#defensive-stance:hover { background-color: #e5ac00; }
+
+.attack-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
 }
