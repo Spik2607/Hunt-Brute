@@ -3,17 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jeu de Combat Avancé</title>
+    <title>Jeu de Combat en Ligne</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <div id="game-container">
-        <h1>Jeu de Combat Avancé</h1>
-        <div id="character-creation">
-            <h2>Créez votre combattant</h2>
-            <input type="text" id="fighter-name" placeholder="Nom du combattant">
-            <button id="create-fighter">Créer</button>
+        <h1>Jeu de Combat en Ligne</h1>
+        <div id="room-creation">
+            <h2>Créer ou rejoindre une salle</h2>
+            <input type="text" id="room-id" placeholder="ID de la salle">
+            <button id="create-room">Créer une salle</button>
+            <button id="join-room">Rejoindre une salle</button>
+        </div>
+        <div id="waiting-room" style="display:none;">
+            <h2>En attente d'un autre joueur...</h2>
+            <button id="ready-button" style="display:none;">Prêt</button>
         </div>
         <div id="battle-area" style="display:none;">
             <div id="battle-scene">
@@ -39,32 +44,9 @@
                 <button id="defensive-stance" class="attack-button"><i class="fas fa-shield-alt"></i> Posture Défensive</button>
             </div>
         </div>
-        <div id="game-controls">
-            <button id="save-game" class="control-button"><i class="fas fa-save"></i> Sauvegarder</button>
-            <button id="load-game" class="control-button"><i class="fas fa-folder-open"></i> Charger</button>
-        </div>
-    </div>
-    
-    <div id="level-up-modal" class="modal">
-        <div class="modal-content">
-            <h2>Niveau Supérieur !</h2>
-            <p>Points disponibles: <span id="available-points"></span></p>
-            <div>
-                <label for="health-points">Santé:</label>
-                <input type="number" id="health-points" min="0" value="0">
-            </div>
-            <div>
-                <label for="attack-points">Attaque:</label>
-                <input type="number" id="attack-points" min="0" value="0">
-            </div>
-            <div>
-                <label for="defense-points">Défense:</label>
-                <input type="number" id="defense-points" min="0" value="0">
-            </div>
-            <button id="confirm-level-up">Confirmer</button>
-        </div>
     </div>
 
+    <script src="/socket.io/socket.io.js"></script>
     <script src="game.js"></script>
 </body>
 </html>
