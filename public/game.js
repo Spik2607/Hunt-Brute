@@ -21,7 +21,7 @@ class Character {
         if (this.energy >= ability.energyCost) {
             this.energy -= ability.energyCost;
             return ability.use(this, target);
-        }
+        
         return 0; // Pas assez d'énergie
     }
 
