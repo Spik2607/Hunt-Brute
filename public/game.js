@@ -4,7 +4,7 @@ class Character {
     constructor(name, hp, attack, defense) {
         this.name = name;
         this.level = 1;
-        this.maxhp = hp;
+        this.maxHp = hp;
         this.hp = hp;
         this.attack = attack;
         this.defense = defense;
@@ -22,7 +22,7 @@ class Character {
     }
 
     heal(amount) {
-        this.hp = Math.min(this.hp + amount, this.maxhp);
+        this.hp = Math.min(this.hp + amount, this.maxHp);
     }
 
     gainExperience(amount) {
@@ -152,7 +152,11 @@ function startRandomMission() {
     updateBattleInfo();
 }
 
-function playerAttack() {
+function playerAttack()
+      if (!player) {
+        console.error("Player is not initialized");
+        return;
+    }{
     const damage = Math.max(player.attack - enemy.defense, 0);
     const enemyDefeated = enemy.takeDamage(damage);
     updateBattleLog(`${player.name} inflige ${damage} dégâts à l'ennemi.`);
@@ -220,7 +224,11 @@ function updatePlayerInfo()
         return;
     }
 {
-    if (!player) return; // Ajoutez cette vérification
+    function updatePlayerInfo() {
+    if (!player) {
+        console.error("Player is not initialized");
+        return;
+    }
     document.getElementById('player-info').innerHTML = `
         ${player.name} - Niveau ${player.level}<br>
         PV: ${player.hp}/${player.maxHp}<br>
@@ -253,7 +261,7 @@ function setupLevelUpListeners() {
         const defensePoints = parseInt(document.getElementById('level-up-defense').value) || 0;
         
         if (hpPoints + attackPoints + defensePoints === 5) {
-            player.maxhp += hpPoints * 10;
+            player.maxHp += hpPoints * 10;
             player.attack += attackPoints;
             player.defense += defensePoints;
             document.getElementById('level-up-modal').style.display = 'none';
@@ -380,7 +388,11 @@ function useItem(index) {
 }
 
 // Amélioration du système de combat
-function playerAttack() {
+function playerAttack() 
+  if (!player) {
+        console.error("Player is not initialized");
+        return;
+    }{
     if (player.energy < 10) {
         alert("Pas assez d'énergie pour attaquer !");
         return;
