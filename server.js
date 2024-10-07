@@ -1,12 +1,3 @@
-K
-ecrit moi l'intégralité du code server.js
-
-
-Bien sûr, je vais vous fournir un exemple complet de fichier server.js qui intègre toutes les fonctionnalités nécessaires pour votre jeu de combat en ligne, y compris la gestion des salles et les communications Socket.IO. Voici le code :
-
-javascript
-
-Copy
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
