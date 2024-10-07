@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeu de Combat</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="game-container">
+        <h1>Jeu de Combat</h1>
+        <div id="character-creation">
+            <h2>Créez votre combattant</h2>
+            <input type="text" id="fighter-name" placeholder="Nom du combattant">
+            <button id="create-fighter">Créer</button>
+        </div>
+        <div id="battle-area" style="display:none;">
+            <div id="player-stats"></div>
+            <div id="enemy-stats"></div>
+            <div id="battle-log"></div>
+            <button id="attack-button">Attaquer</button>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>
