@@ -493,20 +493,6 @@ function loadGame() {
 document.getElementById('save-game').addEventListener('click', saveGame);
 document.getElementById('load-game').addEventListener('click', loadGame);
 
-// Mise à jour de l'interface utilisateur
-function updateBattleInfo() {
-    document.getElementById('player-stats').innerHTML = `
-        ${player.name} - Niveau ${player.level}<br>
-        PV: ${player.hp}/${player.maxHp}<br>
-        Énergie: ${player.energy}/${player.maxEnergy}<br>
-        Attaque: ${player.attack} | Défense: ${player.defense}
-    `;
-    
-    document.getElementById('enemy-stats').innerHTML = `
-        ${enemy.name} - Niveau ${enemy.level}<br>
-        PV: ${enemy.hp}/${enemy.maxHp}<br>
-        Attaque: ${enemy.attack} | Défense: ${enemy.defense}
-    `;
 
     // Mise à jour des boutons de capacités
     const abilitiesContainer = document.getElementById('player-abilities');
