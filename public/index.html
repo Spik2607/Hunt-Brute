@@ -13,156 +13,135 @@
             --text-color: #ecf0f1;
             --container-color: #34495e;
         }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--background-color);
             color: var(--text-color);
             margin: 0;
-            padding: 0;
+            padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background-image: url('https://example.com/path-to-your-background-image.jpg');
-            background-size: cover;
-            background-position: center;
         }
-
         #game-container {
-            background-color: rgba(52, 73, 94, 0.9);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            background-color: var(--container-color);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
             max-width: 800px;
-            width: 90%;
+            width: 100%;
         }
-
-        .game-area {
-            display: none;
-            animation: fadeIn 0.5s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
+        .game-area { display: none; }
         #main-menu { display: block; }
-
         h1, h2 {
             color: var(--primary-color);
             text-align: center;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
-
-        input[type="text"], input[type="number"] {
+        input, button {
             width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
+            padding: 10px;
+            margin: 5px 0;
             border: none;
             border-radius: 5px;
-            background-color: rgba(236, 240, 241, 0.1);
-            color: var(--text-color);
-            font-size: 16px;
         }
-
+        input {
+            background-color: var(--text-color);
+            color: var(--background-color);
+        }
         button {
             background-color: var(--primary-color);
             color: var(--text-color);
-            border: none;
-            padding: 12px 20px;
-            margin: 5px;
-            border-radius: 5px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 16px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            transition: background-color 0.3s;
         }
-
         button:hover {
             background-color: #c0392b;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
-
-        #player-info, #player-stats, #enemy-stats {
-            background-color: rgba(44, 62, 80, 0.7);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        #player-info, #player-stats, #enemy-stats, #battle-log {
+            background-color: rgba(0,0,0,0.2);
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
         }
-
         #battle-log {
-            height: 200px;
+            height: 150px;
             overflow-y: auto;
-            background-color: rgba(44, 62, 80, 0.7);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            font-family: monospace;
-            font-size: 14px;
-            line-height: 1.6;
         }
-
-        #shop-items, #inventory {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-        }
-
         .shop-item, .inventory-item {
-            background-color: rgba(44, 62, 80, 0.7);
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .shop-item:hover, .inventory-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-
-        #level-up-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.8);
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            z-index: 1000;
-        }
-
-        #level-up-modal > div {
-            background-color: var(--container-color);
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-            max-width: 400px;
-            width: 90%;
-        }
-
-        .ability-button {
-            background-color: var(--secondary-color);
-            margin: 5px;
-        }
-
-        .ability-button:hover {
-            background-color: #2980b9;
+            margin: 5px 0;
         }
     </style>
 </head>
 <body>
     <div id="game-container">
-        <!-- Le contenu reste le même que dans votre HTML précédent -->
-        <!-- Assurez-vous d'ajouter la classe 'ability-button' aux boutons de capacités -->
+        <div id="main-menu" class="game-area">
+            <h1>Hunt Brute</h1>
+            <button id="start-solo"><i class="fas fa-user"></i> Mode Solo</button>
+            <h2>Mode Multijoueur</h2>
+            <input type="text" id="room-id" placeholder="ID de la salle">
+            <button id="create-room"><i class="fas fa-plus-circle"></i> Créer une salle</button>
+            <button id="join-room"><i class="fas fa-sign-in-alt"></i> Rejoindre une salle</button>
+        </div>
+
+        <div id="character-creation" class="game-area">
+            <h2>Création du personnage</h2>
+            <input type="text" id="hero-name" placeholder="Nom du héros">
+            <input type="number" id="stat-hp" placeholder="PV">
+            <input type="number" id="stat-attack" placeholder="Attaque">
+            <input type="number" id="stat-defense" placeholder="Défense">
+            <button id="create-character"><i class="fas fa-user-plus"></i> Créer le personnage</button>
+        </div>
+
+        <div id="solo-menu" class="game-area">
+            <h2>Menu Solo</h2>
+            <div id="player-info"></div>
+            <button id="start-mission"><i class="fas fa-play"></i> Commencer une mission</button>
+            <button id="open-shop"><i class="fas fa-store"></i> Ouvrir la boutique</button>
+            <button id="open-inventory"><i class="fas fa-briefcase"></i> Ouvrir l'inventaire</button>
+            <button id="save-game"><i class="fas fa-save"></i> Sauvegarder la partie</button>
+            <button id="load-game"><i class="fas fa-folder-open"></i> Charger la partie</button>
+            <button id="back-to-main"><i class="fas fa-arrow-left"></i> Retour au menu principal</button>
+        </div>
+
+        <div id="mission-area" class="game-area">
+            <h2>Mission en cours</h2>
+            <div id="player-stats"></div>
+            <div id="enemy-stats"></div>
+            <div id="battle-log"></div>
+            <button id="attack-button"><i class="fas fa-fist-raised"></i> Attaquer</button>
+            <div id="player-abilities"></div>
+        </div>
+
+        <div id="shop" class="game-area">
+            <h2>Boutique</h2>
+            <div id="shop-items"></div>
+            <button id="leave-shop"><i class="fas fa-door-open"></i> Quitter la boutique</button>
+        </div>
+
+        <div id="inventory-area" class="game-area">
+            <h2>Inventaire</h2>
+            <div id="inventory"></div>
+            <button id="close-inventory"><i class="fas fa-times"></i> Fermer l'inventaire</button>
+        </div>
+
+        <div id="waiting-area" class="game-area">
+            <h2>En attente d'un autre joueur...</h2>
+            <p>ID de la salle: <span id="room-id-display"></span></p>
+        </div>
+
+        <div id="level-up-modal" class="game-area">
+            <h2>Niveau Supérieur !</h2>
+            <p>Vous avez atteint le niveau <span id="new-level"></span> !</p>
+            <p>Points à distribuer : <span id="stat-points"></span></p>
+            <input type="number" id="level-up-hp" placeholder="PV">
+            <input type="number" id="level-up-attack" placeholder="Attaque">
+            <input type="number" id="level-up-defense" placeholder="Défense">
+            <button id="confirm-level-up"><i class="fas fa-check"></i> Confirmer</button>
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.js"></script>
