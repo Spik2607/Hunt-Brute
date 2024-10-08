@@ -11,7 +11,7 @@ body {
     background-color: var(--background-color);
     color: var(--text-color);
     margin: 0;
-    padding: 20px;
+    padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -23,115 +23,105 @@ body {
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0 0 20px rgba(0,0,0,0.3);
-    max-width: 800px;
+    max-width: 1000px;
     width: 100%;
 }
 
-.game-area {
-    display: none;
-}
-
-#main-menu {
-    display: block;
-}
-
-h1, h2 {
-    color: var(--primary-color);
+header {
     text-align: center;
     margin-bottom: 20px;
 }
 
-input, button {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
+h1, h2 {
+    color: var(--primary-color);
 }
 
-input {
-    background-color: var(--text-color);
-    color: var(--background-color);
+#main-menu {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
 }
 
 button {
     background-color: var(--primary-color);
     color: var(--text-color);
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.3s;
-}
-
-button:hover {
-    background-color: #c0392b;
-    transform: translateY(-2px);
-}
-
-#player-info, #player-stats, #enemy-stats, #battle-log {
-    background-color: rgba(0,0,0,0.2);
-    padding: 15px;
-    border-radius: 5px;
-    margin: 15px 0;
-}
-
-#battle-log {
-    height: 200px;
-    overflow-y: auto;
-}
-
-.shop-item, .inventory-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: rgba(0,0,0,0.1);
-    padding: 15px;
-    margin: 10px 0;
-    border-radius: 5px;
-}
-
-.buy-button {
-    background-color: var(--secondary-color);
-    padding: 5px 15px;
+    border: none;
+    padding: 10px 15px;
+    margin: 5px;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s;
 }
 
-.buy-button:hover {
-    background-color: #2980b9;
+button:hover {
+    background-color: #c0392b;
 }
 
-#level-up-modal {
+input[type="text"], input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #ecf0f1;
+    color: #2c3e50;
+}
+
+.game-area {
+    background-color: rgba(52, 73, 94, 0.7);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    display: none;
+}
+
+#player-info, #player-stats, #enemy-stats {
+    background-color: rgba(0,0,0,0.2);
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+#battle-log {
+    height: 150px;
+    overflow-y: auto;
+    background-color: rgba(0,0,0,0.2);
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.modal {
+    display: none;
     position: fixed;
-    top: 0;
+    z-index: 1;
     left: 0;
+    top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
 }
 
-#level-up-modal > div {
+.modal-content {
     background-color: var(--container-color);
+    margin: 15% auto;
     padding: 20px;
     border-radius: 10px;
+    width: 80%;
+    max-width: 500px;
+}
+
+#shop-items, #inventory {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.shop-item, .inventory-item {
+    background-color: rgba(0,0,0,0.2);
+    padding: 10px;
+    border-radius: 5px;
     text-align: center;
-    max-width: 400px;
-    width: 90%;
-}
-
-.ability-button {
-    background-color: var(--secondary-color);
-    margin: 5px;
-}
-
-.ability-button:hover {
-    background-color: #2980b9;
-}
-
-#remaining-points {
-    font-weight: bold;
-    color: var(--primary-color);
 }
