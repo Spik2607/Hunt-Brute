@@ -16,8 +16,7 @@ class Character {
         this.energy = 100;
         this.maxEnergy = 100;
         this.abilities = [];
-        updateAbilityButtons();
-        
+         
     }
  levelUp() {
         this.level++;
@@ -203,7 +202,9 @@ function endMission(victory) {
         abilitiesContainer.appendChild(abilityButton);
     });
 }
-function updateBattleInfo() {
+
+function updateBattleInfo() { 
+if (!player || !enemy) return;
     document.getElementById('player-stats').innerHTML = `
         ${player.name} - Niveau ${player.level}<br>
         PV: ${player.hp}/${player.maxHp}<br>
@@ -226,11 +227,16 @@ function updateBattleLog(message) {
 
 
 
-    function updatePlayerInfo() {
+  function updatePlayerInfo() {
+    if (!player) return;
+    const playerInfoElement = document.getElementById('player-info');
+    if (!playerInfoElement) return;
+      
     if (!player) {
         console.error("Player is not initialized");
         return;
     }
+      
     document.getElementById('player-info').innerHTML = `
         ${player.name} - Niveau ${player.level}<br>
         PV: ${player.hp}/${player.maxHp}<br>
@@ -515,11 +521,33 @@ document.getElementById('load-game').addEventListener('click', loadGame);
  
       
 // Initialisation du jeu
-
 document.addEventListener('DOMContentLoaded', () => {
     console.log("DOM fully loaded");
     showGameArea('main-menu');
-    console.log("Attempted to show main menu");
+    
+    const addClickListener = (id, func) => {
+        const element = document.getElementById(id);
+        if (element) element.addEventListener('click', func);
+        else console.warn(`Element with id '${id}' not found`);
+    };
+
+    addClickListener('start-solo', () => {
+        gameMode = 'solo';
+        showGameArea('character-creation');
+    });
+    addClickListener('create-character', createCharacter);
+    addClickListener('start-mission', startRandomMission);
+    addClickListener('attack-button', playerAttack);
+    addClickListener('open-shop', openShop);
+    addClickListener('open-inventory', openInventory);
+    addClickListener('open-multiplayer', () => showGameArea('multiplayer-options'));
+    addClickListener('create-room', createRoom);
+    addClickListener('join-room', joinRoom);
+    addClickListener('back-to-solo', () => showGameArea('solo-menu'));
+    
+    setupLevelUpListeners();
+    setupMultiplayerListeners();
+});
     
     // Log pour vérifier si les éléments existent
     console.log("Start solo button:", document.getElementById('start-solo'));
