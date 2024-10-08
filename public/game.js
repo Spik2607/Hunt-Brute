@@ -72,13 +72,14 @@ class Mission {
 }
 
 function showGameArea(areaId) {
-    console.log(`Showing area: ${areaId}`);
+    console.log(`Attempting to show area: ${areaId}`);
     document.querySelectorAll('.game-area').forEach(area => {
         area.style.display = 'none';
     });
     const areaToShow = document.getElementById(areaId);
     if (areaToShow) {
         areaToShow.style.display = 'block';
+        console.log(`Area ${areaId} shown successfully`);
     } else {
         console.error(`Area ${areaId} not found`);
     }
@@ -144,8 +145,8 @@ function createCharacter() {
 
     if (name && !isNaN(hp) && !isNaN(attack) && !isNaN(defense)) {
         player = new Character(name, hp, attack, defense);
-        player.abilities = [];
-        console.log("Personnage créé:", player); // Pour le débogage
+        player.abilities = []; // Initialisation explicite des capacités
+        console.log("Personnage créé:", player);
         updateAbilityButtons();
         showGameArea('solo-menu');
         updatePlayerInfo();
