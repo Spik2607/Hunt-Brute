@@ -167,8 +167,13 @@ function createCharacter() {
     
     saveGame();
     
-    showGameArea('solo-menu');
-    prepareMission();
+   const goMultiplayer = confirm("Voulez-vous rejoindre la salle multijoueur fixe ?");
+    if (goMultiplayer) {
+        joinRoom(FIXED_ROOM);
+    } else {
+        showGameArea('solo-menu');
+        prepareMission();
+    }
     
     alert(`${player.name} a été créé avec succès ! Vous pouvez maintenant commencer votre aventure.`);
 }
@@ -567,15 +572,15 @@ function setupMultiplayerListeners() {
     addSafeEventListener('join-room', 'click', joinCustomRoom);
     addSafeEventListener('multiplayer-attack-button', 'click', multiplayerAttack);
 
-    socket.on('roomJoined', (roomId) => {
+   socket.on('roomJoined', (roomId) => {
         console.log(`Joined room: ${roomId}`);
         showGameArea('waiting-area');
-        updateWaitingArea(roomId, [player]);
+        updateWaitingAreaDisplay(roomId, [player]);
     });
 
-    socket.on('playerJoined', (playerInfo) => {
-        console.log('Another player joined:', playerInfo);
-        updateWaitingArea(roomId, [player, playerInfo]);
+    socket.on('playerJoined', (players) => {
+        console.log('Players in room:', players);
+        updateWaitingAreaDisplay(FIXED_ROOM, players);
     });
 
     socket.on('gameReady', (players) => {
@@ -594,7 +599,19 @@ function setupMultiplayerListeners() {
 }
 
 function joinRoom(roomId) {
-    socket.emit('joinRoom', roomId);
+    if (!player) {
+        alert("Veuillez d'abord créer un personnage.");
+        return;
+    }
+    const playerInfo = {
+        id: socket.id,
+        name: player.name,
+        level: player.level,
+        hp: player.hp,
+        attack: player.attack,
+        defense: player.defense
+    };
+    socket.emit('joinRoom', { roomId, playerInfo });
 }
 
 function createCustomRoom() {
@@ -624,6 +641,23 @@ function updateWaitingArea(roomId, players) {
         playerElement.textContent = `${player.name} (Niveau ${player.level})`;
         playersList.appendChild(playerElement);
     });
+}
+
+function updateWaitingAreaDisplay(roomId, players) {
+    const waitingArea = document.getElementById('waiting-area');
+    const roomIdDisplay = document.getElementById('room-id-display');
+    const playersList = document.getElementById('players-list');
+
+    roomIdDisplay.textContent = roomId;
+    playersList.innerHTML = '';
+
+    players.forEach(p => {
+        const playerElement = document.createElement('div');
+        playerElement.textContent = `${p.name} (Niveau ${p.level})`;
+        playersList.appendChild(playerElement);
+    });
+
+    waitingArea.style.display = 'block';
 }
 
 function startMultiplayerGame(opponentInfo) {
