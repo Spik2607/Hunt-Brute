@@ -538,10 +538,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.warn(`Element with id '${id}' not found`);
         }
     }
-   const addClickListener = (id, func) => {
-        const element = document.getElementById(id);
-        if (element) element.addEventListener('click', func);
-        else console.warn(`Element with id '${id}' not found`)
+ 
        
     // Utilisation des document.getElementById() avec gestion d'erreurs
     if (document.getElementById('start-solo')) {
