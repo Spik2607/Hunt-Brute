@@ -507,9 +507,9 @@ function autoSave() {
 setInterval(autoSave, 60000); // Sauvegarde toutes les minutes
 function saveGame() {
     if (!player) {
-        alert('Aucun personnage à sauvegarder. Créez d'abord un personnage.');
+        alert('Aucun personnage à sauvegarder. Créez dabord un personnage.');
         return;
-    }}
+    }
     const gameState = {
         player: player,
         inventory: player.inventory,
