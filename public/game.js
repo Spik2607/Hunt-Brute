@@ -471,6 +471,40 @@ function selectMission(index) {
 }
 
 // Système de sauvegarde et chargement
+
+function addSafeEventListener(id, eventType, callback) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.addEventListener(eventType, callback);
+    } else {
+        console.warn(`Element with id '${id}' not found`);
+    }
+}
+
+// Utilisez cette fonction dans votre code d'initialisation
+document.addEventListener('DOMContentLoaded', () => {
+    addSafeEventListener('save-game', 'click', saveGame);
+    addSafeEventListener('load-game', 'click', loadGame);
+    // Autres initialisations...
+});
+
+function autoSave() {
+    if (player) {
+        const gameState = {
+            player: player,
+            inventory: player.inventory,
+            abilities: player.abilities,
+            gold: player.gold,
+            level: player.level,
+            experience: player.experience
+        };
+        localStorage.setItem('huntBruteGameState', JSON.stringify(gameState));
+        console.log('Partie sauvegardée automatiquement');
+    }
+}
+
+// Appelez cette fonction périodiquement ou après des événements importants
+setInterval(autoSave, 60000); // Sauvegarde toutes les minutes
 function saveGame() {
     if (!player) {
         alert('Aucun personnage à sauvegarder. Créez d'abord un personnage.');
@@ -488,6 +522,19 @@ function saveGame() {
     alert('Partie sauvegardée avec succès !');
     console.log('Partie sauvegardée:', gameState);
 }
+
+function autoLoad() {
+    const savedState = localStorage.getItem('huntBruteGameState');
+    if (savedState) {
+        const gameState = JSON.parse(savedState);
+        // Initialiser le joueur et l'état du jeu avec les données sauvegardées
+        // ...
+        console.log('Partie chargée automatiquement');
+    }
+}
+
+// Appelez cette fonction au démarrage du jeu
+document.addEventListener('DOMContentLoaded', autoLoad);
 
 function loadGame() {
     const savedState = localStorage.getItem('huntBruteGameState');
