@@ -185,21 +185,64 @@ function addSafeEventListener(id, event, callback) {
 }
 
 function createCharacter() {
-    const name = document.getElementById('hero-name').value;
+    const name = document.getElementById('hero-name').value.trim();
     const hp = parseInt(document.getElementById('stat-hp').value) || 0;
     const attack = parseInt(document.getElementById('stat-attack').value) || 0;
     const defense = parseInt(document.getElementById('stat-defense').value) || 0;
-
-    if (name && (hp + attack + defense) <= totalPoints) {
-        player = new Character(name, hp * 10 + 100, attack + 10, defense + 5);
-        console.log("Personnage créé:", player);
-        updateAbilityButtons();
-        showGameArea('solo-menu');
-        updatePlayerInfo();
-    } else {
-        alert("Veuillez remplir tous les champs correctement et ne pas dépasser " + totalPoints + " points au total.");
+    
+    const totalAssignedPoints = hp + attack + defense;
+    
+    if (!name) {
+        alert("Veuillez entrer un nom pour votre personnage.");
+        return;
     }
+    
+    if (totalAssignedPoints > totalPoints) {
+        alert(`Vous avez attribué trop de points. Maximum autorisé : ${totalPoints}`);
+        return;
+    }
+    
+    if (totalAssignedPoints < totalPoints) {
+        const confirmCreate = confirm(`Vous n'avez pas utilisé tous vos points (${totalPoints - totalAssignedPoints} restants). Voulez-vous quand même créer le personnage ?`);
+        if (!confirmCreate) return;
+    }
+    
+    player = new Character(name, hp * 10 + 100, attack + 10, defense + 5);
+    console.log("Personnage créé:", player);
+    
+    // Initialiser les capacités du joueur si nécessaire
+    player.abilities = [];
+    
+    updateAbilityButtons();
+    updatePlayerInfo();
+    
+    // Sauvegarder le personnage si nécessaire
+    saveGame();
+    
+    // Afficher le menu solo et préparer la première mission
+    showGameArea('solo-menu');
+    prepareMission();
+    
+    alert(`${player.name} a été créé avec succès ! Vous pouvez maintenant commencer votre aventure.`);
 }
+
+function prepareMission() {
+    // Logique pour préparer la première mission
+    // Par exemple, générer une mission aléatoire ou afficher un bouton pour commencer une mission
+    const missionButton = document.createElement('button');
+    missionButton.id = 'start-mission';
+    missionButton.textContent = 'Commencer une mission';
+    missionButton.onclick = startMission;
+    
+    const soloMenu = document.getElementById('solo-menu');
+    soloMenu.appendChild(missionButton);
+}
+
+function startMission() {
+    console.log("Démarrage d'une mission");
+    // Logique pour démarrer une mission
+    showGameArea('mission-area');
+    // Ajoutez ici la logique pour initialiser et afficher les détails de la mission
 
 function updateRemainingPoints() {
     const hp = parseInt(document.getElementById('stat-hp').value) || 0;
