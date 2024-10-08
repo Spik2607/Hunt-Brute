@@ -176,26 +176,30 @@ function createCharacter() {
 }
 
 function startRandomMission() {
-    if (!player) {
-        console.error("Player not initialized");
+    console.log("Démarrage d'une mission aléatoire");
+    const availableMissions = missions.filter(m => m.enemyLevel <= player.level + 2);
+    if (availableMissions.length === 0) {
+        alert("Aucune mission disponible pour votre niveau.");
         return;
     }
-    const availableMissions = missions.filter(m => m.enemyLevel <= player.level + 2);
     const missionChoices = availableMissions.slice(0, 3);
     
     const missionChoiceArea = document.getElementById('mission-choices');
-    if (missionChoiceArea) {
-        missionChoiceArea.innerHTML = '';
-        missionChoices.forEach((mission, index) => {
-            const missionButton = document.createElement('button');
-            missionButton.textContent = `${mission.description} (${mission.difficulty})`;
-            missionButton.onclick = () => selectMission(index);
-            missionChoiceArea.appendChild(missionButton);
-        });
-        showGameArea('mission-choice-area');
-    } else {
-        console.error("Mission choice area not found");
+    if (!missionChoiceArea) {
+        console.error("Zone de choix de mission non trouvée");
+        missionChoiceArea = document.createElement('div');
+        missionChoiceArea.id = 'mission-choices';
+        document.getElementById('solo-menu').appendChild(missionChoiceArea);
     }
+    missionChoiceArea.innerHTML = '';
+    missionChoices.forEach((mission, index) => {
+        const missionButton = document.createElement('button');
+        missionButton.textContent = `${mission.description} (${mission.difficulty})`;
+        missionButton.onclick = () => selectMission(index);
+        missionChoiceArea.appendChild(missionButton);
+    });
+    
+    showGameArea('mission-choice-area');
 }
 
 function selectMission(index) {
@@ -395,6 +399,9 @@ function initGame() {
 }
 
 function setupEventListeners() {
+    addSafeEventListener('back-to-solo', 'click', () => showGameArea('main-menu'));
+    addSafeEventListener('leave-shop', 'click', () => showGameArea('solo-menu'));
+    addSafeEventListener('close-inventory', 'click', () => showGameArea('solo-menu'));{
     addSafeEventListener('start-solo', 'click', () => {
         gameMode = 'solo';
         showGameArea('character-creation');
