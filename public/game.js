@@ -562,25 +562,85 @@ function joinFixedRoom() {
 }
 
 function setupMultiplayerListeners() {
+    addSafeEventListener('join-fixed-room', 'click', () => joinRoom(FIXED_ROOM));
+    addSafeEventListener('create-room', 'click', createCustomRoom);
+    addSafeEventListener('join-room', 'click', joinCustomRoom);
+    addSafeEventListener('multiplayer-attack-button', 'click', multiplayerAttack);
+
     socket.on('roomJoined', (roomId) => {
         console.log(`Joined room: ${roomId}`);
         showGameArea('waiting-area');
-        document.getElementById('room-id-display').textContent = roomId;
+        updateWaitingArea(roomId, [player]);
     });
 
     socket.on('playerJoined', (playerInfo) => {
         console.log('Another player joined:', playerInfo);
-        updateOpponentInfo(playerInfo);
+        updateWaitingArea(roomId, [player, playerInfo]);
     });
 
-    socket.on('gameReady', (opponentInfo) => {
+    socket.on('gameReady', (players) => {
         console.log('Game is ready to start');
-        startMultiplayerGame(opponentInfo);
+        const opponent = players.find(p => p.id !== socket.id);
+        startMultiplayerGame(opponent);
     });
 
     socket.on('opponentMove', (move) => {
-        handleOpponentMove(move);
+        if (move.type === 'attack') {
+            player.hp -= move.damage;
+            updateBattleLog(`L'adversaire vous inflige ${move.damage} dégâts.`);
+            updateBattleInfo();
+        }
     });
+}
+
+function joinRoom(roomId) {
+    socket.emit('joinRoom', roomId);
+}
+
+function createCustomRoom() {
+    const roomId = document.getElementById('room-id').value;
+    if (roomId) {
+        joinRoom(roomId);
+    } else {
+        alert("Veuillez entrer un ID de salle valide.");
+    }
+}
+
+function joinCustomRoom() {
+    const roomId = document.getElementById('room-id').value;
+    if (roomId) {
+        joinRoom(roomId);
+    } else {
+        alert("Veuillez entrer un ID de salle valide.");
+    }
+}
+
+function updateWaitingArea(roomId, players) {
+    document.getElementById('room-id-display').textContent = roomId;
+    const playersList = document.getElementById('players-list');
+    playersList.innerHTML = '';
+    players.forEach(player => {
+        const playerElement = document.createElement('div');
+        playerElement.textContent = `${player.name} (Niveau ${player.level})`;
+        playersList.appendChild(playerElement);
+    });
+}
+
+function startMultiplayerGame(opponentInfo) {
+    enemy = new Character(opponentInfo.name, opponentInfo.hp, opponentInfo.attack, opponentInfo.defense);
+    showGameArea('multiplayer-battle');
+    updateBattleInfo();
+}
+
+function multiplayerAttack() {
+    if (!player || !enemy) {
+        console.error("Player or enemy not initialized");
+        return;
+    }
+    const damage = Math.max(player.attack - enemy.defense, 0);
+    socket.emit('playerMove', { type: 'attack', damage: damage });
+    updateBattleLog(`${player.name} inflige ${damage} dégâts à l'adversaire.`);
+    updateBattleInfo();
 }
 
 function updateOpponentInfo(opponentInfo) {
@@ -590,11 +650,6 @@ function updateOpponentInfo(opponentInfo) {
     }
 }
 
-function startMultiplayerGame(opponentInfo) {
-    enemy = new Character(opponentInfo.name, opponentInfo.hp, opponentInfo.attack, opponentInfo.defense);
-    showGameArea('multiplayer-battle');
-    updateBattleInfo();
-}
 
 function handleOpponentMove(move) {
     if (move.type === 'attack') {
