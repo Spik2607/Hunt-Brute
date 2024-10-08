@@ -21,25 +21,26 @@
             <button id="open-inventory"><i class="fas fa-briefcase"></i> Inventaire</button>
             <button id="save-game"><i class="fas fa-save"></i> Sauvegarder</button>
             <button id="load-game"><i class="fas fa-folder-open"></i> Charger</button>
+            <button id="back-to-main" style="display: none;"><i class="fas fa-arrow-left"></i> Retour au menu</button>
         </nav>
 
         <main id="game-content">
-            <section id="character-creation" class="game-area">
+            <section id="character-creation" class="game-area" style="display: none;">
                 <h2>Création du Personnage</h2>
                 <input type="text" id="hero-name" placeholder="Nom du héros">
-                <input type="number" id="stat-hp" placeholder="PV">
-                <input type="number" id="stat-attack" placeholder="Attaque">
-                <input type="number" id="stat-defense" placeholder="Défense">
+                <input type="number" id="stat-hp" placeholder="PV" min="0">
+                <input type="number" id="stat-attack" placeholder="Attaque" min="0">
+                <input type="number" id="stat-defense" placeholder="Défense" min="0">
                 <p>Points restants: <span id="remaining-points">15</span></p>
                 <button id="create-character">Créer le personnage</button>
             </section>
 
-            <section id="solo-menu" class="game-area">
+            <section id="solo-menu" class="game-area" style="display: none;">
                 <h2>Menu Solo</h2>
-                <!-- Le bouton start-mission sera ajouté dynamiquement ici -->
+                <button id="start-mission">Commencer une mission</button>
             </section>
 
-            <section id="mission-area" class="game-area">
+            <section id="mission-area" class="game-area" style="display: none;">
                 <h2>Mission en cours</h2>
                 <div id="player-stats"></div>
                 <div id="enemy-stats"></div>
@@ -48,39 +49,39 @@
                 <div id="player-abilities"></div>
             </section>
 
-            <section id="shop" class="game-area">
+            <section id="shop" class="game-area" style="display: none;">
                 <h2>Boutique</h2>
                 <div id="shop-items"></div>
                 <button id="leave-shop">Quitter la boutique</button>
             </section>
 
-            <section id="inventory-area" class="game-area">
+            <section id="inventory-area" class="game-area" style="display: none;">
                 <h2>Inventaire</h2>
                 <div id="inventory"></div>
                 <button id="close-inventory">Fermer l'inventaire</button>
             </section>
 
-            <section id="multiplayer" class="game-area">
+            <section id="multiplayer" class="game-area" style="display: none;">
                 <h2>Mode Multijoueur</h2>
                 <input type="text" id="room-id" placeholder="ID de la salle">
                 <button id="create-room">Créer une salle</button>
                 <button id="join-room">Rejoindre une salle</button>
             </section>
 
-            <section id="waiting-area" class="game-area">
+            <section id="waiting-area" class="game-area" style="display: none;">
                 <h2>En attente d'un autre joueur...</h2>
                 <p>ID de la salle: <span id="room-id-display"></span></p>
             </section>
         </main>
 
-        <div id="level-up-modal" class="modal">
+        <div id="level-up-modal" class="modal" style="display: none;">
             <div class="modal-content">
                 <h2>Niveau Supérieur !</h2>
                 <p>Vous avez atteint le niveau <span id="new-level"></span> !</p>
                 <p>Points à distribuer : <span id="stat-points"></span></p>
-                <input type="number" id="level-up-hp" placeholder="PV">
-                <input type="number" id="level-up-attack" placeholder="Attaque">
-                <input type="number" id="level-up-defense" placeholder="Défense">
+                <input type="number" id="level-up-hp" placeholder="PV" min="0">
+                <input type="number" id="level-up-attack" placeholder="Attaque" min="0">
+                <input type="number" id="level-up-defense" placeholder="Défense" min="0">
                 <button id="confirm-level-up">Confirmer</button>
             </div>
         </div>
