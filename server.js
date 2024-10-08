@@ -15,34 +15,26 @@ const rooms = new Map();
 io.on('connection', (socket) => {
     console.log('Un joueur s\'est connecté', socket.id);
 
-    socket.on('joinRoom', (roomId) => {
+    socket.on('joinRoom', ({ roomId, playerInfo }) => {
         let room;
         if (roomId === FIXED_ROOM) {
             if (!rooms.has(FIXED_ROOM)) {
-                rooms.set(FIXED_ROOM, { players: [], ready: 0 });
+                rooms.set(FIXED_ROOM, { players: [] });
             }
             room = rooms.get(FIXED_ROOM);
-        } else if (rooms.has(roomId)) {
-            room = rooms.get(roomId);
         } else {
-            room = { players: [], ready: 0 };
-            rooms.set(roomId, room);
+            if (!rooms.has(roomId)) {
+                rooms.set(roomId, { players: [] });
+            }
+            room = rooms.get(roomId);
         }
 
         if (room.players.length < 2) {
-            room.players.push({
-                id: socket.id,
-                name: `Player ${room.players.length + 1}`,
-                level: 1,
-                hp: 100,
-                attack: 10,
-                defense: 5
-            });
+            playerInfo.id = socket.id;
+            room.players.push(playerInfo);
             socket.join(roomId);
             socket.emit('roomJoined', roomId);
-            
-            // Informer les autres joueurs de la salle
-            socket.to(roomId).emit('playerJoined', room.players[room.players.length - 1]);
+            io.to(roomId).emit('playerJoined', room.players);
 
             if (room.players.length === 2) {
                 io.to(roomId).emit('gameReady', room.players);
@@ -69,12 +61,24 @@ io.on('connection', (socket) => {
                     rooms.delete(roomId);
                 } else {
                     io.to(roomId).emit('playerDisconnected', socket.id);
+                    io.to(roomId).emit('playerJoined', room.players); // Mettre à jour la liste des joueurs
                 }
             }
         });
     });
 
-    // Ajoutez d'autres gestionnaires d'événements si nécessaire
+    // Nouvelle fonctionnalité : chat
+    socket.on('sendMessage', ({ roomId, message }) => {
+        io.to(roomId).emit('newMessage', { 
+            senderId: socket.id, 
+            message: message 
+        });
+    });
+
+    // Nouvelle fonctionnalité : synchronisation de l'état du jeu
+    socket.on('syncGameState', ({ roomId, gameState }) => {
+        socket.to(roomId).emit('gameStateSynced', gameState);
+    });
 });
 
 const PORT = process.env.PORT || 3000;
