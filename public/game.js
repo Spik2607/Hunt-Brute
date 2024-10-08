@@ -144,6 +144,7 @@ function createCharacter() {
 
     if (name && !isNaN(hp) && !isNaN(attack) && !isNaN(defense)) {
         player = new Character(name, hp, attack, defense);
+        player.abilities = [];
         console.log("Personnage créé:", player); // Pour le débogage
         updateAbilityButtons();
         showGameArea('solo-menu');
@@ -516,14 +517,27 @@ function loadGame() {
 
 
     // Mise à jour des boutons de capacités
+    function updateAbilityButtons() {
     const abilitiesContainer = document.getElementById('player-abilities');
+    if (!abilitiesContainer) {
+        console.warn("Abilities container not found");
+        return;
+    }
+    
     abilitiesContainer.innerHTML = '';
-    player.abilities.forEach((ability, index) => {
-        const abilityButton = document.createElement('button');
-        abilityButton.textContent = `${ability.name} (${ability.energyCost} énergie)`;
-        abilityButton.onclick = () => useAbility(index);
-        abilitiesContainer.appendChild(abilityButton);
-    });
+    
+    if (player && Array.isArray(player.abilities)) {
+        player.abilities.forEach((ability, index) => {
+            const abilityButton = document.createElement('button');
+            abilityButton.textContent = `${ability.name} (${ability.energyCost} énergie)`;
+            abilityButton.onclick = () => useAbility(index);
+            abilitiesContainer.appendChild(abilityButton);
+        });
+    } else {
+        console.warn("Player abilities not initialized or not an array");
+        abilitiesContainer.innerHTML = '<p>Aucune capacité disponible</p>';
+    }
+}
 
 
  
