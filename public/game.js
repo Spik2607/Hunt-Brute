@@ -7,6 +7,7 @@ let enemy = null;
 let currentMission = null;
 let gameMode = 'solo';
 let roomId = null;
+let availablePoints = null;
 
 // Classe Character
 class Character {
