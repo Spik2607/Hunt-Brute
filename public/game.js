@@ -509,7 +509,7 @@ function saveGame() {
     if (!player) {
         alert('Aucun personnage à sauvegarder. Créez d'abord un personnage.');
         return;
-    }
+    }}
     const gameState = {
         player: player,
         inventory: player.inventory,
