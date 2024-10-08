@@ -111,7 +111,6 @@ function showGameArea(areaId) {
 function setupEventListeners() {
     addSafeEventListener('start-solo', 'click', () => showGameArea('character-creation'));
     addSafeEventListener('create-character', 'click', createCharacter);
-    addSafeEventListener('start-mission', 'click', startRandomMission);
     addSafeEventListener('attack-button', 'click', playerAttack);
     addSafeEventListener('open-shop', 'click', openShop);
     addSafeEventListener('open-inventory', 'click', openInventory);
@@ -196,8 +195,15 @@ function startMission(mission) {
     enemy = new Character(mission.name, mission.enemyLevel * 50, mission.enemyLevel * 5, mission.enemyLevel * 2);
     showGameArea('mission-area');
     updateBattleInfo();
+    
+    // Réinitialiser le bouton d'attaque
+    const attackButton = document.getElementById('attack-button');
+    if (attackButton) {
+        attackButton.onclick = playerAttack;
+    } else {
+        console.error("Le bouton d'attaque n'a pas été trouvé");
+    }
 }
-
 
 function playerAttack() {
     if (!player || !enemy) {
@@ -205,11 +211,10 @@ function playerAttack() {
         return;
     }
     const damage = Math.max(player.attack - enemy.defense, 0);
-    enemy.hp -= damage;  // Ajoutez cette ligne pour réduire les PV de l'ennemi
-    const enemyDefeated = enemy.hp <= 0;  // Modifiez cette condition
+    enemy.hp -= damage;
     updateBattleLog(`${player.name} inflige ${damage} dégâts à l'ennemi.`);
     
-    if (enemyDefeated) {
+    if (enemy.hp <= 0) {
         endMission(true);
     } else {
         enemyAttack();
