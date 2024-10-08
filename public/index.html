@@ -104,7 +104,6 @@
 </head>
 <body>
     <div id="game-container">
-        <!-- Le contenu de vos div reste le même, mais ajoutez des icônes aux boutons -->
         <div id="main-menu" class="game-area">
             <h1>Hunt Brute</h1>
             <button id="start-solo"><i class="fas fa-user"></i> Mode Solo</button>
@@ -114,8 +113,63 @@
             <button id="join-room"><i class="fas fa-sign-in-alt"></i> Rejoindre une salle</button>
         </div>
 
-        <!-- Répétez ce processus pour les autres div, en ajoutant des icônes appropriées aux boutons -->
+        <div id="character-creation" class="game-area">
+            <h2>Création du personnage</h2>
+            <input type="text" id="hero-name" placeholder="Nom du héros">
+            <input type="number" id="stat-hp" placeholder="PV">
+            <input type="number" id="stat-attack" placeholder="Attaque">
+            <input type="number" id="stat-defense" placeholder="Défense">
+            <button id="create-character"><i class="fas fa-user-plus"></i> Créer le personnage</button>
+        </div>
 
+        <div id="solo-menu" class="game-area">
+            <h2>Menu Solo</h2>
+            <div id="player-info"></div>
+            <button id="start-mission"><i class="fas fa-play"></i> Commencer une mission</button>
+            <button id="open-shop"><i class="fas fa-store"></i> Ouvrir la boutique</button>
+            <button id="open-inventory"><i class="fas fa-briefcase"></i> Ouvrir l'inventaire</button>
+            <button id="save-game"><i class="fas fa-save"></i> Sauvegarder la partie</button>
+            <button id="load-game"><i class="fas fa-folder-open"></i> Charger la partie</button>
+            <button id="back-to-solo"><i class="fas fa-arrow-left"></i> Retour au menu principal</button>
+        </div>
+
+        <div id="mission-area" class="game-area">
+            <h2>Mission en cours</h2>
+            <div id="player-stats"></div>
+            <div id="enemy-stats"></div>
+            <div id="battle-log"></div>
+            <button id="attack-button"><i class="fas fa-fist-raised"></i> Attaquer</button>
+            <div id="player-abilities"></div>
+        </div>
+
+        <div id="shop" class="game-area">
+            <h2>Boutique</h2>
+            <div id="shop-items"></div>
+            <button id="leave-shop"><i class="fas fa-door-open"></i> Quitter la boutique</button>
+        </div>
+
+        <div id="inventory-area" class="game-area">
+            <h2>Inventaire</h2>
+            <div id="inventory"></div>
+            <button id="close-inventory"><i class="fas fa-times"></i> Fermer l'inventaire</button>
+        </div>
+
+        <div id="waiting-area" class="game-area">
+            <h2>En attente d'un autre joueur...</h2>
+            <p>ID de la salle: <span id="room-id-display"></span></p>
+        </div>
+
+        <div id="level-up-modal" class="game-area">
+            <div>
+                <h2>Niveau Supérieur !</h2>
+                <p>Vous avez atteint le niveau <span id="new-level"></span> !</p>
+                <p>Points à distribuer : <span id="stat-points"></span></p>
+                <input type="number" id="level-up-hp" placeholder="PV">
+                <input type="number" id="level-up-attack" placeholder="Attaque">
+                <input type="number" id="level-up-defense" placeholder="Défense">
+                <button id="confirm-level-up"><i class="fas fa-check"></i> Confirmer</button>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.js"></script>
