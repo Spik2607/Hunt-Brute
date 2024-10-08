@@ -417,12 +417,13 @@ function initGame() {
 }
 
 function setupEventListeners() {
-    addSafeEventListener('back-to-solo', 'click', () => showGameArea('main-menu'));
-    addSafeEventListener('leave-shop', 'click', () => showGameArea('solo-menu'));
-    addSafeEventListener('close-inventory', 'click', () => showGameArea('solo-menu'));{
     addSafeEventListener('start-solo', 'click', () => {
         gameMode = 'solo';
         showGameArea('character-creation');
+    addSafeEventListener('back-to-solo', 'click', () => showGameArea('main-menu'));
+    addSafeEventListener('leave-shop', 'click', () => showGameArea('solo-menu'));
+    addSafeEventListener('close-inventory', 'click', () => showGameArea('solo-menu'));{
+    
     });
     addSafeEventListener('create-character', 'click', createCharacter);
     addSafeEventListener('start-mission', 'click', startRandomMission);
