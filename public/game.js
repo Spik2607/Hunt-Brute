@@ -479,7 +479,7 @@ function setupLevelUpListeners() {
 
 function saveGame() {
     if (!player) {
-        alert('Aucun personnage à sauvegarder. Créez d'abord un personnage.');
+        alert('Aucun personnage à sauvegarder. Créez dabord un personnage.');
         return;
     }
     const gameState = {
