@@ -38,9 +38,11 @@ class Character {
         console.log("Level up:", this);
         showLevelUpModal();
     }
-    let availablePoints = 5;
+}   
 
-    function updateAvailablePoints() {
+    function updateAvailablePoints() { 
+     let availablePoints + 5;
+    
     const hpPoints = parseInt(document.getElementById('stat-hp').value) || 0;
     const attackPoints = parseInt(document.getElementById('stat-attack').value) || 0;
     const defensePoints = parseInt(document.getElementById('stat-defense').value) || 0;
