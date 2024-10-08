@@ -181,17 +181,21 @@ function prepareMission() {
         return;
     }
     
-    const oldButton = document.getElementById('start-mission');
-    if (oldButton) {
-        oldButton.remove();
-    }
+    soloMenu.innerHTML = '<h2>Choisissez une mission</h2>';
     
-    const missionButton = document.createElement('button');
-    missionButton.id = 'start-mission';
-    missionButton.textContent = 'Commencer une mission';
-    missionButton.onclick = startRandomMission;
-    
-    soloMenu.appendChild(missionButton);
+    missions.forEach((mission, index) => {
+        const missionButton = document.createElement('button');
+        missionButton.textContent = `${mission.name} (Niveau ${mission.enemyLevel})`;
+        missionButton.onclick = () => startMission(index);
+        soloMenu.appendChild(missionButton);
+    });
+}
+
+function startMission(missionIndex) {
+    currentMission = missions[missionIndex];
+    enemy = new Character(currentMission.name, currentMission.enemyLevel * 50, currentMission.enemyLevel * 5, currentMission.enemyLevel * 2);
+    showGameArea('mission-area');
+    updateBattleInfo();
 }
 
 function startRandomMission() {
@@ -212,7 +216,8 @@ function playerAttack() {
         return;
     }
     const damage = Math.max(player.attack - enemy.defense, 0);
-    const enemyDefeated = enemy.takeDamage(damage);
+    enemy.hp -= damage;  // Ajoutez cette ligne pour réduire les PV de l'ennemi
+    const enemyDefeated = enemy.hp <= 0;  // Modifiez cette condition
     updateBattleLog(`${player.name} inflige ${damage} dégâts à l'ennemi.`);
     
     if (enemyDefeated) {
