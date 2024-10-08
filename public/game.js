@@ -145,6 +145,7 @@ function createCharacter() {
     if (name && !isNaN(hp) && !isNaN(attack) && !isNaN(defense)) {
         player = new Character(name, hp, attack, defense);
         console.log("Personnage créé:", player); // Pour le débogage
+        updateAbilityButtons();
         showGameArea('solo-menu');
         updatePlayerInfo();
     } else {
@@ -188,12 +189,16 @@ function endMission(victory) {
     }, 3000);
 }
 
-    function updateAbilityButtons() {
+   function updateAbilityButtons() {
     if (!player || !player.abilities) {
         console.log("Player or player abilities not initialized");
         return;
     }
     const abilitiesContainer = document.getElementById('player-abilities');
+    if (!abilitiesContainer) {
+        console.log("Abilities container not found");
+        return;
+    }
     abilitiesContainer.innerHTML = '';
     player.abilities.forEach((ability, index) => {
         const abilityButton = document.createElement('button');
@@ -492,8 +497,9 @@ function loadGame() {
         player.experience = gameState.experience;
         player.gold = gameState.gold;
         player.inventory = gameState.inventory;
-        player.abilities = gameState.abilities;
-        updateAbilityButtons()
+        player.abilities = gameState.abilities || []; // Assurez-vous que abilities est initialisé
+        player.energy = gameState.energy || player.maxEnergy; // Ajoutez cette ligne
+        updateAbilityButtons();
         updatePlayerInfo();
         showGameArea('solo-menu');
         alert('Partie chargée !');
