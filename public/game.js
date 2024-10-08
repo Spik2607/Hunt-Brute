@@ -100,11 +100,11 @@ function showGameArea(areaId) {
         console.error(`Area ${areaId} not found`);
     }
 
-    const backButton = document.getElementById('back-to-main');
-    if (areaId === 'main-menu' || areaId === 'character-creation') {
-        backButton.style.display = 'none';
+    // Gestion spéciale pour le menu principal
+    if (areaId === 'main-menu') {
+        document.getElementById('main-menu').style.display = 'block';
     } else {
-        backButton.style.display = 'block';
+        document.getElementById('main-menu').style.display = 'none';
     }
 }
 
@@ -187,6 +187,7 @@ function prepareMission() {
         const missionButton = document.createElement('button');
         missionButton.textContent = `${mission.name} (Niveau ${mission.enemyLevel})`;
         missionButton.onclick = () => startMission(index);
+        missionButton.className = 'mission-button';
         soloMenu.appendChild(missionButton);
     });
 }
