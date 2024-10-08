@@ -514,10 +514,6 @@ function loadGame() {
     }
 }
 
-// Ajout des écouteurs d'événements pour la sauvegarde et le chargement
-document.getElementById('save-game').addEventListener('click', saveGame);
-document.getElementById('load-game').addEventListener('click', loadGame);
-
 
     // Mise à jour des boutons de capacités
     const abilitiesContainer = document.getElementById('player-abilities');
