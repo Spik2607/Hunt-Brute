@@ -37,7 +37,25 @@ class Character {
         console.log("Level up:", this);
         showLevelUpModal();
     }
+    let availablePoints = 5;
 
+    function updateAvailablePoints() {
+    const hpPoints = parseInt(document.getElementById('stat-hp').value) || 0;
+    const attackPoints = parseInt(document.getElementById('stat-attack').value) || 0;
+    const defensePoints = parseInt(document.getElementById('stat-defense').value) || 0;
+    
+    const usedPoints = hpPoints + attackPoints + defensePoints;
+    const remainingPoints = availablePoints - usedPoints;
+    
+    document.getElementById('available-points').textContent = remainingPoints;
+}
+
+function setupCharacterCreation() {
+    const statInputs = ['stat-hp', 'stat-attack', 'stat-defense'];
+    statInputs.forEach(id => {
+        document.getElementById(id).addEventListener('input', updateAvailablePoints);
+    });
+}
     useAbility(abilityIndex, target) {
         const ability = this.abilities[abilityIndex];
         if (this.energy >= ability.energyCost) {
