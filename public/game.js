@@ -1,5 +1,5 @@
 // Connexion au serveur socket
-const socket = io('https://hunt-brute-server.onrender.com');
+let socket;
 
 // Variables globales
 let player = null;
@@ -128,11 +128,23 @@ function initGame() {
     console.log("Initializing game...");
     showGameArea('main-menu');
     setupEventListeners();
+    initializeSocket();
     setupMultiplayerListeners();
     document.getElementById('stat-hp').addEventListener('input', updateRemainingPoints);
     document.getElementById('stat-attack').addEventListener('input', updateRemainingPoints);
     document.getElementById('stat-defense').addEventListener('input', updateRemainingPoints);
     updateRemainingPoints();
+}
+
+// Initialiser la connexion socket
+function initializeSocket() {
+    socket = io('https://hunt-brute-server.onrender.com');
+    socket.on('connect', () => {
+        console.log('Connected to server');
+    });
+    socket.on('connect_error', (error) => {
+        console.error('Connection error:', error);
+    });
 }
 
 // Fonction pour afficher une zone de jeu spécifique
@@ -171,6 +183,7 @@ function setupEventListeners() {
     addSafeEventListener('join-room', 'click', joinRoom);
     addSafeEventListener('leave-shop', 'click', () => showGameArea('solo-menu'));
     addSafeEventListener('close-inventory', 'click', () => showGameArea('solo-menu'));
+    addSafeEventListener('open-multiplayer', 'click', () => showGameArea('multiplayer'));
 
     setupLevelUpListeners();
 }
@@ -210,46 +223,41 @@ function createCharacter() {
     player = new Character(name, hp * 10 + 100, attack + 10, defense + 5);
     console.log("Personnage créé:", player);
     
-    // Initialiser les capacités du joueur si nécessaire
-    player.abilities = [];
-    
     updateAbilityButtons();
     updatePlayerInfo();
     
-    // Sauvegarder le personnage si nécessaire
     saveGame();
     
-    // Afficher le menu solo et préparer la première mission
     showGameArea('solo-menu');
     prepareMission();
+    hideMainMenu();
     
     alert(`${player.name} a été créé avec succès ! Vous pouvez maintenant commencer votre aventure.`);
 }
 
+function hideMainMenu() {
+    document.getElementById('main-menu').style.display = 'none';
+}
+
 function prepareMission() {
-    // Logique pour préparer la première mission
-    // Par exemple, générer une mission aléatoire ou afficher un bouton pour commencer une mission
+    const soloMenu = document.getElementById('solo-menu');
+    if (!soloMenu) {
+        console.error("L'élément 'solo-menu' n'a pas été trouvé");
+        return;
+    }
+    
+    // Supprime l'ancien bouton s'il existe
+    const oldButton = document.getElementById('start-mission');
+    if (oldButton) {
+        oldButton.remove();
+    }
+    
     const missionButton = document.createElement('button');
     missionButton.id = 'start-mission';
     missionButton.textContent = 'Commencer une mission';
-    missionButton.onclick = startMission;
+    missionButton.onclick = startRandomMission;
     
-    const soloMenu = document.getElementById('solo-menu');
     soloMenu.appendChild(missionButton);
-}
-
-function startMission() {
-    console.log("Démarrage d'une mission");
-    // Logique pour démarrer une mission
-    showGameArea('mission-area');
-    // Ajoutez ici la logique pour initialiser et afficher les détails de la mission
-
-function updateRemainingPoints() {
-    const hp = parseInt(document.getElementById('stat-hp').value) || 0;
-    const attack = parseInt(document.getElementById('stat-attack').value) || 0;
-    const defense = parseInt(document.getElementById('stat-defense').value) || 0;
-    const remainingPoints = totalPoints - (hp + attack + defense);
-    document.getElementById('remaining-points').textContent = remainingPoints;
 }
 
 function startRandomMission() {
@@ -539,7 +547,7 @@ function setupLevelUpListeners() {
 
 function saveGame() {
     if (!player) {
-        alert('Aucun personnage à sauvegarder. Créez dabord un personnage.');
+        alert('Aucun personnage à sauvegarder. Créez d'abord un personnage.');
         return;
     }
     const gameState = {
@@ -625,7 +633,15 @@ function setupMultiplayerListeners() {
         alert(error);
     });
 }
- 
+
+function updateRemainingPoints() {
+    const hp = parseInt(document.getElementById('stat-hp').value) || 0;
+    const attack = parseInt(document.getElementById('stat-attack').value) || 0;
+    const defense = parseInt(document.getElementById('stat-defense').value) || 0;
+    const remainingPoints = totalPoints - (hp + attack + defense);
+    document.getElementById('remaining-points').textContent = remainingPoints;
+}
+
 // Initialisation du jeu
 document.addEventListener('DOMContentLoaded', initGame);
 
