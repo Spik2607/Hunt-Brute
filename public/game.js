@@ -487,22 +487,28 @@ function loadGame() {
     const savedState = localStorage.getItem('huntBruteGameState');
     if (savedState) {
         const gameState = JSON.parse(savedState);
-        player = new Character(
-            gameState.player.name, 
-            gameState.player.maxHp, 
-            gameState.player.attack, 
-            gameState.player.defense
-        );
-        player.level = gameState.level;
-        player.experience = gameState.experience;
-        player.gold = gameState.gold;
-        player.inventory = gameState.inventory;
-        player.abilities = gameState.abilities || []; // Assurez-vous que abilities est initialisé
-        player.energy = gameState.energy || player.maxEnergy; // Ajoutez cette ligne
-        updateAbilityButtons();
-        updatePlayerInfo();
-        showGameArea('solo-menu');
-        alert('Partie chargée !');
+        if (gameState && gameState.player) {
+            player = new Character(
+                gameState.player.name || "Héros",
+                gameState.player.maxHp || 100,
+                gameState.player.attack || 10,
+                gameState.player.defense || 5
+            );
+            player.level = gameState.level || 1;
+            player.experience = gameState.experience || 0;
+            player.gold = gameState.gold || 0;
+            player.inventory = gameState.inventory || [];
+            player.abilities = gameState.abilities || [];
+            player.energy = gameState.player.energy || player.maxEnergy;
+            player.maxEnergy = gameState.player.maxEnergy || 100;
+
+            updateAbilityButtons();
+            updatePlayerInfo();
+            showGameArea('solo-menu');
+            alert('Partie chargée !');
+        } else {
+            alert('Données de sauvegarde corrompues ou incomplètes.');
+        }
     } else {
         alert('Aucune sauvegarde trouvée.');
     }
