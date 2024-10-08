@@ -563,8 +563,7 @@ document.addEventListener('DOMContentLoaded', () => {
  
        
     // Utilisation des document.getElementById() avec gestion d'erreurs
-    document.getElementById('save-game').addEventListener('click', saveGame);
-document.getElementById('load-game').addEventListener('click', loadGame);
+ 
     if (document.getElementById('start-solo')) {
         document.getElementById('start-solo').addEventListener('click', () => {
             gameMode = 'solo';
