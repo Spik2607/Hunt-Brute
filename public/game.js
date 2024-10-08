@@ -160,6 +160,13 @@ function showGameArea(areaId) {
     } else {
         console.error(`Area ${areaId} not found`);
     }
+
+    // Gestion spéciale pour le menu principal
+    if (areaId === 'main-menu') {
+        document.getElementById('main-menu').style.display = 'block';
+    } else {
+        document.getElementById('main-menu').style.display = 'none';
+    }
 }
 
 // Configuration des écouteurs d'événements
@@ -277,11 +284,7 @@ function playerAttack() {
         console.error("Player or enemy not initialized");
         return;
     }
-    if (player.energy < 10) {
-        alert("Pas assez d'énergie pour attaquer !");
-        return;
-    }
-    player.energy -= 10;
+   
     const damage = Math.max(player.attack - enemy.defense, 0);
     const enemyDefeated = enemy.takeDamage(damage);
     updateBattleLog(`${player.name} inflige ${damage} dégâts à l'ennemi.`);
