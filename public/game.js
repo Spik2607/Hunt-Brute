@@ -265,11 +265,24 @@ function showLevelUpModal() {
     document.getElementById('level-up-modal').style.display = 'block';
 }
 
-function setupLevelUpListeners() {
-    document.getElementById('confirm-level-up').addEventListener('click', () => {
-        const hpPoints = parseInt(document.getElementById('level-up-hp').value) || 0;
-        const attackPoints = parseInt(document.getElementById('level-up-attack').value) || 0;
-        const defensePoints = parseInt(document.getElementById('level-up-defense').value) || 0;
+function setupEventListeners() {
+    addSafeEventListener('start-solo', 'click', () => {
+        gameMode = 'solo';
+        showGameArea('character-creation');
+    });
+    addSafeEventListener('create-character', 'click', createCharacter);
+    addSafeEventListener('start-mission', 'click', startRandomMission);
+    addSafeEventListener('attack-button', 'click', playerAttack);
+    addSafeEventListener('open-shop', 'click', openShop);
+    addSafeEventListener('open-inventory', 'click', openInventory);
+    addSafeEventListener('create-room', 'click', createRoom);
+    addSafeEventListener('join-room', 'click', joinRoom);
+    addSafeEventListener('back-to-solo', 'click', () => showGameArea('solo-menu'));
+    addSafeEventListener('save-game', 'click', saveGame);
+    addSafeEventListener('load-game', 'click', loadGame);
+
+    setupLevelUpListeners();
+}
 
         // Vérifier si le joueur est bien initialisé
         if (!player || player === null) {
