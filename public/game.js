@@ -185,31 +185,19 @@ function prepareMission() {
     
     missions.forEach((mission, index) => {
         const missionButton = document.createElement('button');
-        missionButton.textContent = `${mission.name} (Niveau ${mission.enemyLevel})`;
-        missionButton.onclick = () => startMission(index);
-        missionButton.className = 'mission-button';
+        missionButton.textContent = mission.name;
+        missionButton.onclick = () => startMission(mission);
         soloMenu.appendChild(missionButton);
     });
 }
 
-function startMission(missionIndex) {
-    currentMission = missions[missionIndex];
-    enemy = new Character(currentMission.name, currentMission.enemyLevel * 50, currentMission.enemyLevel * 5, currentMission.enemyLevel * 2);
+function startMission(mission) {
+    currentMission = mission;
+    enemy = new Character(mission.name, mission.enemyLevel * 50, mission.enemyLevel * 5, mission.enemyLevel * 2);
     showGameArea('mission-area');
     updateBattleInfo();
 }
 
-function startRandomMission() {
-    if (!player) {
-        console.error("Player not initialized");
-        return;
-    }
-    const availableMissions = missions.filter(m => m.enemyLevel <= player.level + 2);
-    currentMission = availableMissions[Math.floor(Math.random() * availableMissions.length)];
-    enemy = new Character(currentMission.name, currentMission.enemyLevel * 50, currentMission.enemyLevel * 5, currentMission.enemyLevel * 2);
-    showGameArea('mission-area');
-    updateBattleInfo();
-}
 
 function playerAttack() {
     if (!player || !enemy) {
@@ -236,10 +224,10 @@ function enemyAttack() {
         return;
     }
     const damage = Math.max(enemy.attack - player.defense, 0);
-    const playerDefeated = player.takeDamage(damage);
+    player.hp -= damage; // Assurez-vous que cette ligne est présente
     updateBattleLog(`L'ennemi inflige ${damage} dégâts à ${player.name}.`);
     
-    if (playerDefeated) {
+    if (player.hp <= 0) {
         endMission(false);
     }
     
