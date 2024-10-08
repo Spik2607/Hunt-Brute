@@ -66,18 +66,31 @@
                 <button id="close-inventory">Fermer l'inventaire</button>
             </section>
 
-            <section id="multiplayer" class="game-area" style="display: none;">
-                <h2>Mode Multijoueur</h2>
-                <input type="text" id="room-id" placeholder="ID de la salle">
-                <button id="create-room">Créer une salle</button>
-                <button id="join-room">Rejoindre une salle</button>
-            </section>
+          <section id="multiplayer" class="game-area" style="display: none;">
+    <h2>Mode Multijoueur</h2>
+    <div id="room-options">
+        <button id="join-fixed-room">Rejoindre la salle fixe</button>
+        <p>ou</p>
+        <input type="text" id="room-id" placeholder="ID de la salle personnalisée">
+        <button id="create-room">Créer une salle</button>
+        <button id="join-room">Rejoindre une salle</button>
+    </div>
+</section>
 
-            <section id="waiting-area" class="game-area" style="display: none;">
-                <h2>En attente d'un autre joueur...</h2>
-                <p>ID de la salle: <span id="room-id-display"></span></p>
-            </section>
-        </main>
+<section id="waiting-area" class="game-area" style="display: none;">
+    <h2>En attente d'un autre joueur...</h2>
+    <p>ID de la salle: <span id="room-id-display"></span></p>
+    <div id="players-list"></div>
+</section>
+
+<section id="multiplayer-battle" class="game-area" style="display: none;">
+    <h2>Combat Multijoueur</h2>
+    <div id="player-stats"></div>
+    <div id="opponent-stats"></div>
+    <div id="battle-log"></div>
+    <button id="multiplayer-attack-button">Attaquer</button>
+    <div id="player-abilities"></div>
+</section>
 
         <div id="level-up-modal" class="modal" style="display: none;">
             <div class="modal-content">
