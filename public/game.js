@@ -7,7 +7,6 @@ let enemy = null;
 let currentMission = null;
 let gameMode = 'solo';
 let roomId = null;
-let availablePoints = null;
 
 // Classe Character
 class Character {
@@ -38,26 +37,7 @@ class Character {
         console.log("Level up:", this);
         showLevelUpModal();
     }
-}   
 
-    function updateAvailablePoints() { 
-        
-    const hpPoints = parseInt(document.getElementById('stat-hp').value) || 0;
-    const attackPoints = parseInt(document.getElementById('stat-attack').value) || 0;
-    const defensePoints = parseInt(document.getElementById('stat-defense').value) || 0;
-    
-    const usedPoints = hpPoints + attackPoints + defensePoints;
-    const remainingPoints = availablePoints - usedPoints;
-    
-    document.getElementById('available-points').textContent = remainingPoints;
-}
-
-function setupCharacterCreation() {
-    const statInputs = ['stat-hp', 'stat-attack', 'stat-defense'];
-    statInputs.forEach(id => {
-        document.getElementById(id).addEventListener('input', updateAvailablePoints);
-    });
-}
     useAbility(abilityIndex, target) {
         const ability = this.abilities[abilityIndex];
         if (this.energy >= ability.energyCost) {
@@ -142,7 +122,14 @@ const items = [
     { id: 'potion', name: 'Potion de soin', type: 'consumable', heal: 30, cost: 20 }
 ];
 
-// Fonctions utilitaires
+// Fonction d'initialisation principale
+function initGame() {
+    console.log("Initializing game...");
+    showGameArea('main-menu');
+    setupEventListeners();
+}
+
+// Fonction pour afficher une zone de jeu spécifique
 function showGameArea(areaId) {
     console.log(`Attempting to show area: ${areaId}`);
     document.querySelectorAll('.game-area').forEach(area => {
@@ -157,26 +144,38 @@ function showGameArea(areaId) {
     }
 }
 
-function addSafeEventListener(id, eventType, callback) {
+// Configuration des écouteurs d'événements
+function setupEventListeners() {
+    console.log("Setting up event listeners");
+
+    addSafeEventListener('start-solo', 'click', () => {
+        console.log("Mode Solo clicked");
+        showGameArea('character-creation');
+    });
+
+    addSafeEventListener('create-character', 'click', createCharacter);
+    addSafeEventListener('start-mission', 'click', startRandomMission);
+    addSafeEventListener('attack-button', 'click', playerAttack);
+    addSafeEventListener('open-shop', 'click', openShop);
+    addSafeEventListener('open-inventory', 'click', openInventory);
+    addSafeEventListener('save-game', 'click', saveGame);
+    addSafeEventListener('load-game', 'click', loadGame);
+    addSafeEventListener('back-to-main', 'click', () => showGameArea('main-menu'));
+    addSafeEventListener('create-room', 'click', createRoom);
+    addSafeEventListener('join-room', 'click', joinRoom);
+
+    setupLevelUpListeners();
+}
+
+function addSafeEventListener(id, event, callback) {
     const element = document.getElementById(id);
     if (element) {
-        element.addEventListener(eventType, callback);
+        element.addEventListener(event, callback);
     } else {
         console.warn(`Element with id '${id}' not found`);
     }
 }
 
-function updateBattleLog(message) {
-    const battleLog = document.getElementById('battle-log');
-    if (battleLog) {
-        battleLog.innerHTML += `<p>${message}</p>`;
-        battleLog.scrollTop = battleLog.scrollHeight;
-    } else {
-        console.warn("Battle log element not found");
-    }
-}
-
-// Fonctions de jeu principales
 function createCharacter() {
     const name = document.getElementById('hero-name').value;
     const hp = parseInt(document.getElementById('stat-hp').value) * 10 + 100;
@@ -185,7 +184,6 @@ function createCharacter() {
 
     if (name && !isNaN(hp) && !isNaN(attack) && !isNaN(defense)) {
         player = new Character(name, hp, attack, defense);
-        player.abilities = []; // Initialisation explicite des capacités
         console.log("Personnage créé:", player);
         updateAbilityButtons();
         showGameArea('solo-menu');
@@ -196,38 +194,15 @@ function createCharacter() {
 }
 
 function startRandomMission() {
-    console.log("Démarrage d'une mission aléatoire");
-    const availableMissions = missions.filter(m => m.enemyLevel <= player.level + 2);
-    if (availableMissions.length === 0) {
-        alert("Aucune mission disponible pour votre niveau.");
+    if (!player) {
+        console.error("Player not initialized");
         return;
     }
-    const missionChoices = availableMissions.slice(0, 3);
-    
-    const missionChoiceArea = document.getElementById('mission-choices');
-    if (!missionChoiceArea) {
-        console.error("Zone de choix de mission non trouvée");
-        missionChoiceArea = document.createElement('div');
-        missionChoiceArea.id = 'mission-choices';
-        document.getElementById('solo-menu').appendChild(missionChoiceArea);
-    }
-    missionChoiceArea.innerHTML = '';
-    missionChoices.forEach((mission, index) => {
-        const missionButton = document.createElement('button');
-        missionButton.textContent = `${mission.description} (${mission.difficulty})`;
-        missionButton.onclick = () => selectMission(index);
-        missionChoiceArea.appendChild(missionButton);
-    });
-    
-    showGameArea('mission-choice-area');
-}
-
-function selectMission(index) {
-    currentMission = missions[index];
+    const availableMissions = missions.filter(m => m.enemyLevel <= player.level + 2);
+    currentMission = availableMissions[Math.floor(Math.random() * availableMissions.length)];
     enemy = new Character("Ennemi", currentMission.enemyLevel * 50, currentMission.enemyLevel * 5, currentMission.enemyLevel * 2);
     showGameArea('mission-area');
     updateBattleInfo();
-    updateBattleLog(`Vous commencez la mission : ${currentMission.description}`);
 }
 
 function playerAttack() {
@@ -288,27 +263,6 @@ function endMission(victory) {
     }, 3000);
 }
 
-function useAbility(abilityIndex) {
-    if (!player || !enemy) {
-        console.error("Player or enemy not initialized");
-        return;
-    }
-    const ability = player.abilities[abilityIndex];
-    if (player.energy >= ability.energyCost) {
-        const damage = player.useAbility(abilityIndex, enemy);
-        updateBattleLog(`${player.name} utilise ${ability.name} et inflige ${damage} dégâts à l'ennemi.`);
-        if (enemy.hp <= 0) {
-            endMission(true);
-        } else {
-            enemyAttack();
-        }
-    } else {
-        alert("Pas assez d'énergie pour utiliser cette capacité !");
-    }
-    updateBattleInfo();
-}
-
-// Fonctions de mise à jour de l'interface
 function updatePlayerInfo() {
     if (!player) return;
     const playerInfoElement = document.getElementById('player-info');
@@ -346,6 +300,14 @@ function updateBattleInfo() {
     }
 }
 
+function updateBattleLog(message) {
+    const battleLog = document.getElementById('battle-log');
+    if (battleLog) {
+        battleLog.innerHTML += `<p>${message}</p>`;
+        battleLog.scrollTop = battleLog.scrollHeight;
+    }
+}
+
 function updateAbilityButtons() {
     if (!player || !player.abilities) {
         console.log("Player or player abilities not initialized");
@@ -365,138 +327,24 @@ function updateAbilityButtons() {
     });
 }
 
-// Fonctions de sauvegarde et chargement
-function saveGame() {
-    if (!player) {
-        alert('Aucun personnage à sauvegarder. Créez dabord un personnage.');
+function useAbility(abilityIndex) {
+    if (!player || !enemy) {
+        console.error("Player or enemy not initialized");
         return;
     }
-    const gameState = {
-        player: player,
-        inventory: player.inventory,
-        abilities: player.abilities,
-        gold: player.gold,
-        level: player.level,
-        experience: player.experience
-    };
-    localStorage.setItem('huntBruteGameState', JSON.stringify(gameState));
-    alert('Partie sauvegardée avec succès !');
-    console.log('Partie sauvegardée:', gameState);
-}
-
-function loadGame() {
-    const savedState = localStorage.getItem('huntBruteGameState');
-    if (savedState) {
-        const gameState = JSON.parse(savedState);
-        player = new Character(
-            gameState.player.name, 
-            gameState.player.maxHp, 
-            gameState.player.attack, 
-            gameState.player.defense
-        );
-        player.level = gameState.level;
-        player.experience = gameState.experience;
-        player.gold = gameState.gold;
-        player.inventory = gameState.inventory || [];
-        player.abilities = gameState.abilities || [];
-        player.energy = gameState.player.energy || player.maxEnergy;
-        updateAbilityButtons();
-        updatePlayerInfo();
-        showGameArea('solo-menu');
-        alert('Partie chargée avec succès !');
-        console.log('Partie chargée:', player);
-    } else {
-        alert('Aucune sauvegarde trouvée.');
-    }
-}
-
-// Initialisation du jeu
-function initGame() {
-    console.log("Initializing game...");
-    showGameArea('main-menu');
-    setupEventListeners();
-    setupMultiplayerListeners();
-}
-
-function setupEventListeners() {
-    addSafeEventListener('start-solo', 'click', () => {
-        gameMode = 'solo';
-        showGameArea('character-creation');
-    addSafeEventListener('back-to-solo', 'click', () => showGameArea('main-menu'));
-    addSafeEventListener('leave-shop', 'click', () => showGameArea('solo-menu'));
-    addSafeEventListener('close-inventory', 'click', () => showGameArea('solo-menu'));{
-    
-    });
-    addSafeEventListener('create-character', 'click', createCharacter);
-    addSafeEventListener('start-mission', 'click', startRandomMission);
-    addSafeEventListener('attack-button', 'click', playerAttack);
-    addSafeEventListener('open-shop', 'click', openShop);
-    addSafeEventListener('open-inventory', 'click', openInventory);
-    addSafeEventListener('create-room', 'click', createRoom);
-    addSafeEventListener('join-room', 'click', joinRoom);
-    addSafeEventListener('back-to-solo', 'click', () => showGameArea('solo-menu'));
-    addSafeEventListener('save-game', 'click', saveGame);
-    addSafeEventListener('load-game', 'click', loadGame);
-
-    setupLevelUpListeners();
-}
-
-function setupLevelUpListeners() {
-    addSafeEventListener('confirm-level-up', 'click', () => {
-        const hpPoints = parseInt(document.getElementById('level-up-hp').value) || 0;
-        const attackPoints = parseInt(document.getElementById('level-up-attack').value) || 0;
-        const defensePoints = parseInt(document.getElementById('level-up-defense').value) || 0;
-
-        if (!player) {
-            console.error("Player is not initialized");
-            return;
-        }
-
-        if (hpPoints + attackPoints + defensePoints <= 5) {
-            player.maxHp += hpPoints * 10;
-            player.attack += attackPoints;
-            player.defense += defensePoints;
-            document.getElementById('level-up-modal').style.display = 'none';
-            updatePlayerInfo();
+    const ability = player.abilities[abilityIndex];
+    if (player.energy >= ability.energyCost) {
+        const damage = player.useAbility(abilityIndex, enemy);
+        updateBattleLog(`${player.name} utilise ${ability.name} et inflige ${damage} dégâts à l'ennemi.`);
+        if (enemy.hp <= 0) {
+            endMission(true);
         } else {
-            alert("Vous avez attribué trop de points. Veuillez en redistribuer.");
+            enemyAttack();
         }
-    });
-}
-
-function setupMultiplayerListeners() {
-    socket.on('roomCreated', (createdRoomId) => {
-        console.log(`Salle créée: ${createdRoomId}`);
-        showGameArea('waiting-area');
-    });
-
-    socket.on('roomJoined', (joinedRoomId) => {
-        console.log(`Salle rejointe: ${joinedRoomId}`);
-        showGameArea('waiting-area');
-    });
-
-    socket.on('gameReady', () => {
-        console.log('La partie est prête à commencer');
-        // Initialiser la partie multijoueur ici
-    });
-
-    socket.on('playerMove', (move) => {
-        // Gérer le mouvement de l'adversaire ici
-    });
-
-    socket.on('roomError', (error) => {
-        alert(error);
-    });
-}
-
-function createRoom() {
-    roomId = document.getElementById('room-id').value;
-    socket.emit('createRoom', roomId);
-}
-
-function joinRoom() {
-    roomId = document.getElementById('room-id').value;
-    socket.emit('joinRoom', roomId);
+    } else {
+        alert("Pas assez d'énergie pour utiliser cette capacité !");
+    }
+    updateBattleInfo();
 }
 
 function openShop() {
@@ -611,7 +459,104 @@ function showLevelUpModal() {
     levelUpModal.style.display = 'block';
 }
 
-// Fonction d'initialisation principale
+function setupLevelUpListeners() {
+    addSafeEventListener('confirm-level-up', 'click', () => {
+        const hpPoints = parseInt(document.getElementById('level-up-hp').value) || 0;
+        const attackPoints = parseInt(document.getElementById('level-up-attack').value) || 0;
+        const defensePoints = parseInt(document.getElementById('level-up-defense').value) || 0;
+
+        if (hpPoints + attackPoints + defensePoints <= 5) {
+            player.maxHp += hpPoints * 10;
+            player.attack += attackPoints;
+            player.defense += defensePoints;
+            document.getElementById('level-up-modal').style.display = 'none';
+            updatePlayerInfo();
+        } else {
+            alert("Vous avez attribué trop de points. Veuillez en redistribuer.");
+        }
+    });
+}
+
+function saveGame() {
+    if (!player) {
+        alert('Aucun personnage à sauvegarder. Créez d'abord un personnage.');
+        return;
+    }
+    const gameState = {
+        player: player,
+        inventory: player.inventory,
+        abilities: player.abilities,
+        gold: player.gold,
+        level: player.level,
+        experience: player.experience
+    };
+    localStorage.setItem('huntBruteGameState', JSON.stringify(gameState));
+    alert('Partie sauvegardée avec succès !');
+    console.log('Partie sauvegardée:', gameState);
+}
+
+function loadGame() {
+    const savedState = localStorage.getItem('huntBruteGameState');
+    if (savedState) {
+        const gameState = JSON.parse(savedState);
+        player = new Character(
+            gameState.player.name, 
+            gameState.player.maxHp, 
+            gameState.player.attack, 
+            gameState.player.defense
+        );
+        player.level = gameState.level;
+        player.experience = gameState.experience;
+        player.gold = gameState.gold;
+        player.inventory = gameState.inventory || [];
+        player.abilities = gameState.abilities || [];
+        player.energy = gameState.player.energy || player.maxEnergy;
+        updateAbilityButtons();
+        updatePlayerInfo();
+        showGameArea('solo-menu');
+        alert('Partie chargée avec succès !');
+        console.log('Partie chargée:', player);
+    } else {
+        alert('Aucune sauvegarde trouvée.');
+    }
+}
+
+function createRoom() {
+    roomId = document.getElementById('room-id').value;
+    socket.emit('createRoom', roomId);
+}
+
+function joinRoom() {
+    roomId = document.getElementById('room-id').value;
+    socket.emit('joinRoom', roomId);
+}
+
+function setupMultiplayerListeners() {
+    socket.on('roomCreated', (createdRoomId) => {
+        console.log(`Salle créée: ${createdRoomId}`);
+        showGameArea('waiting-area');
+    });
+
+    socket.on('roomJoined', (joinedRoomId) => {
+        console.log(`Salle rejointe: ${joinedRoomId}`);
+        showGameArea('waiting-area');
+    });
+
+    socket.on('gameReady', () => {
+        console.log('La partie est prête à commencer');
+        // Initialiser la partie multijoueur ici
+    });
+
+    socket.on('playerMove', (move) => {
+        // Gérer le mouvement de l'adversaire ici
+    });
+
+    socket.on('roomError', (error) => {
+        alert(error);
+    });
+}
+
+// Initialisation du jeu
 document.addEventListener('DOMContentLoaded', initGame);
 
 // Sauvegarde automatique
