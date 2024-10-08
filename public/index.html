@@ -3,76 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hunt Brute</title>
+    <title>Hunt Brute - Nouvelle Interface</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="new-style.css">
 </head>
 <body>
     <div id="game-container">
-        <div id="main-menu" class="game-area">
+        <header>
             <h1>Hunt Brute</h1>
-            <button id="start-solo"><i class="fas fa-user"></i> Mode Solo</button>
-            <h2>Mode Multijoueur</h2>
-            <input type="text" id="room-id" placeholder="ID de la salle">
-            <button id="create-room"><i class="fas fa-plus-circle"></i> Créer une salle</button>
-            <button id="join-room"><i class="fas fa-sign-in-alt"></i> Rejoindre une salle</button>
-        </div>
-
-        <div id="character-creation" class="game-area">
-            <h2>Création du personnage</h2>
-            <p>Points restants à attribuer: <span id="remaining-points">15</span></p>
-            <input type="text" id="hero-name" placeholder="Nom du héros">
-            <input type="number" id="stat-hp" placeholder="PV" min="0" max="15">
-            <input type="number" id="stat-attack" placeholder="Attaque" min="0" max="15">
-            <input type="number" id="stat-defense" placeholder="Défense" min="0" max="15">
-            <button id="create-character"><i class="fas fa-user-plus"></i> Créer le personnage</button>
-        </div>
-
-        <div id="solo-menu" class="game-area">
-            <h2>Menu Solo</h2>
             <div id="player-info"></div>
-            <button id="start-mission"><i class="fas fa-play"></i> Commencer une mission</button>
-            <button id="open-shop"><i class="fas fa-store"></i> Ouvrir la boutique</button>
-            <button id="open-inventory"><i class="fas fa-briefcase"></i> Ouvrir l'inventaire</button>
-            <button id="save-game"><i class="fas fa-save"></i> Sauvegarder la partie</button>
-            <button id="load-game"><i class="fas fa-folder-open"></i> Charger la partie</button>
-            <button id="back-to-main"><i class="fas fa-arrow-left"></i> Retour au menu principal</button>
-        </div>
+        </header>
+        
+        <nav id="main-menu">
+            <button id="start-solo"><i class="fas fa-user"></i> Mode Solo</button>
+            <button id="open-multiplayer"><i class="fas fa-users"></i> Mode Multijoueur</button>
+            <button id="open-shop"><i class="fas fa-store"></i> Boutique</button>
+            <button id="open-inventory"><i class="fas fa-briefcase"></i> Inventaire</button>
+            <button id="save-game"><i class="fas fa-save"></i> Sauvegarder</button>
+            <button id="load-game"><i class="fas fa-folder-open"></i> Charger</button>
+        </nav>
 
-        <div id="mission-area" class="game-area">
-            <h2>Mission en cours</h2>
-            <div id="player-stats"></div>
-            <div id="enemy-stats"></div>
-            <div id="battle-log"></div>
-            <button id="attack-button"><i class="fas fa-fist-raised"></i> Attaquer</button>
-            <div id="player-abilities"></div>
-        </div>
+        <main id="game-content">
+            <section id="character-creation" class="game-area">
+                <h2>Création du Personnage</h2>
+                <input type="text" id="hero-name" placeholder="Nom du héros">
+                <input type="number" id="stat-hp" placeholder="PV">
+                <input type="number" id="stat-attack" placeholder="Attaque">
+                <input type="number" id="stat-defense" placeholder="Défense">
+                <button id="create-character">Créer le personnage</button>
+            </section>
 
-        <div id="shop" class="game-area">
-            <h2>Boutique</h2>
-            <div id="shop-items"></div>
-            <button id="leave-shop"><i class="fas fa-door-open"></i> Quitter la boutique</button>
-        </div>
+            <section id="mission-area" class="game-area">
+                <h2>Mission en cours</h2>
+                <div id="player-stats"></div>
+                <div id="enemy-stats"></div>
+                <div id="battle-log"></div>
+                <button id="attack-button">Attaquer</button>
+                <div id="player-abilities"></div>
+            </section>
 
-        <div id="inventory-area" class="game-area">
-            <h2>Inventaire</h2>
-            <div id="inventory"></div>
-            <button id="close-inventory"><i class="fas fa-times"></i> Fermer l'inventaire</button>
-        </div>
+            <section id="shop" class="game-area">
+                <h2>Boutique</h2>
+                <div id="shop-items"></div>
+            </section>
 
-        <div id="waiting-area" class="game-area">
-            <h2>En attente d'un autre joueur...</h2>
-            <p>ID de la salle: <span id="room-id-display"></span></p>
-        </div>
+            <section id="inventory-area" class="game-area">
+                <h2>Inventaire</h2>
+                <div id="inventory"></div>
+            </section>
 
-        <div id="level-up-modal" class="game-area">
-            <h2>Niveau Supérieur !</h2>
-            <p>Vous avez atteint le niveau <span id="new-level"></span> !</p>
-            <p>Points à distribuer : <span id="stat-points"></span></p>
-            <input type="number" id="level-up-hp" placeholder="PV" min="0" max="5">
-            <input type="number" id="level-up-attack" placeholder="Attaque" min="0" max="5">
-            <input type="number" id="level-up-defense" placeholder="Défense" min="0" max="5">
-            <button id="confirm-level-up"><i class="fas fa-check"></i> Confirmer</button>
+            <section id="multiplayer" class="game-area">
+                <h2>Mode Multijoueur</h2>
+                <input type="text" id="room-id" placeholder="ID de la salle">
+                <button id="create-room">Créer une salle</button>
+                <button id="join-room">Rejoindre une salle</button>
+            </section>
+
+            <section id="waiting-area" class="game-area">
+                <h2>En attente d'un autre joueur...</h2>
+                <p>ID de la salle: <span id="room-id-display"></span></p>
+            </section>
+        </main>
+
+        <div id="level-up-modal" class="modal">
+            <div class="modal-content">
+                <h2>Niveau Supérieur !</h2>
+                <p>Vous avez atteint le niveau <span id="new-level"></span> !</p>
+                <p>Points à distribuer : <span id="stat-points"></span></p>
+                <input type="number" id="level-up-hp" placeholder="PV">
+                <input type="number" id="level-up-attack" placeholder="Attaque">
+                <input type="number" id="level-up-defense" placeholder="Défense">
+                <button id="confirm-level-up">Confirmer</button>
+            </div>
         </div>
     </div>
 
