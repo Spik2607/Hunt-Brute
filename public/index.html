@@ -113,15 +113,15 @@
             <button id="join-room"><i class="fas fa-sign-in-alt"></i> Rejoindre une salle</button>
         </div>
 
-        <div id="character-creation" class="game-area">
-            <h2>Création du personnage</h2>
-            <input type="text" id="hero-name" placeholder="Nom du héros">
-            <input type="number" id="stat-hp" placeholder="PV">
-            <input type="number" id="stat-attack" placeholder="Attaque">
-            <input type="number" id="stat-defense" placeholder="Défense">
-            <button id="create-character"><i class="fas fa-user-plus"></i> Créer le personnage</button>
-        </div>
-
+       <div id="character-creation" class="game-area">
+    <h2>Création du personnage</h2>
+    <p>Points disponibles: <span id="available-points">15</span></p>
+    <input type="text" id="hero-name" placeholder="Nom du héros">
+    <input type="number" id="stat-hp" placeholder="PV" min="0" max="20">
+    <input type="number" id="stat-attack" placeholder="Attaque" min="0" max="20">
+    <input type="number" id="stat-defense" placeholder="Défense" min="0" max="20">
+    <button id="create-character"><i class="fas fa-user-plus"></i> Créer le personnage</button>
+</div>
         <div id="solo-menu" class="game-area">
             <h2>Menu Solo</h2>
             <div id="player-info"></div>
