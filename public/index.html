@@ -7,123 +7,58 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: Arial, sans-serif;
             background-color: #2c3e50;
             color: #ecf0f1;
             margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            padding: 20px;
         }
         #game-container {
-            background-color: #34495e;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.3);
             max-width: 800px;
-            width: 100%;
+            margin: 0 auto;
+            background-color: #34495e;
+            padding: 20px;
+            border-radius: 10px;
         }
-        .game-area {
-            display: none;
-        }
-        #main-menu {
-            display: block;
-        }
-        h1, h2 {
-            color: #e74c3c;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        input[type="text"], input[type="number"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: none;
-            border-radius: 5px;
-            background-color: #ecf0f1;
-            color: #2c3e50;
-        }
+        .game-area { display: none; }
+        #main-menu { display: block; }
+        h1, h2 { color: #e74c3c; }
         button {
             background-color: #e74c3c;
-            color: #ecf0f1;
+            color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 10px 15px;
             margin: 5px;
-            border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s;
         }
-        button:hover {
-            background-color: #c0392b;
-        }
-        #player-info, #player-stats, #enemy-stats {
-            background-color: #2c3e50;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
-        #battle-log {
-            height: 150px;
-            overflow-y: auto;
-            background-color: #2c3e50;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
-        #shop-items, #inventory {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 10px;
-        }
-        .shop-item, .inventory-item {
-            background-color: #2c3e50;
-            padding: 10px;
-            border-radius: 5px;
-            text-align: center;
-        }
-        #level-up-modal {
-            background-color: rgba(0,0,0,0.8);
-            position: fixed;
-            top: 0;
-            left: 0;
+        input {
             width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        #level-up-modal > div {
-            background-color: #34495e;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
+            padding: 10px;
+            margin: 5px 0;
         }
     </style>
 </head>
 <body>
-    
     <div id="game-container">
-    <div id="main-menu" class="game-area">
-        <h1>Hunt Brute</h1>
-        <button id="start-solo"><i class="fas fa-user"></i> Mode Solo</button>
-        <h2>Mode Multijoueur</h2>
-        <input type="text" id="room-id" placeholder="ID de la salle">
-        <button id="create-room"><i class="fas fa-plus-circle"></i> Créer une salle</button>
-        <button id="join-room"><i class="fas fa-sign-in-alt"></i> Rejoindre une salle</button>
-    </div>
+        <div id="main-menu" class="game-area">
+            <h1>Hunt Brute</h1>
+            <button id="start-solo"><i class="fas fa-user"></i> Mode Solo</button>
+            <h2>Mode Multijoueur</h2>
+            <input type="text" id="room-id" placeholder="ID de la salle">
+            <button id="create-room"><i class="fas fa-plus-circle"></i> Créer une salle</button>
+            <button id="join-room"><i class="fas fa-sign-in-alt"></i> Rejoindre une salle</button>
+        </div>
 
         <div id="character-creation" class="game-area">
-        <h2>Création du personnage</h2>
-        <p>Points disponibles: <span id="available-points">5</span></p>
-        <input type="text" id="hero-name" placeholder="Nom du héros">
-        <input type="number" id="stat-hp" placeholder="PV" min="0" max="5">
-        <input type="number" id="stat-attack" placeholder="Attaque" min="0" max="5">
-        <input type="number" id="stat-defense" placeholder="Défense" min="0" max="5">
-        <button id="create-character"><i class="fas fa-user-plus"></i> Créer le personnage</button>
-    </div>
-        
+            <h2>Création du personnage</h2>
+            <p>Points disponibles: <span id="available-points">5</span></p>
+            <input type="text" id="hero-name" placeholder="Nom du héros">
+            <input type="number" id="stat-hp" placeholder="PV" min="0" max="5">
+            <input type="number" id="stat-attack" placeholder="Attaque" min="0" max="5">
+            <input type="number" id="stat-defense" placeholder="Défense" min="0" max="5">
+            <button id="create-character"><i class="fas fa-user-plus"></i> Créer le personnage</button>
+        </div>
+
         <div id="solo-menu" class="game-area">
             <h2>Menu Solo</h2>
             <div id="player-info"></div>
@@ -132,7 +67,7 @@
             <button id="open-inventory"><i class="fas fa-briefcase"></i> Ouvrir l'inventaire</button>
             <button id="save-game"><i class="fas fa-save"></i> Sauvegarder la partie</button>
             <button id="load-game"><i class="fas fa-folder-open"></i> Charger la partie</button>
-            <button id="back-to-solo"><i class="fas fa-arrow-left"></i> Retour au menu principal</button>
+            <button id="back-to-main"><i class="fas fa-arrow-left"></i> Retour au menu principal</button>
         </div>
 
         <div id="mission-area" class="game-area">
@@ -156,13 +91,7 @@
             <button id="close-inventory"><i class="fas fa-times"></i> Fermer l'inventaire</button>
         </div>
 
-        <div id="waiting-area" class="game-area">
-            <h2>En attente d'un autre joueur...</h2>
-            <p>ID de la salle: <span id="room-id-display"></span></p>
-        </div>
-
-       <div id="level-up-modal" class="game-area">
-        <div>
+        <div id="level-up-modal" class="game-area">
             <h2>Niveau Supérieur !</h2>
             <p>Vous avez atteint le niveau <span id="new-level"></span> !</p>
             <p>Points à distribuer : <span id="stat-points"></span></p>
@@ -172,7 +101,6 @@
             <button id="confirm-level-up"><i class="fas fa-check"></i> Confirmer</button>
         </div>
     </div>
-</div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.js"></script>
     <script src="game.js"></script>
