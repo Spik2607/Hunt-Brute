@@ -520,52 +520,63 @@ document.getElementById('load-game').addEventListener('click', loadGame);
 
  
       
-// Initialisation du jeu
 document.addEventListener('DOMContentLoaded', () => {
     console.log("DOM fully loaded");
     showGameArea('main-menu');
-    
-    const addClickListener = (id, func) => {
-        const element = document.getElementById(id);
-        if (element) element.addEventListener('click', func);
-        else console.warn(`Element with id '${id}' not found`);
-    };
-
-    addClickListener('start-solo', () => {
-        gameMode = 'solo';
-        showGameArea('character-creation');
-    });
-    addClickListener('create-character', createCharacter);
-    addClickListener('start-mission', startRandomMission);
-    addClickListener('attack-button', playerAttack);
-    addClickListener('open-shop', openShop);
-    addClickListener('open-inventory', openInventory);
-    addClickListener('open-multiplayer', () => showGameArea('multiplayer-options'));
-    addClickListener('create-room', createRoom);
-    addClickListener('join-room', joinRoom);
-    addClickListener('back-to-solo', () => showGameArea('solo-menu'));
-    
-    setupLevelUpListeners();
-    setupMultiplayerListeners();
-});
+    console.log("Attempted to show main menu");
     
     // Log pour vérifier si les éléments existent
     console.log("Start solo button:", document.getElementById('start-solo'));
     console.log("Create character button:", document.getElementById('create-character'));
     
-    document.getElementById('start-solo').addEventListener('click', () => {
-        gameMode = 'solo';
-        showGameArea('character-creation');
-    });
-    document.getElementById('create-character').addEventListener('click', createCharacter);
-    document.getElementById('start-mission').addEventListener('click', startRandomMission);
-    document.getElementById('attack-button').addEventListener('click', playerAttack);
-    document.getElementById('open-shop').addEventListener('click', openShop);
-    document.getElementById('open-inventory').addEventListener('click', openInventory);
-    document.getElementById('open-multiplayer').addEventListener('click', () => showGameArea('multiplayer-options'));
-    document.getElementById('create-room').addEventListener('click', createRoom);
-    document.getElementById('join-room').addEventListener('click', joinRoom);
-    document.getElementById('back-to-solo').addEventListener('click', () => showGameArea('solo-menu'));
+    // Fonction sécurisée pour ajouter des écouteurs d'événements
+    function addClickListener(id, func) {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('click', func);
+        } else {
+            console.warn(`Element with id '${id}' not found`);
+        }
+    }
+   const addClickListener = (id, func) => {
+        const element = document.getElementById(id);
+        if (element) element.addEventListener('click', func);
+        else console.warn(`Element with id '${id}' not found`)
+       
+    // Utilisation des document.getElementById() avec gestion d'erreurs
+    if (document.getElementById('start-solo')) {
+        document.getElementById('start-solo').addEventListener('click', () => {
+            gameMode = 'solo';
+            showGameArea('character-creation');
+        });
+    }
+    if (document.getElementById('create-character')) {
+        document.getElementById('create-character').addEventListener('click', createCharacter);
+    }
+    if (document.getElementById('start-mission')) {
+        document.getElementById('start-mission').addEventListener('click', startRandomMission);
+    }
+    if (document.getElementById('attack-button')) {
+        document.getElementById('attack-button').addEventListener('click', playerAttack);
+    }
+    if (document.getElementById('open-shop')) {
+        document.getElementById('open-shop').addEventListener('click', openShop);
+    }
+    if (document.getElementById('open-inventory')) {
+        document.getElementById('open-inventory').addEventListener('click', openInventory);
+    }
+    if (document.getElementById('open-multiplayer')) {
+        document.getElementById('open-multiplayer').addEventListener('click', () => showGameArea('multiplayer-options'));
+    }
+    if (document.getElementById('create-room')) {
+        document.getElementById('create-room').addEventListener('click', createRoom);
+    }
+    if (document.getElementById('join-room')) {
+        document.getElementById('join-room').addEventListener('click', joinRoom);
+    }
+    if (document.getElementById('back-to-solo')) {
+        document.getElementById('back-to-solo').addEventListener('click', () => showGameArea('solo-menu'));
+    }
     
     setupLevelUpListeners();
     setupMultiplayerListeners();
