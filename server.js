@@ -33,8 +33,8 @@ io.on('connection', (socket) => {
             playerInfo.id = socket.id;
             room.players.push(playerInfo);
             socket.join(roomId);
-            socket.emit('roomJoined', roomId);
-            io.to(roomId).emit('playerJoined', room.players);
+            socket.emit('roomJoined', { roomId, players: room.players });
+            socket.to(roomId).emit('playerJoined', room.players);
 
             if (room.players.length === 2) {
                 io.to(roomId).emit('gameReady', room.players);
@@ -44,11 +44,8 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on('playerMove', (move) => {
-        const roomId = [...socket.rooms].find(room => room !== socket.id);
-        if (roomId) {
-            socket.to(roomId).emit('opponentMove', move);
-        }
+    socket.on('playerAction', ({ roomId, action }) => {
+        socket.to(roomId).emit('opponentAction', action);
     });
 
     socket.on('disconnect', () => {
@@ -57,27 +54,9 @@ io.on('connection', (socket) => {
             const playerIndex = room.players.findIndex(p => p.id === socket.id);
             if (playerIndex !== -1) {
                 room.players.splice(playerIndex, 1);
-                if (room.players.length === 0 && roomId !== FIXED_ROOM) {
-                    rooms.delete(roomId);
-                } else {
-                    io.to(roomId).emit('playerDisconnected', socket.id);
-                    io.to(roomId).emit('playerJoined', room.players); // Mettre à jour la liste des joueurs
-                }
+                io.to(roomId).emit('playerLeft', socket.id);
             }
         });
-    });
-
-    // Nouvelle fonctionnalité : chat
-    socket.on('sendMessage', ({ roomId, message }) => {
-        io.to(roomId).emit('newMessage', { 
-            senderId: socket.id, 
-            message: message 
-        });
-    });
-
-    // Nouvelle fonctionnalité : synchronisation de l'état du jeu
-    socket.on('syncGameState', ({ roomId, gameState }) => {
-        socket.to(roomId).emit('gameStateSynced', gameState);
     });
 });
 
