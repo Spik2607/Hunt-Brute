@@ -1,4 +1,4 @@
-/* styles.css pour Hunt Brute MAJ V1.55 */
+/* styles.css pour Hunt Brute MAJ V1.56 */
 
 /* Styles généraux */
 body, html {
@@ -23,6 +23,14 @@ h1, h2, h3 {
     color: #f39c12;
     text-align: center;
     margin-top: 0;
+}
+
+/* Navigation */
+#main-menu {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 20px;
 }
 
 /* Boutons */
@@ -61,7 +69,7 @@ button:active {
 }
 
 /* Informations du joueur */
-#player-info, #companion-info {
+#player-info, #companion-info, #active-companion {
     background-color: #2c3e50;
     padding: 15px;
     border-radius: 8px;
@@ -70,7 +78,7 @@ button:active {
 }
 
 /* Journal de bataille */
-#battle-log {
+#battle-log, #expedition-log {
     height: 200px;
     overflow-y: scroll;
     background-color: #2c3e50;
@@ -82,7 +90,7 @@ button:active {
 }
 
 /* Inventaire et boutique */
-#inventory-area, #shop-area {
+#inventory-items, #shop-items {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 15px;
@@ -126,7 +134,7 @@ button:active {
 }
 
 /* Expédition */
-#expedition-info, #expedition-log {
+#expedition-info, #current-expedition {
     background-color: #2c3e50;
     padding: 15px;
     border-radius: 8px;
@@ -192,36 +200,6 @@ button:active {
     transition: width 0.5s ease-in-out;
 }
 
-/* Responsive design */
-@media (max-width: 600px) {
-    #game-container {
-        padding: 10px;
-    }
-
-    button {
-        width: 100%;
-        margin: 5px 0;
-    }
-
-    #inventory-area, #shop-area, #companions-list {
-        grid-template-columns: 1fr;
-    }
-
-    .modal-content {
-        width: 95%;
-    }
-}
-
-/* Animations */
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-.fade-in {
-    animation: fadeIn 0.5s ease-in-out;
-}
-
 /* Styles spécifiques pour le mode multijoueur */
 #multiplayer-battle {
     display: flex;
@@ -268,7 +246,58 @@ button:active {
     opacity: 1;
 }
 
-/* Ajout pour assurer la visibilité des zones actives */
-.game-area:not(.active) {
-    display: none;
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+    #game-container {
+        padding: 10px;
+    }
+
+    button {
+        width: 100%;
+        margin: 5px 0;
+    }
+
+    #inventory-items, #shop-items, #companions-list {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-content {
+        width: 95%;
+    }
+}
+
+/* Styles spécifiques pour les éléments de combat */
+#player-stats, #enemy-stats, #companion-stats {
+    background-color: #2c3e50;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+/* Style pour le bouton d'annulation d'expédition */
+#cancel-expedition {
+    background-color: #e74c3c;
+}
+
+#cancel-expedition:hover {
+    background-color: #c0392b;
+}
+
+/* Style pour la zone d'attente en multijoueur */
+#waiting-area {
+    background-color: #2c3e50;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+    text-align: center;
 }
