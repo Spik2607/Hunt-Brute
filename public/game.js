@@ -124,7 +124,8 @@ function setupEventListeners() {
         { id: 'load-game', event: 'click', handler: loadGame },
         { id: 'back-to-main', event: 'click', handler: () => showGameArea('main-menu') },
         { id: 'close-inventory', event: 'click', handler: () => showGameArea('main-menu') },
-        { id: 'leave-shop', event: 'click', handler: () => showGameArea('main-menu') }
+        { id: 'leave-shop', event: 'click', handler: () => showGameArea('main-menu') },
+        { id: 'open-multiplayer', event: 'click', handler: startMultiplayerMode }
     ];
 
     listeners.forEach(({ id, event, handler }) => {
@@ -203,6 +204,7 @@ function startExpedition() {
     }
     if (currentExpedition) {
         alert("Une expédition est déjà en cours !");
+        showGameArea('expedition-area');
         return;
     }
     const expedition = expeditionEvents[Math.floor(Math.random() * expeditionEvents.length)];
@@ -211,50 +213,68 @@ function startExpedition() {
         duration: expedition.duration,
         timeRemaining: expedition.duration,
         events: [...expedition.events],
-        rewards: { xp: 0, gold: 0, resources: {} }
+        rewards: { xp: 0, gold: 0, resources: { wood: 0, stone: 0, iron: 0 } }
     };
+    
     updateExpeditionDisplay();
+    showGameArea('expedition-area');
+    
     const expeditionTimer = setInterval(() => {
+        if (!currentExpedition) {
+            clearInterval(expeditionTimer);
+            return;
+        }
+        
         currentExpedition.timeRemaining--;
+        
         if (currentExpedition.timeRemaining <= 0) {
             clearInterval(expeditionTimer);
             finishExpedition();
         } else if (currentExpedition.events.length > 0 && currentExpedition.timeRemaining % 15 === 0) {
             triggerExpeditionEvent();
         }
+        
         updateExpeditionDisplay();
     }, 1000);
-    showGameArea('expedition-area');
+
+    updateAdventureMenu();
     console.log("Expédition commencée:", currentExpedition);
 }
 
 function triggerExpeditionEvent() {
-    const event = currentExpedition.events.shift();
-    // Handle event logic and update rewards
-    updateExpeditionLog(event.description);
-    console.log("Événement d'expédition déclenché:", event);
-}
+    if (!currentExpedition || currentExpedition.events.length === 0) return;
 
-function updateAdventureMenu() {
-    const adventureMenu = document.getElementById('adventure-menu');
-    if (currentExpedition) {
-        const expeditionButton = document.createElement('button');
-        expeditionButton.textContent = "Retourner à l'expédition en cours";
-        expeditionButton.onclick = () => showGameArea('expedition-area');
-        adventureMenu.appendChild(expeditionButton);
-    }
+    const event = currentExpedition.events.shift();
+    const eventResult = event.trigger(player);
+
+    currentExpedition.rewards.xp += eventResult.xp || 0;
+    currentExpedition.rewards.gold += eventResult.gold || 0;
+    
+    Object.keys(eventResult.resources || {}).forEach(resource => {
+        currentExpedition.rewards.resources[resource] += eventResult.resources[resource];
+    });
+
+    updateExpeditionLog(eventResult.message);
+    console.log("Événement d'expédition déclenché:", event, "Résultat:", eventResult);
 }
 
 function finishExpedition() {
+    if (!currentExpedition) return;
+
     player.gainExperience(currentExpedition.rewards.xp);
     player.gold += currentExpedition.rewards.gold;
+    
     Object.entries(currentExpedition.rewards.resources).forEach(([resource, amount]) => {
         player.resources[resource] += amount;
     });
-    updateExpeditionLog("Expédition terminée !");
-    currentExpedition = null;
+
+    updateExpeditionLog("Expédition terminée ! Récompenses attribuées.");
     updatePlayerInfo();
+    
+    currentExpedition = null;
     showGameArea('adventure-menu');
+    updateAdventureMenu();
+    
     console.log("Expédition terminée, récompenses attribuées");
 }
 
@@ -344,7 +364,7 @@ function openInventory() {
         return;
     }
     inventoryItems.innerHTML = '';
-     player.inventory.forEach((item, index) => {
+    player.inventory.forEach((item, index) => {
         const itemElement = document.createElement('div');
         itemElement.className = 'inventory-item';
         itemElement.innerHTML = `
@@ -356,16 +376,21 @@ function openInventory() {
         `;
         inventoryItems.appendChild(itemElement);
     });
-        const itemElement = document.createElement('div');
-        itemElement.textContent = item.name;
-        const equipButton = document.createElement('button');
-        equipButton.textContent = 'Équiper';
-        equipButton.onclick = () => equipItem(index);
-        itemElement.appendChild(equipButton);
-        inventoryItems.appendChild(itemElement);
-    });
     showGameArea('inventory-area');
     console.log("Inventaire ouvert");
+}
+
+function useItem(index) {
+    const item = player.inventory[index];
+    if (item.type === 'consumable') {
+        if (item.effect === 'heal') {
+            player.hp = Math.min(player.hp + item.value, player.maxHp);
+            updateBattleLog(`Vous utilisez ${item.name} et récupérez ${item.value} PV.`);
+        }
+        player.inventory.splice(index, 1);
+        updatePlayerInfo();
+        openInventory();
+    }
 }
 
 function sellItem(index) {
@@ -424,7 +449,7 @@ function buyItem(itemId) {
         console.error("Item not found");
         return;
     }
-      if (player.gold >= item.cost) {
+    if (player.gold >= item.cost) {
         player.gold -= item.cost;
         player.inventory.push(item);
         updatePlayerInfo();
@@ -434,6 +459,7 @@ function buyItem(itemId) {
         alert("Vous n'avez pas assez d'or !");
     }
 }
+
 function openCompanionsMenu() {
     if (!player) {
         console.error("Aucun joueur n'est initialisé");
@@ -552,10 +578,9 @@ function joinRoom(roomId) {
     console.log(`Tentative de rejoindre la salle: ${roomId}`);
 }
 
-// Mode multijoueur de base
 function startMultiplayerMode() {
     showGameArea('multiplayer-area');
-    // Ici, vous pouvez ajouter la logique pour rejoindre une salle, etc.
+    console.log("Mode multijoueur activé");
 }
 
 function startMultiplayerGame(players) {
