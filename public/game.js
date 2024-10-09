@@ -86,7 +86,10 @@ function initGame() {
         if (player) {
             player.regenerateHP();
         }
-    }, 300000); // Régénère 1 PV toutes les 5 minutes
+        if (currentExpedition) {
+            updateExpedition();
+        }
+    }, 60000); // Run every minute
 }
 
 function initializeSocket() {
@@ -115,6 +118,7 @@ function setupEventListeners() {
         { id: 'create-character', event: 'click', handler: createCharacter },
         { id: 'start-mission', event: 'click', handler: chooseMission },
         { id: 'start-expedition', event: 'click', handler: startExpedition },
+        { id: 'cancel-expedition', event: 'click', handler: cancelExpedition },
         { id: 'attack-button', event: 'click', handler: playerAttack },
         { id: 'open-shop', event: 'click', handler: openShop },
         { id: 'open-inventory', event: 'click', handler: openInventory },
@@ -218,27 +222,35 @@ function startExpedition() {
     
     updateExpeditionDisplay();
     showGameArea('expedition-area');
-    
-    const expeditionTimer = setInterval(() => {
-        if (!currentExpedition) {
-            clearInterval(expeditionTimer);
-            return;
-        }
-        
-        currentExpedition.timeRemaining--;
-        
-        if (currentExpedition.timeRemaining <= 0) {
-            clearInterval(expeditionTimer);
-            finishExpedition();
-        } else if (currentExpedition.events.length > 0 && currentExpedition.timeRemaining % 15 === 0) {
-            triggerExpeditionEvent();
-        }
-        
-        updateExpeditionDisplay();
-    }, 1000);
-
     updateAdventureMenu();
     console.log("Expédition commencée:", currentExpedition);
+}
+
+function cancelExpedition() {
+    if (!currentExpedition) {
+        alert("Il n'y a pas d'expédition en cours à annuler.");
+        return;
+    }
+    
+    currentExpedition = null;
+    updateExpeditionDisplay();
+    showGameArea('adventure-menu');
+    updateAdventureMenu();
+    console.log("Expédition annulée");
+}
+
+function updateExpedition() {
+    if (!currentExpedition) return;
+
+    currentExpedition.timeRemaining--;
+
+    if (currentExpedition.timeRemaining <= 0) {
+        finishExpedition();
+    } else if (currentExpedition.events.length > 0 && currentExpedition.timeRemaining % 15 === 0) {
+        triggerExpeditionEvent();
+    }
+
+    updateExpeditionDisplay();
 }
 
 function triggerExpeditionEvent() {
@@ -386,6 +398,9 @@ function useItem(index) {
         if (item.effect === 'heal') {
             player.hp = Math.min(player.hp + item.value, player.maxHp);
             updateBattleLog(`Vous utilisez ${item.name} et récupérez ${item.value} PV.`);
+        } else if (item.effect === 'energy') {
+            player.energy = Math.min(player.energy + item.value, player.maxEnergy);
+            updateBattleLog(`Vous utilisez ${item.name} et récupérez ${item.value} points d'énergie.`);
         }
         player.inventory.splice(index, 1);
         updatePlayerInfo();
@@ -410,9 +425,13 @@ function equipItem(index) {
         if (currentEquipped) {
             player.inventory.push(currentEquipped);
             player.equippedItems = player.equippedItems.filter(i => i.type !== item.type);
+            player.attack -= currentEquipped.attack || 0;
+            player.defense -= currentEquipped.defense || 0;
         }
         player.equippedItems.push(item);
         player.inventory.splice(index, 1);
+        player.attack += item.attack || 0;
+        player.defense += item.defense || 0;
         updatePlayerInfo();
         openInventory();
         console.log("Objet équipé:", item);
@@ -432,7 +451,7 @@ function openShop() {
         itemElement.className = 'shop-item';
         itemElement.innerHTML = `
             <span>${item.name} - ${item.cost} or</span>
-            <button onclick="buyItem('${item.id}')" class="buy-button">Acheter</button>
+            <button onclick="buyItem('${item.id}')">Acheter</button>
         `;
         shopItems.appendChild(itemElement);
     });
@@ -510,6 +529,8 @@ function updatePlayerInfo() {
         PV: ${player.hp}/${player.maxHp}<br>
         XP: ${player.experience}/${player.level * 100}<br>
         Or: ${player.gold}<br>
+        Énergie: ${player.energy}/${player.maxEnergy}<br>
+        Attaque: ${player.attack} | Défense: ${player.defense}<br>
         Ressources: Bois ${player.resources.wood}, Pierre ${player.resources.stone}, Fer ${player.resources.iron}
     `;
 }
