@@ -100,7 +100,7 @@ class Character {
         }
     }
 
-  applyItemEffects(item) {
+    applyItemEffects(item) {
         if (item.attack) this.attack += item.attack;
         if (item.defense) this.defense += item.defense;
         if (item.maxHp) {
@@ -383,6 +383,7 @@ function playerUseSpecial() {
 function playerUseItem() {
     // Implémenter la logique pour utiliser un objet en combat
     console.log("Fonction pour utiliser un objet à implémenter");
+    // Vous pourriez ouvrir un menu pour choisir un objet à utiliser ici
 }
 
 function enemyTurn() {
@@ -403,9 +404,8 @@ function checkBattleEnd() {
     } else if (player.hp <= 0) {
         endCombat(false);
     } else {
-        enemyTurn();
+        updateBattleInfo();
     }
-    updateBattleInfo();
 }
 
 function endCombat(victory) {
@@ -472,7 +472,7 @@ function openInventory() {
     const equippedArmor = document.getElementById('equipped-armor');
     const equippedAccessory = document.getElementById('equipped-accessory');
 
-   if (player.equippedItems.weapon) {
+    if (player.equippedItems.weapon) {
         equippedWeapon.innerHTML = createItemHTML(player.equippedItems.weapon, -1, true);
     } else {
         equippedWeapon.innerHTML = '<p>Aucune arme équipée</p>';
@@ -820,12 +820,10 @@ function handleTradeRequest({ fromId, toId }) {
 
 function startTradeSession({ fromId, toId }) {
     console.log("Session d'échange démarrée entre", fromId, "et", toId);
-    // Implémenter l'interface d'échange ici
     showTradeInterface();
 }
 
 function showTradeInterface() {
-    // Créer et afficher l'interface d'échange
     const tradeInterface = document.createElement('div');
     tradeInterface.id = 'trade-interface';
     tradeInterface.innerHTML = `
@@ -837,7 +835,6 @@ function showTradeInterface() {
     `;
     document.body.appendChild(tradeInterface);
 
-    // Remplir les items du joueur
     const playerTradeItems = document.getElementById('player-trade-items');
     player.inventory.forEach((item, index) => {
         const itemElement = document.createElement('div');
@@ -848,7 +845,6 @@ function showTradeInterface() {
         playerTradeItems.appendChild(itemElement);
     });
 
-// Ajouter des écouteurs d'événements pour les boutons de confirmation et d'annulation
     document.getElementById('confirm-trade').addEventListener('click', confirmTrade);
     document.getElementById('cancel-trade').addEventListener('click', cancelTrade);
 }
@@ -860,22 +856,15 @@ function offerTradeItem(index) {
 
 function handleItemTraded({ fromId, toId, item }) {
     if (fromId === socket.id) {
-        // Retirer l'item de l'inventaire du joueur
         const itemIndex = player.inventory.findIndex(i => i.id === item.id);
         if (itemIndex !== -1) {
             player.inventory.splice(itemIndex, 1);
         }
     } else {
-        // Ajouter l'item à l'inventaire du joueur
         player.inventory.push(item);
     }
     updateInventoryDisplay();
     updateTradeInterface();
-}
-
-function updateInventoryDisplay() {
-    // Mettre à jour l'affichage de l'inventaire du joueur
-    openInventory();
 }
 
 function updateTradeInterface() {
