@@ -65,9 +65,15 @@
 
             <section id="inventory-area" class="game-area">
                 <h2>Inventaire</h2>
-                <div id="character-model"></div>
-                <div id="equipped-items"></div>
-                <div id="inventory-items"></div>
+                <div id="equipped-items">
+                    <h3>Équipement porté</h3>
+                    <div id="equipped-weapon"></div>
+                    <div id="equipped-armor"></div>
+                    <div id="equipped-accessory"></div>
+                </div>
+                <div id="inventory-items">
+                    <h3>Objets en stock</h3>
+                </div>
                 <button id="close-inventory">Fermer l'inventaire</button>
             </section>
 
@@ -98,14 +104,6 @@
                 <button id="trade-request">Demander un échange</button>
                 <button id="back-to-main">Quitter le mode multijoueur</button>
             </section>
-
-            <section id="inventory-area" class="game-area">
-                <h2>Inventaire</h2>
-                <div id="character-model"></div>
-                <div id="equipped-items"></div>
-                <div id="inventory-items"></div>
-                <button id="close-inventory">Fermer l'inventaire</button>
-            </section>
         </main>
 
         <div id="level-up-modal" class="modal">
@@ -115,8 +113,6 @@
                 <button id="confirm-level-up">Confirmer</button>
             </div>
         </div>
-
-        <div id="debug-messages" style="display: none;"></div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.js"></script>
