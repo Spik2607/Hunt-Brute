@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hunt Brute - V1.56</title>
+    <title>Hunt Brute - V1.60</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -89,7 +89,22 @@
                 <button id="join-fixed-room">Rejoindre la salle fixe</button>
                 <div id="waiting-area"></div>
                 <div id="multiplayer-battle"></div>
+                <div id="chat-area">
+                    <div id="chat-messages"></div>
+                    <input type="text" id="chat-input" placeholder="Entrez votre message...">
+                    <button id="send-message">Envoyer</button>
+                </div>
+                <button id="challenge-player">Défier le joueur</button>
+                <button id="trade-request">Demander un échange</button>
                 <button id="back-to-main">Quitter le mode multijoueur</button>
+            </section>
+
+            <section id="inventory-area" class="game-area">
+                <h2>Inventaire</h2>
+                <div id="character-model"></div>
+                <div id="equipped-items"></div>
+                <div id="inventory-items"></div>
+                <button id="close-inventory">Fermer l'inventaire</button>
             </section>
         </main>
 
