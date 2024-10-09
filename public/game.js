@@ -1,5 +1,5 @@
 // game.js
-import { items, missions, dropRates, getRandomCompanionName } from './gameData.js';
+import { items, missions, dropRates, getRandomCompanionName, getItemStats } from './gameData.js';
 import { expeditionEvents, getRandomExpeditionEvent } from './expedition.js';
 
 let player = null;
@@ -8,6 +8,7 @@ let currentMission = null;
 let currentExpedition = null;
 let companion = null;
 let socket;
+let currentRoom = null;
 
 const FIXED_ROOM = 'fixed-room';
 
@@ -22,7 +23,11 @@ class Character {
         this.experience = 0;
         this.gold = 0;
         this.inventory = [];
-        this.equippedItems = [];
+        this.equippedItems = {
+            weapon: null,
+            armor: null,
+            accessory: null
+        };
         this.energy = 100;
         this.maxEnergy = 100;
         this.resources = { wood: 0, stone: 0, iron: 0 };
@@ -68,6 +73,37 @@ class Character {
             updatePlayerInfo();
         }
     }
+
+    equipItem(item) {
+        if (item.type === 'weapon' || item.type === 'armor' || item.type === 'accessory') {
+            const currentEquipped = this.equippedItems[item.type];
+            if (currentEquipped) {
+                this.inventory.push(currentEquipped);
+                this.unequipItem(currentEquipped);
+            }
+            this.equippedItems[item.type] = item;
+            this.applyItemEffects(item);
+        }
+    }
+
+    unequipItem(item) {
+        if (item.type === 'weapon' || item.type === 'armor' || item.type === 'accessory') {
+            this.equippedItems[item.type] = null;
+            this.removeItemEffects(item);
+        }
+    }
+
+    applyItemEffects(item) {
+        if (item.attack) this.attack += item.attack;
+        if (item.defense) this.defense += item.defense;
+        // Ajouter d'autres effets selon les propriétés de l'item
+    }
+
+    removeItemEffects(item) {
+        if (item.attack) this.attack -= item.attack;
+        if (item.defense) this.defense -= item.defense;
+        // Retirer d'autres effets selon les propriétés de l'item
+    }
 }
 
 class Companion extends Character {
@@ -99,6 +135,7 @@ function initializeSocket() {
     });
     socket.on('roomJoined', ({ roomId, players }) => {
         console.log(`Joined room: ${roomId}`, players);
+        currentRoom = roomId;
         updateWaitingAreaDisplay(players);
     });
     socket.on('playerJoined', (players) => {
@@ -110,6 +147,12 @@ function initializeSocket() {
         startMultiplayerGame(players);
     });
     socket.on('opponentAction', handleOpponentAction);
+    socket.on('newMessage', displayChatMessage);
+    socket.on('challengeReceived', handleChallengeReceived);
+    socket.on('battleStart', startMultiplayerBattle);
+    socket.on('tradeRequestReceived', handleTradeRequest);
+    socket.on('tradeStart', startTradeSession);
+    socket.on('itemTraded', handleItemTraded);
 }
 
 function setupEventListeners() {
@@ -129,7 +172,10 @@ function setupEventListeners() {
         { id: 'back-to-main', event: 'click', handler: () => showGameArea('main-menu') },
         { id: 'close-inventory', event: 'click', handler: () => showGameArea('main-menu') },
         { id: 'leave-shop', event: 'click', handler: () => showGameArea('main-menu') },
-        { id: 'open-multiplayer', event: 'click', handler: startMultiplayerMode }
+        { id: 'open-multiplayer', event: 'click', handler: startMultiplayerMode },
+        { id: 'send-message', event: 'click', handler: sendChatMessage },
+        { id: 'challenge-player', event: 'click', handler: challengePlayer },
+        { id: 'trade-request', event: 'click', handler: requestTrade }
     ];
 
     listeners.forEach(({ id, event, handler }) => {
@@ -379,11 +425,14 @@ function openInventory() {
     player.inventory.forEach((item, index) => {
         const itemElement = document.createElement('div');
         itemElement.className = 'inventory-item';
+        const isEquipped = Object.values(player.equippedItems).some(equippedItem => equippedItem && equippedItem.id === item.id);
+        if (isEquipped) itemElement.classList.add('equipped-item');
         itemElement.innerHTML = `
             <span>${item.name}</span>
+            <div class="item-stats">${getItemStats(item)}</div>
             ${item.type === 'consumable' ? 
               `<button onclick="window.useItem(${index})">Utiliser</button>` :
-              `<button onclick="window.equipItem(${index})">Équiper</button>`}
+              `<button onclick="window.equipItem(${index})">${isEquipped ? 'Déséquiper' : 'Équiper'}</button>`}
             <button onclick="window.sellItem(${index})">Vendre</button>
         `;
         inventoryItems.appendChild(itemElement);
@@ -397,8 +446,9 @@ function useItem(index) {
     const item = player.inventory[index];
     if (item.type === 'consumable') {
         if (item.effect === 'heal') {
-            player.hp = Math.min(player.hp + item.value, player.maxHp);
-            updateBattleLog(`Vous utilisez ${item.name} et récupérez ${item.value} PV.`);
+            const healAmount = item.value;
+            player.hp = Math.min(player.hp + healAmount, player.maxHp);
+            updateBattleLog(`Vous utilisez ${item.name} et récupérez ${healAmount} PV.`);
         } else if (item.effect === 'energy') {
             player.energy = Math.min(player.energy + item.value, player.maxEnergy);
             updateBattleLog(`Vous utilisez ${item.name} et récupérez ${item.value} points d'énergie.`);
@@ -412,18 +462,9 @@ function useItem(index) {
 function equipItem(index) {
     if (!player || !player.inventory[index]) return;
     const item = player.inventory[index];
-    if (item.type === 'weapon' || item.type === 'armor') {
-        const currentEquipped = player.equippedItems.find(i => i.type === item.type);
-        if (currentEquipped) {
-            player.inventory.push(currentEquipped);
-            player.equippedItems = player.equippedItems.filter(i => i.type !== item.type);
-            player.attack -= currentEquipped.attack || 0;
-            player.defense -= currentEquipped.defense || 0;
-        }
-        player.equippedItems.push(item);
+    if (item.type === 'weapon' || item.type === 'armor' || item.type === 'accessory') {
+        player.equipItem(item);
         player.inventory.splice(index, 1);
-        player.attack += item.attack || 0;
-        player.defense += item.defense || 0;
         updatePlayerInfo();
         openInventory();
         console.log("Objet équipé:", item);
@@ -480,41 +521,6 @@ function buyItem(itemId) {
     } else {
         alert("Vous n'avez pas assez d'or !");
     }
-}
-
-function openCompanionsMenu() {
-    if (!player) {
-        console.error("Aucun joueur n'est initialisé");
-        return;
-    }
-    const companionsList = document.getElementById('companions-list');
-    if (!companionsList) {
-        console.error("L'élément 'companions-list' n'a pas été trouvé");
-        return;
-    }
-    companionsList.innerHTML = '';
-    player.companions.forEach((comp, index) => {
-        const compElement = document.createElement('div');
-        compElement.textContent = `${comp.name} (${comp.type})`;
-        const selectButton = document.createElement('button');
-        selectButton.textContent = 'Sélectionner';
-        selectButton.onclick = () => selectCompanion(index);
-        compElement.appendChild(selectButton);
-        companionsList.appendChild(compElement);
-    });
-    showGameArea('companions-area');
-    console.log("Menu des compagnons ouvert");
-}
-
-function selectCompanion(index) {
-    if (!player || !player.companions[index]) {
-        console.error("Joueur non initialisé ou compagnon non trouvé");
-        return;
-    }
-    companion = player.companions[index];
-    updateCompanionInfo();
-    showGameArea('adventure-menu');
-    console.log("Compagnon sélectionné:", companion);
 }
 
 function updatePlayerInfo() {
@@ -604,6 +610,12 @@ function updateAdventureMenu() {
     }
 }
 
+// Fonctions pour le mode multijoueur
+function startMultiplayerMode() {
+    showGameArea('multiplayer-area');
+    console.log("Mode multijoueur activé");
+}
+
 function joinRoom(roomId) {
     if (!player) {
         alert("Veuillez d'abord créer un personnage.");
@@ -620,20 +632,160 @@ function joinRoom(roomId) {
     console.log(`Tentative de rejoindre la salle: ${roomId}`);
 }
 
-function startMultiplayerMode() {
-    showGameArea('multiplayer-area');
-    console.log("Mode multijoueur activé");
+function updateWaitingAreaDisplay(players) {
+    const waitingArea = document.getElementById('waiting-area');
+    if (waitingArea) {
+        waitingArea.innerHTML = '<h3>Joueurs dans la salle :</h3>';
+        players.forEach(player => {
+            waitingArea.innerHTML += `<p>${player.name} (Niveau ${player.level})</p>`;
+        });
+    }
 }
 
-function startMultiplayerGame(players) {
-    const opponent = players.find(p => p.name !== player.name);
-    if (opponent) {
-        enemy = new Character(opponent.name, opponent.hp, opponent.attack, opponent.defense);
-        showGameArea('multiplayer-battle');
-        updateBattleInfo();
-        console.log("Partie multijoueur commencée avec:", opponent);
+function sendChatMessage() {
+    const chatInput = document.getElementById('chat-input');
+    const message = chatInput.value.trim();
+    if (message && currentRoom) {
+        socket.emit('chatMessage', { roomId: currentRoom, message: { sender: player.name, text: message } });
+        chatInput.value = '';
+    }
+}
+
+function displayChatMessage(message) {
+    const chatMessages = document.getElementById('chat-messages');
+    if (chatMessages) {
+        chatMessages.innerHTML += `<p><strong>${message.sender}:</strong> ${message.text}</p>`;
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+}
+
+function challengePlayer() {
+    if (currentRoom) {
+        socket.emit('initiateChallenge', { roomId: currentRoom, challengerId: socket.id });
+    }
+}
+
+function handleChallengeReceived({ challengerId }) {
+    if (challengerId !== socket.id) {
+        const accept = confirm("Vous avez été défié ! Acceptez-vous le combat ?");
+        if (accept) {
+            socket.emit('acceptChallenge', { roomId: currentRoom, challengerId, accepterId: socket.id });
+        }
+    }
+}
+
+function startMultiplayerBattle({ challengerId, accepterId }) {
+    enemy = new Character("Adversaire", player.maxHp, player.attack, player.defense);
+    showGameArea('battle-area');
+    updateBattleInfo();
+    console.log("Combat multijoueur commencé entre", challengerId, "et", accepterId);
+}
+
+function requestTrade() {
+    if (currentRoom) {
+        const otherPlayerId = socket.id; // À remplacer par l'ID réel de l'autre joueur
+        socket.emit('initiateTradeRequest', { roomId: currentRoom, fromId: socket.id, toId: otherPlayerId });
+    }
+}
+
+function handleTradeRequest({ fromId, toId }) {
+    if (toId === socket.id) {
+        const accept = confirm("Vous avez reçu une demande d'échange. Acceptez-vous ?");
+        if (accept) {
+            socket.emit('acceptTradeRequest', { roomId: currentRoom, fromId, toId });
+        }
+    }
+}
+
+function startTradeSession({ fromId, toId }) {
+    console.log("Session d'échange démarrée entre", fromId, "et", toId);
+    // Implémenter l'interface d'échange ici
+    showTradeInterface();
+}
+
+function showTradeInterface() {
+    // Créer et afficher l'interface d'échange
+    const tradeInterface = document.createElement('div');
+    tradeInterface.id = 'trade-interface';
+    tradeInterface.innerHTML = `
+        <h3>Échange d'objets</h3>
+        <div id="player-trade-items"></div>
+        <div id="opponent-trade-items"></div>
+        <button id="confirm-trade">Confirmer l'échange</button>
+        <button id="cancel-trade">Annuler l'échange</button>
+    `;
+    document.body.appendChild(tradeInterface);
+
+    // Remplir les items du joueur
+    const playerTradeItems = document.getElementById('player-trade-items');
+    player.inventory.forEach((item, index) => {
+        const itemElement = document.createElement('div');
+        itemElement.innerHTML = `
+            <span>${item.name}</span>
+            <button onclick="offerTradeItem(${index})">Offrir</button>
+        `;
+        playerTradeItems.appendChild(itemElement);
+    });
+
+    // Ajouter des écouteurs d'événements pour les boutons de confirmation et d'annulation
+    document.getElementById('confirm-trade').addEventListener('click', confirmTrade);
+    document.getElementById('cancel-trade').addEventListener('click', cancelTrade);
+}
+
+function offerTradeItem(index) {
+    const item = player.inventory[index];
+    socket.emit('offerTradeItem', { roomId: currentRoom, itemId: item.id });
+}
+
+function handleItemTraded({ fromId, toId, item }) {
+    if (fromId === socket.id) {
+        // Retirer l'item de l'inventaire du joueur
+        const itemIndex = player.inventory.findIndex(i => i.id === item.id);
+        if (itemIndex !== -1) {
+            player.inventory.splice(itemIndex, 1);
+        }
     } else {
-        console.error("Adversaire non trouvé dans la liste des joueurs");
+        // Ajouter l'item à l'inventaire du joueur
+        player.inventory.push(item);
+    }
+    updateInventoryDisplay();
+    updateTradeInterface();
+}
+
+function updateInventoryDisplay() {
+    // Mettre à jour l'affichage de l'inventaire du joueur
+    openInventory();
+}
+
+function updateTradeInterface() {
+    const playerTradeItems = document.getElementById('player-trade-items');
+    if (playerTradeItems) {
+        playerTradeItems.innerHTML = '';
+        player.inventory.forEach((item, index) => {
+            const itemElement = document.createElement('div');
+            itemElement.innerHTML = `
+                <span>${item.name}</span>
+                <button onclick="offerTradeItem(${index})">Offrir</button>
+            `;
+            playerTradeItems.appendChild(itemElement);
+        });
+    }
+}
+
+function confirmTrade() {
+    socket.emit('confirmTrade', { roomId: currentRoom });
+    closeTradeInterface();
+}
+
+function cancelTrade() {
+    socket.emit('cancelTrade', { roomId: currentRoom });
+    closeTradeInterface();
+}
+
+function closeTradeInterface() {
+    const tradeInterface = document.getElementById('trade-interface');
+    if (tradeInterface) {
+        tradeInterface.remove();
     }
 }
 
@@ -727,26 +879,52 @@ function updateCompanionInfo() {
     }
 }
 
-function updateWaitingAreaDisplay(players) {
-    const waitingArea = document.getElementById('waiting-area');
-    if (waitingArea) {
-        waitingArea.innerHTML = '<h3>Joueurs dans la salle :</h3>';
-        players.forEach(player => {
-            waitingArea.innerHTML += `<p>${player.name} (Niveau ${player.level})</p>`;
-        });
+function openCompanionsMenu() {
+    if (!player) {
+        console.error("Aucun joueur n'est initialisé");
+        return;
     }
+    const companionsList = document.getElementById('companions-list');
+    if (!companionsList) {
+        console.error("L'élément 'companions-list' n'a pas été trouvé");
+        return;
+    }
+    companionsList.innerHTML = '';
+    player.companions.forEach((comp, index) => {
+        const compElement = document.createElement('div');
+        compElement.textContent = `${comp.name} (${comp.type})`;
+        const selectButton = document.createElement('button');
+        selectButton.textContent = 'Sélectionner';
+        selectButton.onclick = () => selectCompanion(index);
+        compElement.appendChild(selectButton);
+        companionsList.appendChild(compElement);
+    });
+    showGameArea('companions-area');
+    console.log("Menu des compagnons ouvert");
+}
+
+function selectCompanion(index) {
+    if (!player || !player.companions[index]) {
+        console.error("Joueur non initialisé ou compagnon non trouvé");
+        return;
+    }
+    companion = player.companions[index];
+    updateCompanionInfo();
+    showGameArea('adventure-menu');
+    console.log("Compagnon sélectionné:", companion);
 }
 
 // Initialisation du jeu
-document.addEventListener('DOMContentLoaded', initGame);
+document.addEventListener('DOMContentLoaded', () => {
+    initGame();
+    initializeMultiplayerChat();
+});
 
-// Sauvegarde automatique
-setInterval(saveGame, 300000); // Sauvegarde toutes les 5 minutes
-
-// Rendre les fonctions accessibles globalement
+// Fonctions pour rendre accessibles globalement
 window.useItem = useItem;
 window.equipItem = equipItem;
 window.sellItem = sellItem;
 window.buyItem = buyItem;
+window.offerTradeItem = offerTradeItem;
 
 console.log("Script game.js chargé");
