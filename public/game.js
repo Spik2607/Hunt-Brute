@@ -540,15 +540,7 @@ function sendPlayerAction(action) {
     socket.emit('playerAction', { roomId: FIXED_ROOM, action: action });
 }
 
-function handleOpponentAction(action) {
-    if (action.type === 'attack') {
-        player.hp -= action.damage;
-        updateBattleLog(`L'adversaire vous inflige ${action.damage} dégâts.`);
-        checkGameOver();
-        updateBattleInfo();
-    }
-    // Handle other action types as needed
-}
+
 
 // Initialize the game
 document.addEventListener('DOMContentLoaded', initGame);
