@@ -150,6 +150,12 @@ function initGame() {
     }, 1000); // Mise à jour toutes les secondes
 }
 
+if (typeof initializeMultiplayerChat === 'function') {
+    initializeMultiplayerChat();
+} else {
+    console.warn("La fonction initializeMultiplayerChat n'est pas définie. Le chat multijoueur peut ne pas fonctionner.");
+}
+
 function initializeSocket() {
     socket = io('https://hunt-brute-server.onrender.com');
     socket.on('connect', () => {
@@ -1054,6 +1060,22 @@ function confirmLevelUp() {
     player.applySkills();
     document.getElementById('level-up-modal').style.display = 'none';
     updatePlayerInfo();
+}
+
+function initializeMultiplayerChat() {
+    const chatInput = document.getElementById('chat-input');
+    const sendButton = document.getElementById('send-message');
+
+    if (chatInput && sendButton) {
+        sendButton.addEventListener('click', sendChatMessage);
+        chatInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendChatMessage();
+            }
+        });
+    } else {
+        console.warn("Les éléments de chat n'ont pas été trouvés. Le chat peut ne pas fonctionner correctement.");
+    }
 }
 
 // Initialisation du jeu
