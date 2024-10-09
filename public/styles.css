@@ -224,6 +224,37 @@ button:active {
     display: inline-block;
 }
 
+#chat-area {
+    height: 200px;
+    overflow-y: scroll;
+    border: 1px solid #3498db;
+    padding: 10px;
+    margin-top: 20px;
+}
+
+#chat-messages {
+    margin-bottom: 10px;
+}
+
+#chat-input {
+    width: 70%;
+    padding: 5px;
+}
+
+#send-message {
+    width: 25%;
+}
+
+.equipped-item {
+    background-color: #2ecc71;
+    border: 2px solid #27ae60;
+}
+
+.item-stats {
+    font-size: 0.8em;
+    color: #bdc3c7;
+}
+
 .tooltip .tooltiptext {
     visibility: hidden;
     width: 120px;
