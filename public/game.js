@@ -1,6 +1,6 @@
 // game.js
-import { items, missions, dropRates } from './gameData.js';
-import { expeditionEvents } from './expedition.js';
+import { items, missions, dropRates, getRandomCompanionName } from './gameData.js';
+import { expeditionEvents, getRandomExpeditionEvent } from './expedition.js';
 
 let player = null;
 let enemy = null;
@@ -78,8 +78,12 @@ class Companion extends Character {
 }
 
 function initGame() {
-    setupEventListeners();
+    console.log("Initializing game...");
     initializeSocket();
+    document.addEventListener('DOMContentLoaded', () => {
+        setupEventListeners();
+        showGameArea('main-menu');
+    });
     setInterval(() => {
         if (player) {
             player.regenerateHP();
@@ -104,24 +108,37 @@ function initializeSocket() {
         console.log('Game is ready to start');
         startMultiplayerGame(players);
     });
-    socket.on('opponentAction', (action) => {
-        handleOpponentAction(action);
-    });
+    socket.on('opponentAction', handleOpponentAction);
 }
 
 function setupEventListeners() {
-    document.getElementById('create-character').addEventListener('click', createCharacter);
-    document.getElementById('start-mission').addEventListener('click', chooseMission);
-    document.getElementById('start-expedition').addEventListener('click', startExpedition);
-    document.getElementById('attack-button').addEventListener('click', playerAttack);
-    document.getElementById('open-inventory').addEventListener('click', openInventory);
-    document.getElementById('manage-companions').addEventListener('click', openCompanionsMenu);
-    document.getElementById('join-fixed-room').addEventListener('click', () => joinRoom(FIXED_ROOM));
-    // Add more event listeners as needed
+    addSafeEventListener('create-character', 'click', createCharacter);
+    addSafeEventListener('start-mission', 'click', chooseMission);
+    addSafeEventListener('start-expedition', 'click', startExpedition);
+    addSafeEventListener('attack-button', 'click', playerAttack);
+    addSafeEventListener('open-inventory', 'click', openInventory);
+    addSafeEventListener('manage-companions', 'click', openCompanionsMenu);
+    addSafeEventListener('join-fixed-room', 'click', () => joinRoom(FIXED_ROOM));
+    addSafeEventListener('save-game', 'click', saveGame);
+    addSafeEventListener('load-game', 'click', loadGame);
+}
+
+function addSafeEventListener(id, event, callback) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.addEventListener(event, callback);
+    } else {
+        console.warn(`Élément avec l'id '${id}' non trouvé. L'écouteur d'événement n'a pas été ajouté.`);
+    }
 }
 
 function createCharacter() {
-    const name = document.getElementById('hero-name').value.trim();
+    const nameInput = document.getElementById('hero-name');
+    if (!nameInput) {
+        console.error("L'élément 'hero-name' n'a pas été trouvé");
+        return;
+    }
+    const name = nameInput.value.trim();
     if (!name) {
         alert("Veuillez entrer un nom pour votre personnage.");
         return;
@@ -133,6 +150,10 @@ function createCharacter() {
 
 function chooseMission() {
     const missionList = document.getElementById('mission-list');
+    if (!missionList) {
+        console.error("L'élément 'mission-list' n'a pas été trouvé");
+        return;
+    }
     missionList.innerHTML = '';
     missions.forEach((mission, index) => {
         const missionButton = document.createElement('button');
@@ -261,12 +282,16 @@ function getRandomItem() {
 function getRandomCompanion() {
     const types = ['animal', 'monster', 'slave', 'spirit', 'shinigami'];
     const type = types[Math.floor(Math.random() * types.length)];
-    const name = `Companion${Math.floor(Math.random() * 1000)}`;
+    const name = getRandomCompanionName(type);
     return new Companion(name, type, 50, 5, 3);
 }
 
 function openInventory() {
     const inventoryItems = document.getElementById('inventory-items');
+    if (!inventoryItems) {
+        console.error("L'élément 'inventory-items' n'a pas été trouvé");
+        return;
+    }
     inventoryItems.innerHTML = '';
     player.inventory.forEach((item, index) => {
         const itemElement = document.createElement('div');
@@ -297,6 +322,10 @@ function equipItem(index) {
 
 function openCompanionsMenu() {
     const companionsList = document.getElementById('companions-list');
+    if (!companionsList) {
+        console.error("L'élément 'companions-list' n'a pas été trouvé");
+        return;
+    }
     companionsList.innerHTML = '';
     player.companions.forEach((comp, index) => {
         const compElement = document.createElement('div');
@@ -318,6 +347,10 @@ function selectCompanion(index) {
 
 function updatePlayerInfo() {
     const playerInfo = document.getElementById('player-info');
+    if (!playerInfo) {
+        console.error("L'élément 'player-info' n'a pas été trouvé");
+        return;
+    }
     playerInfo.innerHTML = `
         ${player.name} - Niveau ${player.level}<br>
         PV: ${player.hp}/${player.maxHp}<br>
@@ -332,44 +365,58 @@ function updateBattleInfo() {
     const enemyStats = document.getElementById('enemy-stats');
     const companionStats = document.getElementById('companion-stats');
 
-    playerStats.innerHTML = `${player.name}: ${player.hp}/${player.maxHp} PV`;
-    enemyStats.innerHTML = `${enemy.name}: ${enemy.hp}/${enemy.maxHp} PV`;
+    if (playerStats) playerStats.innerHTML = `${player.name}: ${player.hp}/${player.maxHp} PV`;
+    if (enemyStats && enemy) enemyStats.innerHTML = `${enemy.name}: ${enemy.hp}/${enemy.maxHp} PV`;
     
-    if (companion) {
-        companionStats.innerHTML = `${companion.name}: ${companion.hp}/${companion.maxHp} PV`;
-        companionStats.style.display = 'block';
-    } else {
-        companionStats.style.display = 'none';
+    if (companionStats) {
+        if (companion) {
+            companionStats.innerHTML = `${companion.name}: ${companion.hp}/${companion.maxHp} PV`;
+            companionStats.style.display = 'block';
+        } else {
+            companionStats.style.display = 'none';
+        }
     }
 }
 
 function updateBattleLog(message) {
     const battleLog = document.getElementById('battle-log');
-    battleLog.innerHTML += `<p>${message}</p>`;
-    battleLog.scrollTop = battleLog.scrollHeight;
+    if (battleLog) {
+        battleLog.innerHTML += `<p>${message}</p>`;
+        battleLog.scrollTop = battleLog.scrollHeight;
+    }
 }
 
 function updateExpeditionDisplay() {
     const expeditionInfo = document.getElementById('expedition-info');
-    if (currentExpedition) {
-        expeditionInfo.innerHTML = `
-            Expédition: ${currentExpedition.name}<br>
-            Temps restant: ${Math.floor(currentExpedition.timeRemaining / 60)}:${(currentExpedition.timeRemaining % 60).toString().padStart(2, '0')}
-        `;
-    } else {
-        expeditionInfo.innerHTML = 'Aucune expédition en cours';
+    if (expeditionInfo) {
+        if (currentExpedition) {
+            expeditionInfo.innerHTML = `
+                Expédition: ${currentExpedition.name}<br>
+                Temps restant: ${Math.floor(currentExpedition.timeRemaining / 60)}:${(currentExpedition.timeRemaining % 60).toString().padStart(2, '0')}
+            `;
+        } else {
+            expeditionInfo.innerHTML = 'Aucune expédition en cours';
+        }
     }
 }
 
 function updateExpeditionLog(message) {
     const expeditionLog = document.getElementById('expedition-log');
-    expeditionLog.innerHTML += `<p>${message}</p>`;
-    expeditionLog.scrollTop = expeditionLog.scrollHeight;
+    if (expeditionLog) {
+        expeditionLog.innerHTML += `<p>${message}</p>`;
+        expeditionLog.scrollTop = expeditionLog.scrollHeight;
+    }
 }
 
 function showGameArea(areaId) {
-    document.querySelectorAll('.game-area').forEach(area => area.style.display = 'none');
-    document.getElementById(areaId).style.display = 'block';
+    const areas = document.querySelectorAll('.game-area');
+    areas.forEach(area => {
+        if (area.id === areaId) {
+            area.style.display = 'block';
+        } else {
+            area.style.display = 'none';
+        }
+    });
 }
 
 function joinRoom(roomId) {
@@ -389,9 +436,13 @@ function joinRoom(roomId) {
 
 function startMultiplayerGame(players) {
     const opponent = players.find(p => p.name !== player.name);
-    enemy = new Character(opponent.name, opponent.hp, opponent.attack, opponent.defense);
-    showGameArea('multiplayer-battle');
-    updateBattleInfo();
+    if (opponent) {
+        enemy = new Character(opponent.name, opponent.hp, opponent.attack, opponent.defense);
+        showGameArea('multiplayer-battle');
+        updateBattleInfo();
+    } else {
+        console.error("Opponent not found in players list");
+    }
 }
 
 function handleOpponentAction(action) {
@@ -404,27 +455,22 @@ function handleOpponentAction(action) {
     // Handle other action types as needed
 }
 
-function showLevelUpModal() {
-    const modal = document.getElementById('level-up-modal');
-    const newLevelSpan = document.getElementById('new-level');
-    newLevelSpan.textContent = player.level;
-    modal.style.display = 'block';
-}
-
-document.getElementById('confirm-level-up').addEventListener('click', () => {
-    document.getElementById('level-up-modal').style.display = 'none';
-    updatePlayerInfo();
-});
-
-function updateWaitingAreaDisplay(players) {
-    const waitingArea = document.getElementById('waiting-area');
-    waitingArea.innerHTML = '<h3>Joueurs dans la salle :</h3>';
-    players.forEach(p => {
-        waitingArea.innerHTML += `<p>${p.name} (Niveau ${p.level})</p>`;
-    });
+function checkGameOver() {
+    if (player.hp <= 0) {
+        alert("Game Over! Votre personnage est mort.");
+        player = null;
+        companion = null;
+        currentMission = null;
+        currentExpedition = null;
+        showGameArea('main-menu');
+    }
 }
 
 function saveGame() {
+    if (!player) {
+        alert("Aucun personnage à sauvegarder.");
+        return;
+    }
     const gameState = {
         player: player,
         companion: companion,
@@ -472,37 +518,18 @@ function loadGame() {
     }
 }
 
-function useItem(itemIndex) {
-    const item = player.inventory[itemIndex];
-    if (item.type === 'consumable') {
-        if (item.effect === 'heal') {
-            player.hp = Math.min(player.hp + item.value, player.maxHp);
-            updateBattleLog(`Vous utilisez ${item.name} et récupérez ${item.value} PV.`);
-        } else if (item.effect === 'energy') {
-            player.energy = Math.min(player.energy + item.value, player.maxEnergy);
-            updateBattleLog(`Vous utilisez ${item.name} et récupérez ${item.value} points d'énergie.`);
-        }
-        player.inventory.splice(itemIndex, 1);
-        updatePlayerInfo();
-        openInventory();
-    }
-}
-
-function startRaid() {
-    // Implement raid logic here
-    alert("Fonctionnalité de raid pas encore implémentée.");
-}
-
 function updateCompanionInfo() {
     const activeCompanion = document.getElementById('active-companion');
-    if (companion) {
-        activeCompanion.innerHTML = `
-            Compagnon actif : ${companion.name} (${companion.type})<br>
-            PV : ${companion.hp}/${companion.maxHp}<br>
-            Attaque : ${companion.attack} | Défense : ${companion.defense}
-        `;
-    } else {
-        activeCompanion.innerHTML = 'Aucun compagnon actif';
+    if (activeCompanion) {
+        if (companion) {
+            activeCompanion.innerHTML = `
+                Compagnon actif : ${companion.name} (${companion.type})<br>
+                PV : ${companion.hp}/${companion.maxHp}<br>
+                Attaque : ${companion.attack} | Défense : ${companion.defense}
+            `;
+        } else {
+            activeCompanion.innerHTML = 'Aucun compagnon actif';
+        }
     }
 }
 
@@ -517,31 +544,8 @@ function toggleCompanion() {
     updatePlayerInfo();
 }
 
-document.getElementById('toggle-companion').addEventListener('click', toggleCompanion);
-
-function checkGameOver() {
-    if (player.hp <= 0) {
-        alert("Game Over! Votre personnage est mort.");
-        // Reset game state or return to main menu
-        player = null;
-        companion = null;
-        currentMission = null;
-        currentExpedition = null;
-        showGameArea('main-menu');
-    }
-}
-
-setInterval(checkGameOver, 1000); // Check every second
-
-// Multiplayer functions
-function sendPlayerAction(action) {
-    socket.emit('playerAction', { roomId: FIXED_ROOM, action: action });
-}
-
-
-
 // Initialize the game
-document.addEventListener('DOMContentLoaded', initGame);
+initGame();
 
 // Automatic saving
 setInterval(saveGame, 300000); // Save every 5 minutes
