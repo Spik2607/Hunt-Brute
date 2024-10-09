@@ -1,4 +1,3 @@
-/* Réinitialisation et styles de base */
 * {
     margin: 0;
     padding: 0;
@@ -6,13 +5,12 @@
 }
 
 body {
-    font-family: 'Cinzel', serif;
+    font-family: 'MedievalSharp', cursive;
     background: url('https://example.com/parchment-texture.jpg') repeat;
-    color: #2c2c2c;
+    color: #3a3a3a;
     line-height: 1.6;
 }
 
-/* Container principal */
 #game-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -22,7 +20,6 @@ body {
     border-radius: 8px;
 }
 
-/* En-tête */
 header {
     text-align: center;
     margin-bottom: 30px;
@@ -36,10 +33,10 @@ h1 {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* Menu principal */
 nav {
     display: flex;
     justify-content: space-around;
+    flex-wrap: wrap;
     margin-bottom: 30px;
     background: linear-gradient(to bottom, #8B4513, #A0522D);
     padding: 10px;
@@ -47,7 +44,7 @@ nav {
 }
 
 nav button {
-    font-family: 'Cinzel', serif;
+    font-family: 'MedievalSharp', cursive;
     font-size: 1em;
     color: #FFF8DC;
     background: none;
@@ -55,6 +52,7 @@ nav button {
     cursor: pointer;
     transition: all 0.3s ease;
     padding: 10px 15px;
+    margin: 5px;
 }
 
 nav button:hover {
@@ -62,7 +60,6 @@ nav button:hover {
     transform: translateY(-2px);
 }
 
-/* Zones de jeu */
 .game-area {
     background-color: rgba(255, 253, 240, 0.7);
     border: 2px solid #8B4513;
@@ -71,14 +68,13 @@ nav button:hover {
     margin-bottom: 20px;
 }
 
-/* Boutique */
-#shop-items {
+#shop-items, #inventory-items {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 20px;
 }
 
-.shop-item {
+.shop-item, .inventory-item {
     background-color: #FFF8DC;
     border: 1px solid #A0522D;
     border-radius: 5px;
@@ -87,12 +83,12 @@ nav button:hover {
     transition: all 0.3s ease;
 }
 
-.shop-item:hover {
+.shop-item:hover, .inventory-item:hover {
     transform: scale(1.05);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
-.shop-item button {
+button {
     background-color: #8B4513;
     color: #FFF8DC;
     border: none;
@@ -102,38 +98,10 @@ nav button:hover {
     transition: background-color 0.3s ease;
 }
 
-.shop-item button:hover {
+button:hover {
     background-color: #A0522D;
 }
 
-/* Inventaire */
-#inventory-items {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 15px;
-}
-
-.item {
-    background-color: #FFF8DC;
-    border: 1px solid #A0522D;
-    border-radius: 5px;
-    padding: 10px;
-    transition: all 0.3s ease;
-}
-
-.item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-/* Styles pour les raretés d'items */
-.item-common { color: #2c2c2c; }
-.item-uncommon { color: #1a9850; }
-.item-rare { color: #2c7bb6; }
-.item-epic { color: #762a83; }
-.item-legendary { color: #feb24c; }
-
-/* Zone de combat */
 #battle-area {
     background: url('https://example.com/battle-background.jpg') center/cover no-repeat;
     color: #FFF8DC;
@@ -154,55 +122,54 @@ nav button:hover {
 #action-buttons {
     display: flex;
     justify-content: space-around;
+    flex-wrap: wrap;
 }
 
 #action-buttons button {
-    font-family: 'Cinzel', serif;
-    font-size: 1em;
-    background-color: #8B4513;
-    color: #FFF8DC;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s ease;
+    margin: 5px;
 }
 
-#action-buttons button:hover {
-    background-color: #A0522D;
-    transform: translateY(-2px);
-}
-
-/* Modal de level up */
 .modal {
+    display: none;
     position: fixed;
-    top: 0;
+    z-index: 1;
     left: 0;
+    top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
 }
 
 .modal-content {
     background: url('https://example.com/scroll-texture.jpg') center/cover no-repeat;
-    padding: 30px;
-    border-radius: 10px;
-    text-align: center;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
     max-width: 500px;
-    width: 90%;
+    border-radius: 10px;
 }
 
-/* Responsivité */
+#skill-distribution {
+    margin-top: 20px;
+}
+
+#skill-distribution div {
+    margin-bottom: 10px;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #8B4513;
+    border-radius: 5px;
+}
+
 @media (max-width: 768px) {
     nav {
         flex-direction: column;
-    }
-    
-    nav button {
-        margin-bottom: 10px;
     }
     
     #shop-items, #inventory-items {
