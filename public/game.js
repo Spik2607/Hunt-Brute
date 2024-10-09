@@ -32,6 +32,12 @@ class Character {
         this.maxEnergy = 100;
         this.resources = { wood: 0, stone: 0, iron: 0 };
         this.companions = [];
+        this.skillPoints = 0;
+        this.skills = {
+            strength: 0,
+            agility: 0,
+            intelligence: 0
+        };
     }
 
     levelUp() {
@@ -42,6 +48,7 @@ class Character {
         this.defense += 1;
         this.experience = this.experience - (this.level - 1) * 100;
         this.energy = this.maxEnergy;
+        this.skillPoints += 3;
         showLevelUpModal();
     }
 
@@ -93,16 +100,31 @@ class Character {
         }
     }
 
-    applyItemEffects(item) {
+  applyItemEffects(item) {
         if (item.attack) this.attack += item.attack;
         if (item.defense) this.defense += item.defense;
+        if (item.maxHp) {
+            this.maxHp += item.maxHp;
+            this.hp += item.maxHp;
+        }
         // Ajouter d'autres effets selon les propriétés de l'item
     }
 
     removeItemEffects(item) {
         if (item.attack) this.attack -= item.attack;
         if (item.defense) this.defense -= item.defense;
+        if (item.maxHp) {
+            this.maxHp -= item.maxHp;
+            this.hp = Math.min(this.hp, this.maxHp);
+        }
         // Retirer d'autres effets selon les propriétés de l'item
+    }
+
+    applySkills() {
+        this.attack += this.skills.strength;
+        this.defense += Math.floor(this.skills.agility / 2);
+        this.maxHp += this.skills.intelligence * 5;
+        this.hp = this.maxHp; // Restaure les PV au maximum après l'application des compétences
     }
 }
 
@@ -162,7 +184,6 @@ function setupEventListeners() {
         { id: 'start-mission', event: 'click', handler: chooseMission },
         { id: 'start-expedition', event: 'click', handler: startExpedition },
         { id: 'cancel-expedition', event: 'click', handler: cancelExpedition },
-        { id: 'attack-button', event: 'click', handler: playerAttack },
         { id: 'open-shop', event: 'click', handler: openShop },
         { id: 'open-inventory', event: 'click', handler: openInventory },
         { id: 'manage-companions', event: 'click', handler: openCompanionsMenu },
@@ -242,6 +263,7 @@ function chooseMission() {
 function startMission(index) {
     currentMission = missions[index];
     enemy = new Character(currentMission.name, currentMission.enemyLevel * 50, currentMission.enemyLevel * 5, currentMission.enemyLevel * 2);
+    enemy.name = currentMission.name; // Assurez-vous que le nom de l'ennemi est correctement défini
     showGameArea('battle-area');
     updateBattleInfo();
     console.log("Mission commencée:", currentMission);
@@ -337,42 +359,51 @@ function finishExpedition() {
 }
 
 function playerAttack() {
-    if (!player || !enemy) {
-        console.error("Joueur ou ennemi non initialisé");
-        return;
-    }
+    if (!player || !enemy) return;
     const damage = Math.max(player.attack - enemy.defense, 0);
     enemy.hp -= damage;
     updateBattleLog(`${player.name} inflige ${damage} dégâts à ${enemy.name}.`);
-    if (enemy.hp <= 0) {
-        endCombat(true);
-    } else {
-        enemyAttack();
-    }
-    if (companion) {
-        companionAttack();
-    }
-    updateBattleInfo();
+    checkBattleEnd();
 }
 
-function enemyAttack() {
+function playerDefend() {
+    player.defending = true;
+    updateBattleLog(`${player.name} se met en position défensive.`);
+    enemyTurn();
+}
+
+function playerUseSpecial() {
     if (!player || !enemy) return;
-    const damage = Math.max(enemy.attack - player.defense, 0);
+    const specialDamage = Math.max(player.attack * 1.5 - enemy.defense, 0);
+    enemy.hp -= specialDamage;
+    updateBattleLog(`${player.name} utilise une attaque spéciale et inflige ${specialDamage} dégâts à ${enemy.name}.`);
+    checkBattleEnd();
+}
+
+function playerUseItem() {
+    // Implémenter la logique pour utiliser un objet en combat
+    console.log("Fonction pour utiliser un objet à implémenter");
+}
+
+function enemyTurn() {
+    if (!player || !enemy) return;
+    let damage = Math.max(enemy.attack - player.defense, 0);
+    if (player.defending) {
+        damage = Math.floor(damage / 2);
+        player.defending = false;
+    }
     player.hp -= damage;
     updateBattleLog(`${enemy.name} inflige ${damage} dégâts à ${player.name}.`);
-    if (player.hp <= 0) {
-        endCombat(false);
-    }
-    updateBattleInfo();
+    checkBattleEnd();
 }
 
-function companionAttack() {
-    if (!companion || !enemy) return;
-    const damage = Math.max(companion.attack - enemy.defense, 0);
-    enemy.hp -= damage;
-    updateBattleLog(`${companion.name} inflige ${damage} dégâts à ${enemy.name}.`);
+function checkBattleEnd() {
     if (enemy.hp <= 0) {
         endCombat(true);
+    } else if (player.hp <= 0) {
+        endCombat(false);
+    } else {
+        enemyTurn();
     }
     updateBattleInfo();
 }
@@ -441,7 +472,7 @@ function openInventory() {
     const equippedArmor = document.getElementById('equipped-armor');
     const equippedAccessory = document.getElementById('equipped-accessory');
 
-    if (player.equippedItems.weapon) {
+   if (player.equippedItems.weapon) {
         equippedWeapon.innerHTML = createItemHTML(player.equippedItems.weapon, -1, true);
     } else {
         equippedWeapon.innerHTML = '<p>Aucune arme équipée</p>';
@@ -473,8 +504,18 @@ function openInventory() {
 }
 
 function createItemHTML(item, index, isEquipped) {
+    const rarityColors = {
+        common: '#ffffff',
+        uncommon: '#1eff00',
+        rare: '#0070dd',
+        epic: '#a335ee',
+        legendary: '#ff8000'
+    };
+
+    const itemColor = rarityColors[item.rarity] || '#ffffff';
+
     return `
-        <div class="item ${isEquipped ? 'equipped-item' : ''}">
+        <div class="item ${isEquipped ? 'equipped-item' : ''}" style="color: ${itemColor}; ${isEquipped ? 'font-weight: bold;' : ''}">
             <span>${item.name}</span>
             <div class="item-stats">${getItemStats(item)}</div>
             ${item.type === 'consumable' 
@@ -616,6 +657,17 @@ function updateBattleInfo() {
         } else {
             companionStats.style.display = 'none';
         }
+    }
+
+    // Mise à jour des boutons d'action en combat
+    const actionButtons = document.getElementById('action-buttons');
+    if (actionButtons) {
+        actionButtons.innerHTML = `
+            <button onclick="playerAttack()">Attaque normale</button>
+            <button onclick="playerDefend()">Se défendre</button>
+            <button onclick="playerUseSpecial()">Attaque spéciale</button>
+            <button onclick="playerUseItem()">Utiliser un objet</button>
+        `;
     }
 }
 
@@ -796,7 +848,7 @@ function showTradeInterface() {
         playerTradeItems.appendChild(itemElement);
     });
 
-    // Ajouter des écouteurs d'événements pour les boutons de confirmation et d'annulation
+// Ajouter des écouteurs d'événements pour les boutons de confirmation et d'annulation
     document.getElementById('confirm-trade').addEventListener('click', confirmTrade);
     document.getElementById('cancel-trade').addEventListener('click', cancelTrade);
 }
@@ -986,16 +1038,45 @@ function selectCompanion(index) {
 function showLevelUpModal() {
     const modal = document.getElementById('level-up-modal');
     const newLevelSpan = document.getElementById('new-level');
-    if (modal && newLevelSpan) {
+    const skillPointsSpan = document.getElementById('skill-points');
+    if (modal && newLevelSpan && skillPointsSpan) {
         newLevelSpan.textContent = player.level;
+        skillPointsSpan.textContent = player.skillPoints;
         modal.style.display = 'block';
+        document.getElementById('strength-skill').textContent = player.skills.strength;
+        document.getElementById('agility-skill').textContent = player.skills.agility;
+        document.getElementById('intelligence-skill').textContent = player.skills.intelligence;
     }
+}
+
+function distributeSkillPoint(skill) {
+    if (player.skillPoints > 0) {
+        player.skills[skill]++;
+        player.skillPoints--;
+        document.getElementById(`${skill}-skill`).textContent = player.skills[skill];
+        document.getElementById('skill-points').textContent = player.skillPoints;
+    }
+    if (player.skillPoints === 0) {
+        document.getElementById('confirm-level-up').disabled = false;
+    }
+}
+
+function confirmLevelUp() {
+    player.applySkills();
+    document.getElementById('level-up-modal').style.display = 'none';
+    updatePlayerInfo();
 }
 
 // Initialisation du jeu
 document.addEventListener('DOMContentLoaded', () => {
     initGame();
     initializeMultiplayerChat();
+    
+    // Ajout des gestionnaires d'événements pour la distribution des points de compétence
+    document.getElementById('strength-button').addEventListener('click', () => distributeSkillPoint('strength'));
+    document.getElementById('agility-button').addEventListener('click', () => distributeSkillPoint('agility'));
+    document.getElementById('intelligence-button').addEventListener('click', () => distributeSkillPoint('intelligence'));
+    document.getElementById('confirm-level-up').addEventListener('click', confirmLevelUp);
 });
 
 // Fonctions pour rendre accessibles globalement
@@ -1004,5 +1085,9 @@ window.equipItem = equipItem;
 window.sellItem = sellItem;
 window.buyItem = buyItem;
 window.offerTradeItem = offerTradeItem;
+window.playerAttack = playerAttack;
+window.playerDefend = playerDefend;
+window.playerUseSpecial = playerUseSpecial;
+window.playerUseItem = playerUseItem;
 
 console.log("Script game.js chargé");
