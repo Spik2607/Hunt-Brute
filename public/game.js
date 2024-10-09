@@ -80,10 +80,8 @@ class Companion extends Character {
 function initGame() {
     console.log("Initializing game...");
     initializeSocket();
-    document.addEventListener('DOMContentLoaded', () => {
-        setupEventListeners();
-        showGameArea('main-menu');
-    });
+    setupEventListeners();
+    showGameArea('main-menu');
     setInterval(() => {
         if (player) {
             player.regenerateHP();
@@ -128,20 +126,11 @@ function setupEventListeners() {
         const element = document.getElementById(id);
         if (element) {
             element.addEventListener(event, handler);
+            console.log(`Écouteur ajouté pour ${id}`);
         } else {
             console.warn(`Élément avec l'id '${id}' non trouvé.`);
         }
     });
-}
-
-
-function addSafeEventListener(id, event, callback) {
-    const element = document.getElementById(id);
-    if (element) {
-        element.addEventListener(event, callback);
-    } else {
-        console.warn(`Élément avec l'id '${id}' non trouvé. L'écouteur d'événement n'a pas été ajouté.`);
-    }
 }
 
 function createCharacter() {
@@ -158,9 +147,14 @@ function createCharacter() {
     player = new Character(name, 100, 10, 5);
     updatePlayerInfo();
     showGameArea('adventure-menu');
+    console.log("Personnage créé:", player);
 }
 
 function chooseMission() {
+    if (!player) {
+        console.error("Aucun joueur n'est initialisé");
+        return;
+    }
     const missionList = document.getElementById('mission-list');
     if (!missionList) {
         console.error("L'élément 'mission-list' n'a pas été trouvé");
@@ -181,9 +175,14 @@ function startMission(index) {
     enemy = new Character(currentMission.name, currentMission.enemyLevel * 50, currentMission.enemyLevel * 5, currentMission.enemyLevel * 2);
     showGameArea('battle-area');
     updateBattleInfo();
+    console.log("Mission commencée:", currentMission);
 }
 
 function startExpedition() {
+    if (!player) {
+        console.error("Aucun joueur n'est initialisé");
+        return;
+    }
     if (currentExpedition) {
         alert("Une expédition est déjà en cours !");
         return;
@@ -207,12 +206,14 @@ function startExpedition() {
         }
         updateExpeditionDisplay();
     }, 1000);
+    console.log("Expédition commencée:", currentExpedition);
 }
 
 function triggerExpeditionEvent() {
     const event = currentExpedition.events.shift();
     // Handle event logic and update rewards
     updateExpeditionLog(event.description);
+    console.log("Événement d'expédition déclenché:", event);
 }
 
 function finishExpedition() {
@@ -225,10 +226,14 @@ function finishExpedition() {
     currentExpedition = null;
     updatePlayerInfo();
     showGameArea('adventure-menu');
+    console.log("Expédition terminée, récompenses attribuées");
 }
 
 function playerAttack() {
-    if (!player || !enemy) return;
+    if (!player || !enemy) {
+        console.error("Joueur ou ennemi non initialisé");
+        return;
+    }
     const damage = Math.max(player.attack - enemy.defense, 0);
     enemy.hp -= damage;
     updateBattleLog(`${player.name} inflige ${damage} dégâts à ${enemy.name}.`);
@@ -285,6 +290,7 @@ function endCombat(victory) {
     enemy = null;
     updatePlayerInfo();
     showGameArea('adventure-menu');
+    console.log("Combat terminé, victoire:", victory);
 }
 
 function getRandomItem() {
@@ -299,6 +305,10 @@ function getRandomCompanion() {
 }
 
 function openInventory() {
+    if (!player) {
+        console.error("Aucun joueur n'est initialisé");
+        return;
+    }
     const inventoryItems = document.getElementById('inventory-items');
     if (!inventoryItems) {
         console.error("L'élément 'inventory-items' n'a pas été trouvé");
@@ -315,6 +325,7 @@ function openInventory() {
         inventoryItems.appendChild(itemElement);
     });
     showGameArea('inventory-area');
+    console.log("Inventaire ouvert");
 }
 
 function equipItem(index) {
@@ -329,10 +340,15 @@ function equipItem(index) {
         player.inventory.splice(index, 1);
         updatePlayerInfo();
         openInventory();
+        console.log("Objet équipé:", item);
     }
 }
 
 function openCompanionsMenu() {
+    if (!player) {
+        console.error("Aucun joueur n'est initialisé");
+        return;
+    }
     const companionsList = document.getElementById('companions-list');
     if (!companionsList) {
         console.error("L'élément 'companions-list' n'a pas été trouvé");
@@ -349,15 +365,25 @@ function openCompanionsMenu() {
         companionsList.appendChild(compElement);
     });
     showGameArea('companions-area');
+    console.log("Menu des compagnons ouvert");
 }
 
 function selectCompanion(index) {
+    if (!player || !player.companions[index]) {
+        console.error("Joueur non initialisé ou compagnon non trouvé");
+        return;
+    }
     companion = player.companions[index];
     updateCompanionInfo();
     showGameArea('adventure-menu');
+    console.log("Compagnon sélectionné:", companion);
 }
 
 function updatePlayerInfo() {
+    if (!player) {
+        console.error("Aucun joueur n'est initialisé");
+        return;
+    }
     const playerInfo = document.getElementById('player-info');
     if (!playerInfo) {
         console.error("L'élément 'player-info' n'a pas été trouvé");
@@ -377,7 +403,7 @@ function updateBattleInfo() {
     const enemyStats = document.getElementById('enemy-stats');
     const companionStats = document.getElementById('companion-stats');
 
-    if (playerStats) playerStats.innerHTML = `${player.name}: ${player.hp}/${player.maxHp} PV`;
+    if (playerStats && player) playerStats.innerHTML = `${player.name}: ${player.hp}/${player.maxHp} PV`;
     if (enemyStats && enemy) enemyStats.innerHTML = `${enemy.name}: ${enemy.hp}/${enemy.maxHp} PV`;
     
     if (companionStats) {
@@ -421,10 +447,12 @@ function updateExpeditionLog(message) {
 }
 
 function showGameArea(areaId) {
+    console.log(`Tentative d'affichage de la zone: ${areaId}`);
     const areas = document.querySelectorAll('.game-area');
     areas.forEach(area => {
         if (area.id === areaId) {
             area.style.display = 'block';
+            console.log(`Zone ${areaId} affichée`);
         } else {
             area.style.display = 'none';
         }
@@ -444,6 +472,7 @@ function joinRoom(roomId) {
         defense: player.defense
     };
     socket.emit('joinRoom', { roomId, playerInfo });
+    console.log(`Tentative de rejoindre la salle: ${roomId}`);
 }
 
 function startMultiplayerGame(players) {
@@ -452,8 +481,9 @@ function startMultiplayerGame(players) {
         enemy = new Character(opponent.name, opponent.hp, opponent.attack, opponent.defense);
         showGameArea('multiplayer-battle');
         updateBattleInfo();
+        console.log("Partie multijoueur commencée avec:", opponent);
     } else {
-        console.error("Opponent not found in players list");
+        console.error("Adversaire non trouvé dans la liste des joueurs");
     }
 }
 
@@ -464,7 +494,7 @@ function handleOpponentAction(action) {
         checkGameOver();
         updateBattleInfo();
     }
-    // Handle other action types as needed
+    // Gérer d'autres types d'actions si nécessaire
 }
 
 function checkGameOver() {
@@ -491,6 +521,7 @@ function saveGame() {
     };
     localStorage.setItem('huntBruteGameState', JSON.stringify(gameState));
     alert('Partie sauvegardée avec succès !');
+    console.log('Partie sauvegardée:', gameState);
 }
 
 function loadGame() {
@@ -525,6 +556,7 @@ function loadGame() {
         }
         showGameArea('adventure-menu');
         alert('Partie chargée avec succès !');
+        console.log('Partie chargée:', player);
     } else {
         alert('Aucune sauvegarde trouvée.');
     }
@@ -554,10 +586,13 @@ function toggleCompanion() {
     }
     updateCompanionInfo();
     updatePlayerInfo();
+    console.log("Compagnon actuel:", companion);
 }
 
-// Initialize the game
-initGame();
+// Initialisation du jeu
+document.addEventListener('DOMContentLoaded', initGame);
 
-// Automatic saving
-setInterval(saveGame, 300000); // Save every 5 minutes
+// Sauvegarde automatique
+setInterval(saveGame, 300000); // Sauvegarde toutes les 5 minutes
+
+console.log("Script game.js chargé");
