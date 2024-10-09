@@ -235,6 +235,16 @@ function triggerExpeditionEvent() {
     console.log("Événement d'expédition déclenché:", event);
 }
 
+function updateAdventureMenu() {
+    const adventureMenu = document.getElementById('adventure-menu');
+    if (currentExpedition) {
+        const expeditionButton = document.createElement('button');
+        expeditionButton.textContent = "Retourner à l'expédition en cours";
+        expeditionButton.onclick = () => showGameArea('expedition-area');
+        adventureMenu.appendChild(expeditionButton);
+    }
+}
+
 function finishExpedition() {
     player.gainExperience(currentExpedition.rewards.xp);
     player.gold += currentExpedition.rewards.gold;
@@ -334,7 +344,18 @@ function openInventory() {
         return;
     }
     inventoryItems.innerHTML = '';
-    player.inventory.forEach((item, index) => {
+     player.inventory.forEach((item, index) => {
+        const itemElement = document.createElement('div');
+        itemElement.className = 'inventory-item';
+        itemElement.innerHTML = `
+            <span>${item.name}</span>
+            ${item.type === 'consumable' ? 
+              `<button onclick="useItem(${index})">Utiliser</button>` :
+              `<button onclick="equipItem(${index})">Équiper</button>`}
+            <button onclick="sellItem(${index})">Vendre</button>
+        `;
+        inventoryItems.appendChild(itemElement);
+    });
         const itemElement = document.createElement('div');
         itemElement.textContent = item.name;
         const equipButton = document.createElement('button');
@@ -345,6 +366,16 @@ function openInventory() {
     });
     showGameArea('inventory-area');
     console.log("Inventaire ouvert");
+}
+
+function sellItem(index) {
+    const item = player.inventory[index];
+    const sellPrice = Math.floor(item.cost * 0.5);
+    player.gold += sellPrice;
+    player.inventory.splice(index, 1);
+    updatePlayerInfo();
+    openInventory();
+    alert(`Vous avez vendu ${item.name} pour ${sellPrice} or.`);
 }
 
 function equipItem(index) {
@@ -393,16 +424,16 @@ function buyItem(itemId) {
         console.error("Item not found");
         return;
     }
-    if (player.gold >= item.cost) {
+      if (player.gold >= item.cost) {
         player.gold -= item.cost;
         player.inventory.push(item);
         updatePlayerInfo();
+        openShop(); // Rafraîchir la boutique
         alert(`Vous avez acheté ${item.name}`);
     } else {
         alert("Vous n'avez pas assez d'or !");
     }
 }
-
 function openCompanionsMenu() {
     if (!player) {
         console.error("Aucun joueur n'est initialisé");
@@ -519,6 +550,12 @@ function joinRoom(roomId) {
     };
     socket.emit('joinRoom', { roomId, playerInfo });
     console.log(`Tentative de rejoindre la salle: ${roomId}`);
+}
+
+// Mode multijoueur de base
+function startMultiplayerMode() {
+    showGameArea('multiplayer-area');
+    // Ici, vous pouvez ajouter la logique pour rejoindre une salle, etc.
 }
 
 function startMultiplayerGame(players) {
