@@ -45,13 +45,40 @@
             </section>
 
             <section id="battle-area" class="game-area">
-                <h2>Combat</h2>
-                <div id="player-stats"></div>
-                <div id="companion-stats"></div>
-                <div id="enemy-stats"></div>
-                <div id="battle-log"></div>
-                <div id="action-buttons"></div>
-            </section>
+    <h2>Combat</h2>
+    <div id="combatants">
+        <div id="player-combat-info" class="combatant">
+            <h3>Sprider</h3>
+            <div class="health-bar">
+                <div class="health-bar-fill" style="width: 100%;"></div>
+                <span class="health-text">240/240 PV</span>
+            </div>
+        </div>
+        <div id="companion-combat-info" class="combatant">
+            <h3>Esclave</h3>
+            <div class="health-bar">
+                <div class="health-bar-fill" style="width: 100%;"></div>
+                <span class="health-text">50/50 PV</span>
+            </div>
+        </div>
+        <div id="enemy-combat-info" class="combatant">
+            <h3>Explorer une grotte hantée</h3>
+            <div class="health-bar">
+                <div class="health-bar-fill" style="width: 100%;"></div>
+                <span class="health-text">???/??? PV</span>
+            </div>
+        </div>
+    </div>
+    <div id="battle-log">
+        <!-- Le contenu du log de combat sera inséré ici dynamiquement -->
+    </div>
+    <div id="action-buttons">
+        <button id="normal-attack" class="action-button"><i class="fas fa-sword"></i> Attaque normale</button>
+        <button id="defend" class="action-button"><i class="fas fa-shield"></i> Se défendre</button>
+        <button id="special-attack" class="action-button"><i class="fas fa-bolt"></i> Attaque spéciale</button>
+        <button id="use-item" class="action-button"><i class="fas fa-flask"></i> Utiliser un objet</button>
+    </div>
+</section>
 
             <section id="expedition-area" class="game-area">
                 <h2>Expédition en cours</h2>
