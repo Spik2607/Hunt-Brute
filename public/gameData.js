@@ -3,8 +3,10 @@
 export const items = [
     { id: 'sword', name: 'Épée en fer', type: 'weapon', attack: 5, cost: 50 },
     { id: 'shield', name: 'Bouclier en bois', type: 'armor', defense: 3, cost: 40 },
-    { id: 'potion', name: 'Potion de soin', type: 'consumable', heal: 30, cost: 20 },
-    // Ajoutez d'autres objets ici
+    { id: 'potion', name: 'Potion de soin', type: 'consumable', effect: 'heal', value: 30, cost: 20 },
+    { id: 'energyDrink', name: 'Boisson énergisante', type: 'consumable', effect: 'energy', value: 50, cost: 25 },
+    { id: 'axe', name: 'Hache de guerre', type: 'weapon', attack: 7, cost: 70 },
+    { id: 'chainmail', name: 'Cotte de mailles', type: 'armor', defense: 5, cost: 80 }
 ];
 
 export const missions = [
@@ -12,7 +14,7 @@ export const missions = [
     { name: "Chasser un loup géant", enemyLevel: 2, goldReward: 40, expReward: 50, difficulty: 'Moyenne' },
     { name: "Vaincre un bandit", enemyLevel: 3, goldReward: 60, expReward: 70, difficulty: 'Moyenne' },
     { name: "Affronter un ogre", enemyLevel: 4, goldReward: 100, expReward: 100, difficulty: 'Difficile' },
-    { name: "Explorer une grotte hantée", enemyLevel: 5, goldReward: 150, expReward: 150, difficulty: 'Difficile' },
+    { name: "Explorer une grotte hantée", enemyLevel: 5, goldReward: 150, expReward: 150, difficulty: 'Difficile' }
 ];
 
 export const dropRates = {
@@ -21,27 +23,18 @@ export const dropRates = {
     'Difficile': 0.4,
 };
 
-export const expeditions = [
-    { name: "Forêt dense", resourceType: "wood", maxResourceGain: 50 },
-    { name: "Montagne rocheuse", resourceType: "stone", maxResourceGain: 40 },
-    { name: "Mine abandonnée", resourceType: "iron", maxResourceGain: 30 },
+export const companionTypes = [
+    { type: 'animal', names: ['Loup', 'Ours', 'Aigle', 'Panthère', 'Tigre'] },
+    { type: 'monster', names: ['Gobelin apprivoisé', 'Petit dragon', 'Golem de pierre'] },
+    { type: 'slave', names: ['Écuyer', 'Porteur', 'Archer','Esclave'] },
+    { type: 'spirit', names: ['Esprit du feu', 'Esprit de l eau', 'Esprit de l air', 'Esprit de la terre'] },
+    { type: 'shinigami', names: ['Faucheur d âmes', 'Shinigami', 'Ombre'] }
 ];
 
-export const raids = [
-    {
-        name: "Village gobelin",
-        getLoot: () => ({
-            soldiers: Math.floor(Math.random() * 5),
-            slaves: Math.floor(Math.random() * 10),
-            items: [items[Math.floor(Math.random() * items.length)]]
-        })
-    },
-    {
-        name: "Campement bandit",
-        getLoot: () => ({
-            soldiers: Math.floor(Math.random() * 3),
-            slaves: Math.floor(Math.random() * 5),
-            items: [items[Math.floor(Math.random() * items.length)], items[Math.floor(Math.random() * items.length)]]
-        })
-    },
-];
+export function getRandomCompanionName(type) {
+    const typeData = companionTypes.find(t => t.type === type);
+    if (typeData) {
+        return typeData.names[Math.floor(Math.random() * typeData.names.length)];
+    }
+    return 'Compagnon inconnu';
+}
