@@ -71,8 +71,16 @@ io.on('connection', (socket) => {
         io.to(roomId).emit('tradeStart', { fromId, toId });
     });
 
-    socket.on('tradeItem', ({ roomId, fromId, toId, item }) => {
-        io.to(roomId).emit('itemTraded', { fromId, toId, item });
+    socket.on('offerTradeItem', ({ roomId, itemId }) => {
+        io.to(roomId).emit('itemOffered', { fromId: socket.id, itemId });
+    });
+
+    socket.on('confirmTrade', ({ roomId }) => {
+        io.to(roomId).emit('tradeConfirmed', { playerId: socket.id });
+    });
+
+    socket.on('cancelTrade', ({ roomId }) => {
+        io.to(roomId).emit('tradeCancelled', { playerId: socket.id });
     });
 
     socket.on('disconnect', () => {
