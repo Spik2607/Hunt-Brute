@@ -1,13 +1,71 @@
 // gameData.js
 
 export const items = [
-    { id: 'sword', name: 'Épée en fer', type: 'weapon', attack: 5, cost: 50 },
-    { id: 'shield', name: 'Bouclier en bois', type: 'armor', defense: 3, cost: 40 },
-    { id: 'potion', name: 'Potion de soin', type: 'consumable', effect: 'heal', value: 30, cost: 20 },
-    { id: 'energyDrink', name: 'Boisson énergisante', type: 'consumable', effect: 'energy', value: 50, cost: 25 },
-    { id: 'axe', name: 'Hache de guerre', type: 'weapon', attack: 7, cost: 70 },
-    { id: 'chainmail', name: 'Cotte de mailles', type: 'armor', defense: 5, cost: 80 }
+    // Armes
+    { id: 'sword', name: 'Épée en fer', type: 'weapon', attack: 5, cost: 50, rarity: 'common' },
+    { id: 'axe', name: 'Hache de guerre', type: 'weapon', attack: 7, cost: 70, rarity: 'common' },
+    { id: 'dagger', name: 'Dague des ombres', type: 'weapon', attack: 3, critChance: 10, cost: 60, rarity: 'uncommon' }, // Critique : 10% chance d'attaque critique
+    { id: 'greatsword', name: 'Épée à deux mains', type: 'weapon', attack: 12, speedPenalty: 2, cost: 100, rarity: 'rare' }, // Pénalité de vitesse d'attaque
+    { id: 'flameBlade', name: 'Lame enflammée', type: 'weapon', attack: 10, fireDamage: 3, cost: 150, rarity: 'rare' }, // Dégâts de feu supplémentaires
+    { id: 'excalibur', name: 'Excalibur', type: 'weapon', attack: 20, holyDamage: 5, critChance: 15, cost: 500, rarity: 'legendary' }, // Dégâts sacrés, haute chance critique
+
+    // Armures
+    { id: 'shield', name: 'Bouclier en bois', type: 'armor', defense: 3, cost: 40, rarity: 'common' },
+    { id: 'chainmail', name: 'Cotte de mailles', type: 'armor', defense: 5, cost: 80, rarity: 'common' },
+    { id: 'plateArmor', name: 'Armure de plaques', type: 'armor', defense: 8, speedPenalty: 1, cost: 120, rarity: 'rare' }, // Pénalité de vitesse
+    { id: 'dragonScaleArmor', name: 'Armure d’écailles de dragon', type: 'armor', defense: 12, fireResistance: 50, cost: 300, rarity: 'legendary' }, // Résistance au feu : 50%
+
+    // Accessoires
+    { id: 'ringOfAgility', name: 'Anneau d’agilité', type: 'accessory', effect: 'speedBoost', value: 10, cost: 80, rarity: 'uncommon' }, // Bonus de vitesse
+    { id: 'amuletOfProtection', name: 'Amulette de protection', type: 'accessory', effect: 'damageReduction', value: 10, cost: 150, rarity: 'rare' }, // Réduction des dégâts
+    { id: 'cloakOfInvisibility', name: 'Cape d’invisibilité', type: 'accessory', effect: 'stealth', cost: 200, rarity: 'legendary' }, // Capacité d’invisibilité temporaire
+
+    // Consommables
+    { id: 'potion', name: 'Potion de soin', type: 'consumable', effect: 'heal', value: 30, cost: 20, rarity: 'common' }, // Soigne 30 PV
+    { id: 'energyDrink', name: 'Boisson énergisante', type: 'consumable', effect: 'energy', value: 50, cost: 25, rarity: 'common' }, // Restaure 50 points d'énergie
+    { id: 'elixirOfVitality', name: 'Élixir de vitalité', type: 'consumable', effect: 'heal', value: 100, cost: 100, rarity: 'rare' }, // Soigne 100 PV
+    { id: 'manaPotion', name: 'Potion de mana', type: 'consumable', effect: 'mana', value: 40, cost: 30, rarity: 'common' }, // Restaure 40 points de mana
+    { id: 'phoenixFeather', name: 'Plume de Phénix', type: 'consumable', effect: 'revive', cost: 500, rarity: 'legendary' }, // Ressuscite le joueur avec 50% de PV
+
+    // Objets spéciaux
+    { id: 'scrollOfFireball', name: 'Parchemin de boule de feu', type: 'special', effect: 'fireball', damage: 25, cost: 70, rarity: 'uncommon' }, // Lance une boule de feu infligeant 25 dégâts
+    { id: 'orbOfFrost', name: 'Orbe de givre', type: 'special', effect: 'freeze', freezeDuration: 3, cost: 150, rarity: 'rare' }, // Gèle l'ennemi pendant 3 tours
 ];
+
+// Fonction pour afficher les statistiques des items
+export function getItemStats(item) {
+    let stats = `${item.name} (${item.type}) :`;
+    
+    if (item.type === 'weapon') {
+        stats += `\n- Attaque : ${item.attack}`;
+        if (item.critChance) stats += `\n- Chance de critique : ${item.critChance}%`;
+        if (item.fireDamage) stats += `\n- Dégâts de feu : ${item.fireDamage}`;
+    }
+
+    if (item.type === 'armor') {
+        stats += `\n- Défense : ${item.defense}`;
+        if (item.fireResistance) stats += `\n- Résistance au feu : ${item.fireResistance}%`;
+        if (item.speedPenalty) stats += `\n- Pénalité de vitesse : -${item.speedPenalty}`;
+    }
+
+    if (item.type === 'accessory') {
+        stats += `\n- Effet : ${item.effect} +${item.value || ''}`;
+    }
+
+    if (item.type === 'consumable') {
+        stats += `\n- Effet : ${item.effect} +${item.value}`;
+    }
+
+    if (item.type === 'special') {
+        stats += `\n- Effet spécial : ${item.effect}`;
+        if (item.damage) stats += `\n- Dégâts : ${item.damage}`;
+        if (item.freezeDuration) stats += `\n- Durée de gel : ${item.freezeDuration} tours`;
+    }
+
+    stats += `\n- Coût : ${item.cost} pièces d'or`;
+    stats += `\n- Rareté : ${item.rarity}`;
+    return stats;
+}
 
 export const missions = [
     { name: "Éliminer des gobelins", enemyLevel: 1, goldReward: 20, expReward: 30, difficulty: 'Facile' },
