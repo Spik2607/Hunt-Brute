@@ -24,7 +24,7 @@ export const dropRates = {
 };
 
 export const companionTypes = [
-    { type: 'animal', names: ['Loup', 'Ours', 'Aigle', 'Panthère', 'Tigre'] },
+    { type: 'animal', names: ['Loup', 'Ours', 'Aigle', 'Panthère', 'Tigre', 'Serpent'] },
     { type: 'monster', names: ['Gobelin apprivoisé', 'Petit dragon', 'Golem de pierre'] },
     { type: 'slave', names: ['Écuyer', 'Porteur', 'Archer','Esclave'] },
     { type: 'spirit', names: ['Esprit du feu', 'Esprit de l eau', 'Esprit de l air', 'Esprit de la terre'] },
