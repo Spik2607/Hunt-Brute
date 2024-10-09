@@ -111,15 +111,18 @@ function initializeSocket() {
 
 function setupEventListeners() {
     const listeners = [
+        { id: 'start-adventure', event: 'click', handler: () => showGameArea('adventure-menu') },
         { id: 'create-character', event: 'click', handler: createCharacter },
         { id: 'start-mission', event: 'click', handler: chooseMission },
         { id: 'start-expedition', event: 'click', handler: startExpedition },
         { id: 'attack-button', event: 'click', handler: playerAttack },
+        { id: 'open-shop', event: 'click', handler: openShop },
         { id: 'open-inventory', event: 'click', handler: openInventory },
         { id: 'manage-companions', event: 'click', handler: openCompanionsMenu },
         { id: 'join-fixed-room', event: 'click', handler: () => joinRoom(FIXED_ROOM) },
         { id: 'save-game', event: 'click', handler: saveGame },
-        { id: 'load-game', event: 'click', handler: loadGame }
+        { id: 'load-game', event: 'click', handler: loadGame },
+        { id: 'back-to-main', event: 'click', handler: () => showGameArea('main-menu') }
     ];
 
     listeners.forEach(({ id, event, handler }) => {
@@ -129,6 +132,19 @@ function setupEventListeners() {
             console.log(`Écouteur ajouté pour ${id}`);
         } else {
             console.warn(`Élément avec l'id '${id}' non trouvé.`);
+        }
+    });
+}
+
+function showGameArea(areaId) {
+    console.log(`Tentative d'affichage de la zone: ${areaId}`);
+    const areas = document.querySelectorAll('.game-area');
+    areas.forEach(area => {
+        if (area.id === areaId) {
+            area.classList.add('active');
+            console.log(`Zone ${areaId} affichée`);
+        } else {
+            area.classList.remove('active');
         }
     });
 }
@@ -206,6 +222,7 @@ function startExpedition() {
         }
         updateExpeditionDisplay();
     }, 1000);
+    showGameArea('expedition-area');
     console.log("Expédition commencée:", currentExpedition);
 }
 
@@ -444,19 +461,6 @@ function updateExpeditionLog(message) {
         expeditionLog.innerHTML += `<p>${message}</p>`;
         expeditionLog.scrollTop = expeditionLog.scrollHeight;
     }
-}
-
-function showGameArea(areaId) {
-    console.log(`Tentative d'affichage de la zone: ${areaId}`);
-    const areas = document.querySelectorAll('.game-area');
-    areas.forEach(area => {
-        if (area.id === areaId) {
-            area.style.display = 'block';
-            console.log(`Zone ${areaId} affichée`);
-        } else {
-            area.style.display = 'none';
-        }
-    });
 }
 
 function joinRoom(roomId) {
