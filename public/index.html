@@ -62,14 +62,23 @@
 
             <section id="inventory-area" class="game-area">
                 <h2>Inventaire</h2>
+                <div id="inventory-filters">
+                    <input type="text" id="inventory-search" placeholder="Rechercher un objet...">
+                    <select id="inventory-sort">
+                        <option value="name">Trier par nom</option>
+                        <option value="type">Trier par type</option>
+                        <option value="rarity">Trier par rareté</option>
+                    </select>
+                </div>
                 <div id="equipped-items">
                     <h3>Équipement porté</h3>
-                    <div id="equipped-weapon"></div>
-                    <div id="equipped-armor"></div>
-                    <div id="equipped-accessory"></div>
+                    <div id="equipped-weapon" class="inventory-item"></div>
+                    <div id="equipped-armor" class="inventory-item"></div>
+                    <div id="equipped-accessory" class="inventory-item"></div>
                 </div>
                 <div id="inventory-items">
                     <h3>Objets en stock</h3>
+                    <!-- Les objets seront ajoutés ici dynamiquement par JavaScript -->
                 </div>
             </section>
 
