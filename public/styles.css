@@ -1,23 +1,13 @@
-/* styles.css */
+/* styles.css pour Hunt Brute MAJ V1.55 */
 
+/* Styles généraux */
 body, html {
     margin: 0;
     padding: 0;
-    font-family: 'Arial', sans-serif;
-    color: #e0e0e0;
+    font-family: 'Medieval', Arial, sans-serif;
+    background-color: #2c3e50;
+    color: #ecf0f1;
     height: 100%;
-}
-
-body {
-    background: linear-gradient(45deg, #1a2a6c, #b21f1f, #fdbb2d);
-    background-size: 400% 400%;
-    animation: gradientBG 15s ease infinite;
-}
-
-@keyframes gradientBG {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
 }
 
 #game-container {
@@ -29,53 +19,37 @@ body {
     box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
 }
 
-header {
+h1, h2, h3 {
+    color: #f39c12;
     text-align: center;
-    margin-bottom: 20px;
+    margin-top: 0;
 }
 
-h1, h2 {
-    margin: 0;
-}
-
-.glow {
-    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #fff, 0 0 40px #ff00de, 0 0 70px #ff00de, 0 0 80px #ff00de, 0 0 100px #ff00de, 0 0 150px #ff00de;
-}
-
+/* Boutons */
 button {
-    background-color: #4CAF50;
-    border: none;
+    background-color: #3498db;
     color: white;
-    padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
+    border: none;
+    padding: 10px 15px;
+    margin: 5px;
     cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
     border-radius: 5px;
-    transition: transform 0.1s ease-in-out, box-shadow 0.3s ease-in-out;
+    font-weight: bold;
 }
 
 button:hover {
+    background-color: #2980b9;
     transform: scale(1.05);
 }
 
-.glow-button {
-    box-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #fff, 0 0 40px #00ffff, 0 0 70px #00ffff, 0 0 80px #00ffff, 0 0 100px #00ffff;
+button:active {
+    transform: scale(0.95);
 }
 
-input[type="text"], input[type="number"] {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-}
-
+/* Zones de jeu */
 .game-area {
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: #34495e;
     border-radius: 10px;
     padding: 20px;
     margin-top: 20px;
@@ -87,40 +61,48 @@ input[type="text"], input[type="number"] {
     opacity: 1;
 }
 
+/* Informations du joueur */
+#player-info, #companion-info {
+    background-color: #2c3e50;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Journal de bataille */
 #battle-log {
-    max-height: 200px;
-    overflow-y: auto;
-    border: 1px solid #ccc;
-    padding: 10px;
+    height: 200px;
+    overflow-y: scroll;
+    background-color: #2c3e50;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
     font-family: monospace;
-    background-color: rgba(0, 0, 0, 0.7);
-    color: #00ff00;
-    margin-top: 20px;
+    border: 1px solid #3498db;
 }
 
-#player-stats, #enemy-stats {
-    display: inline-block;
-    width: 48%;
-    padding: 10px;
-    background-color: rgba(0, 0, 0, 0.5);
-    border-radius: 5px;
-    margin-bottom: 10px;
-}
-
-#player-abilities {
-    margin-top: 20px;
+/* Inventaire et boutique */
+#inventory-area, #shop-area {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
 }
 
 .inventory-item, .shop-item {
-    background-color: rgba(255, 255, 255, 0.1);
-    padding: 10px;
-    margin: 5px 0;
-    border-radius: 5px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    background-color: #2c3e50;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    transition: transform 0.3s;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
+.inventory-item:hover, .shop-item:hover {
+    transform: translateY(-5px);
+}
+
+/* Modal */
 .modal {
     display: none;
     position: fixed;
@@ -130,18 +112,52 @@ input[type="text"], input[type="number"] {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgba(0,0,0,0.4);
+    background-color: rgba(0,0,0,0.7);
 }
 
 .modal-content {
-    background-color: #fefefe;
+    background-color: #34495e;
     margin: 15% auto;
     padding: 20px;
     border: 1px solid #888;
     width: 80%;
     max-width: 500px;
     border-radius: 10px;
-    color: #333;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+/* Expédition */
+#expedition-info, #expedition-log {
+    background-color: #2c3e50;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Liste des compagnons */
+#companions-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.companion-item {
+    background-color: #2c3e50;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    transition: transform 0.3s;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.companion-item:hover {
+    transform: translateY(-5px);
+}
+
+/* Effets visuels */
+.glow {
+    text-shadow: 0 0 10px #f39c12, 0 0 20px #f39c12, 0 0 30px #f39c12;
 }
 
 .battle-animation {
@@ -162,6 +178,21 @@ input[type="text"], input[type="number"] {
     100% { transform: translate(1px, -2px) rotate(-1deg); }
 }
 
+/* Barres de progression */
+.progress-bar {
+    width: 100%;
+    background-color: #2c3e50;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress {
+    height: 20px;
+    background-color: #3498db;
+    transition: width 0.5s ease-in-out;
+}
+
 /* Responsive design */
 @media (max-width: 600px) {
     #game-container {
@@ -173,8 +204,67 @@ input[type="text"], input[type="number"] {
         margin: 5px 0;
     }
 
-    #player-stats, #enemy-stats {
-        width: 100%;
-        margin-bottom: 10px;
+    #inventory-area, #shop-area, #companions-list {
+        grid-template-columns: 1fr;
     }
+
+    .modal-content {
+        width: 95%;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Styles spécifiques pour le mode multijoueur */
+#multiplayer-battle {
+    display: flex;
+    justify-content: space-between;
+}
+
+#player-side, #opponent-side {
+    width: 45%;
+}
+
+/* Styles pour les icônes */
+.icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+/* Styles pour les tooltips */
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -60px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
 }
