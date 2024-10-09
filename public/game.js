@@ -382,9 +382,9 @@ function openInventory() {
         itemElement.innerHTML = `
             <span>${item.name}</span>
             ${item.type === 'consumable' ? 
-              `<button onclick="useItem(${index})">Utiliser</button>` :
-              `<button onclick="equipItem(${index})">Équiper</button>`}
-            <button onclick="sellItem(${index})">Vendre</button>
+              `<button onclick="window.useItem(${index})">Utiliser</button>` :
+              `<button onclick="window.equipItem(${index})">Équiper</button>`}
+            <button onclick="window.sellItem(${index})">Vendre</button>
         `;
         inventoryItems.appendChild(itemElement);
     });
@@ -393,6 +393,7 @@ function openInventory() {
 }
 
 function useItem(index) {
+    if (!player || !player.inventory[index]) return;
     const item = player.inventory[index];
     if (item.type === 'consumable') {
         if (item.effect === 'heal') {
@@ -408,17 +409,8 @@ function useItem(index) {
     }
 }
 
-function sellItem(index) {
-    const item = player.inventory[index];
-    const sellPrice = Math.floor(item.cost * 0.5);
-    player.gold += sellPrice;
-    player.inventory.splice(index, 1);
-    updatePlayerInfo();
-    openInventory();
-    alert(`Vous avez vendu ${item.name} pour ${sellPrice} or.`);
-}
-
 function equipItem(index) {
+    if (!player || !player.inventory[index]) return;
     const item = player.inventory[index];
     if (item.type === 'weapon' || item.type === 'armor') {
         const currentEquipped = player.equippedItems.find(i => i.type === item.type);
@@ -438,6 +430,17 @@ function equipItem(index) {
     }
 }
 
+function sellItem(index) {
+    if (!player || !player.inventory[index]) return;
+    const item = player.inventory[index];
+    const sellPrice = Math.floor(item.cost * 0.5);
+    player.gold += sellPrice;
+    player.inventory.splice(index, 1);
+    updatePlayerInfo();
+    openInventory();
+    alert(`Vous avez vendu ${item.name} pour ${sellPrice} or.`);
+}
+
 function openShop() {
     console.log("Ouverture de la boutique");
     const shopItems = document.getElementById('shop-items');
@@ -451,7 +454,7 @@ function openShop() {
         itemElement.className = 'shop-item';
         itemElement.innerHTML = `
             <span>${item.name} - ${item.cost} or</span>
-            <button onclick="buyItem('${item.id}')">Acheter</button>
+            <button onclick="window.buyItem('${item.id}')">Acheter</button>
         `;
         shopItems.appendChild(itemElement);
     });
@@ -565,9 +568,11 @@ function updateExpeditionDisplay() {
     const expeditionInfo = document.getElementById('expedition-info');
     if (expeditionInfo) {
         if (currentExpedition) {
+            const minutes = Math.floor(currentExpedition.timeRemaining / 60);
+            const seconds = currentExpedition.timeRemaining % 60;
             expeditionInfo.innerHTML = `
                 Expédition: ${currentExpedition.name}<br>
-                Temps restant: ${Math.floor(currentExpedition.timeRemaining / 60)}:${(currentExpedition.timeRemaining % 60).toString().padStart(2, '0')}
+                Temps restant: ${minutes}:${seconds.toString().padStart(2, '0')}
             `;
         } else {
             expeditionInfo.innerHTML = 'Aucune expédition en cours';
@@ -580,6 +585,22 @@ function updateExpeditionLog(message) {
     if (expeditionLog) {
         expeditionLog.innerHTML += `<p>${message}</p>`;
         expeditionLog.scrollTop = expeditionLog.scrollHeight;
+    }
+}
+
+function updateAdventureMenu() {
+    const currentExpeditionDiv = document.getElementById('current-expedition');
+    if (currentExpeditionDiv) {
+        if (currentExpedition) {
+            const minutes = Math.floor(currentExpedition.timeRemaining / 60);
+            const seconds = currentExpedition.timeRemaining % 60;
+            currentExpeditionDiv.innerHTML = `
+                <p>Expédition en cours : ${currentExpedition.name}</p>
+                <p>Temps restant : ${minutes}:${seconds.toString().padStart(2, '0')}</p>
+            `;
+        } else {
+            currentExpeditionDiv.innerHTML = '';
+        }
     }
 }
 
@@ -706,16 +727,14 @@ function updateCompanionInfo() {
     }
 }
 
-function toggleCompanion() {
-    if (companion) {
-        player.companions.push(companion);
-        companion = null;
-    } else if (player.companions.length > 0) {
-        companion = player.companions.shift();
+function updateWaitingAreaDisplay(players) {
+    const waitingArea = document.getElementById('waiting-area');
+    if (waitingArea) {
+        waitingArea.innerHTML = '<h3>Joueurs dans la salle :</h3>';
+        players.forEach(player => {
+            waitingArea.innerHTML += `<p>${player.name} (Niveau ${player.level})</p>`;
+        });
     }
-    updateCompanionInfo();
-    updatePlayerInfo();
-    console.log("Compagnon actuel:", companion);
 }
 
 // Initialisation du jeu
@@ -723,5 +742,11 @@ document.addEventListener('DOMContentLoaded', initGame);
 
 // Sauvegarde automatique
 setInterval(saveGame, 300000); // Sauvegarde toutes les 5 minutes
+
+// Rendre les fonctions accessibles globalement
+window.useItem = useItem;
+window.equipItem = equipItem;
+window.sellItem = sellItem;
+window.buyItem = buyItem;
 
 console.log("Script game.js chargé");
