@@ -136,16 +136,16 @@ input[type="text"], select {
 
 /* Inventaire amélioré */
 #inventory-area {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 15px;
+    background-color: #f0e6d2;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 #inventory-filters {
-    grid-column: 1 / -1;
     display: flex;
     justify-content: space-between;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 #inventory-search {
@@ -153,48 +153,72 @@ input[type="text"], select {
     margin-right: 10px;
 }
 
-#inventory-sort {
-    width: auto;
+#inventory-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 10px;
 }
 
 .inventory-item {
-    background-color: #fff8e1;
-    border: 1px solid #d4a76a;
+    background-color: #2c2c2c;
+    color: #ffffff;
+    border: 2px solid #4a4a4a;
     border-radius: 5px;
     padding: 10px;
     display: flex;
     flex-direction: column;
-    align-items: center;
     transition: all 0.3s ease;
 }
 
 .inventory-item:hover {
     transform: translateY(-3px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.inventory-item img {
-    width: 64px;
-    height: 64px;
-    margin-bottom: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
 .inventory-item-name {
     font-weight: bold;
+    font-size: 1.1em;
     margin-bottom: 5px;
 }
 
 .inventory-item-stats {
     font-size: 0.9em;
-    color: #666;
-    text-align: center;
+    color: #cccccc;
+    margin-bottom: 10px;
 }
 
 .inventory-item-buttons {
-    margin-top: 10px;
     display: flex;
-    justify-content: space-around;
-    width: 100%;
+    justify-content: space-between;
+}
+
+/* Couleurs pour les raretés */
+.item-common { border-color: #ffffff; }
+.item-uncommon { border-color: #1eff00; }
+.item-rare { border-color: #0070dd; }
+.item-epic { border-color: #a335ee; }
+.item-legendary { border-color: #ff8000; }
+
+/* Barre de défilement personnalisée */
+#inventory-items::-webkit-scrollbar {
+    width: 10px;
+}
+
+#inventory-items::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 5px;
+}
+
+#inventory-items::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 5px;
+}
+
+#inventory-items::-webkit-scrollbar-thumb:hover {
+    background: #555;
 }
 
 /* Shop styles */
@@ -205,8 +229,9 @@ input[type="text"], select {
 }
 
 .shop-item {
-    background-color: #fff8e1;
-    border: 1px solid #d4a76a;
+    background-color: #2c2c2c;
+    color: #ffffff;
+    border: 1px solid #4a4a4a;
     border-radius: 5px;
     padding: 15px;
     text-align: center;
@@ -232,7 +257,7 @@ input[type="text"], select {
 }
 
 .modal-content {
-    background-color: #fff8e1;
+    background-color: #f0e6d2;
     margin: 15% auto;
     padding: 20px;
     border: 2px solid #8B4513;
@@ -256,13 +281,60 @@ input[type="text"], select {
     margin-bottom: 10px;
 }
 
+/* Styles pour la zone de chat */
+#chat-area {
+    background-color: #f0e6d2;
+    border: 1px solid #8B4513;
+    border-radius: 5px;
+    padding: 10px;
+    margin-top: 20px;
+}
+
+#chat-messages {
+    height: 200px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #ffffff;
+    border-radius: 5px;
+}
+
+#chat-input {
+    width: calc(100% - 80px);
+    margin-right: 10px;
+}
+
+/* Styles pour les compagnons */
+#companions-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.companion-item {
+    background-color: #2c2c2c;
+    color: #ffffff;
+    border: 1px solid #4a4a4a;
+    border-radius: 5px;
+    padding: 10px;
+    text-align: center;
+}
+
+#active-companion {
+    background-color: #4a4a4a;
+    color: #ffffff;
+    border-radius: 5px;
+    padding: 10px;
+    margin-top: 20px;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
     nav {
         flex-direction: column;
     }
     
-    #shop-items, #inventory-items {
+    #shop-items, #inventory-items, #companions-list {
         grid-template-columns: 1fr;
     }
     
@@ -275,4 +347,108 @@ input[type="text"], select {
         margin-right: 0;
         margin-bottom: 10px;
     }
+    
+    .modal-content {
+        width: 95%;
+    }
+    
+    #chat-input {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+    
+    #send-message {
+        width: 100%;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.slide-in {
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Tooltips */
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -60px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Styles supplémentaires pour améliorer l'apparence générale */
+.section-title {
+    font-size: 1.5em;
+    color: #6b3e26;
+    margin-bottom: 15px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.highlight {
+    background-color: rgba(139, 69, 19, 0.2);
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 20px;
+    background-color: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background-color: #8B4513;
+    transition: width 0.5s ease-out;
+}
+
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #4CAF50;
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    z-index: 1000;
+    animation: slideIn 0.5s ease-out;
 }
