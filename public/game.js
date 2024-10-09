@@ -125,7 +125,7 @@ function initGame() {
         if (currentExpedition) {
             updateExpedition();
         }
-    }, 60000); // Run every minute
+    }, 1000); // Mise à jour toutes les secondes
 }
 
 function initializeSocket() {
@@ -416,29 +416,76 @@ function openInventory() {
         console.error("Aucun joueur n'est initialisé");
         return;
     }
-    const inventoryItems = document.getElementById('inventory-items');
-    if (!inventoryItems) {
-        console.error("L'élément 'inventory-items' n'a pas été trouvé");
+    const inventoryArea = document.getElementById('inventory-area');
+    if (!inventoryArea) {
+        console.error("L'élément 'inventory-area' n'a pas été trouvé");
         return;
     }
-    inventoryItems.innerHTML = '';
+
+    // Créer la structure de l'inventaire
+    inventoryArea.innerHTML = `
+        <h2>Inventaire</h2>
+        <div id="equipped-items">
+            <h3>Équipement porté</h3>
+            <div id="equipped-weapon"></div>
+            <div id="equipped-armor"></div>
+            <div id="equipped-accessory"></div>
+        </div>
+        <div id="inventory-items">
+            <h3>Objets en stock</h3>
+        </div>
+    `;
+
+    // Afficher l'équipement porté
+    const equippedWeapon = document.getElementById('equipped-weapon');
+    const equippedArmor = document.getElementById('equipped-armor');
+    const equippedAccessory = document.getElementById('equipped-accessory');
+
+    if (player.equippedItems.weapon) {
+        equippedWeapon.innerHTML = createItemHTML(player.equippedItems.weapon, -1, true);
+    } else {
+        equippedWeapon.innerHTML = '<p>Aucune arme équipée</p>';
+    }
+
+    if (player.equippedItems.armor) {
+        equippedArmor.innerHTML = createItemHTML(player.equippedItems.armor, -1, true);
+    } else {
+        equippedArmor.innerHTML = '<p>Aucune armure équipée</p>';
+    }
+
+    if (player.equippedItems.accessory) {
+        equippedAccessory.innerHTML = createItemHTML(player.equippedItems.accessory, -1, true);
+    } else {
+        equippedAccessory.innerHTML = '<p>Aucun accessoire équipé</p>';
+    }
+
+    // Afficher les objets en stock
+    const inventoryItems = document.getElementById('inventory-items');
     player.inventory.forEach((item, index) => {
         const itemElement = document.createElement('div');
         itemElement.className = 'inventory-item';
-        const isEquipped = Object.values(player.equippedItems).some(equippedItem => equippedItem && equippedItem.id === item.id);
-        if (isEquipped) itemElement.classList.add('equipped-item');
-        itemElement.innerHTML = `
-            <span>${item.name}</span>
-            <div class="item-stats">${getItemStats(item)}</div>
-            ${item.type === 'consumable' ? 
-              `<button onclick="window.useItem(${index})">Utiliser</button>` :
-              `<button onclick="window.equipItem(${index})">${isEquipped ? 'Déséquiper' : 'Équiper'}</button>`}
-            <button onclick="window.sellItem(${index})">Vendre</button>
-        `;
+        itemElement.innerHTML = createItemHTML(item, index, false);
         inventoryItems.appendChild(itemElement);
     });
+
     showGameArea('inventory-area');
     console.log("Inventaire ouvert");
+}
+
+function createItemHTML(item, index, isEquipped) {
+    return `
+        <div class="item ${isEquipped ? 'equipped-item' : ''}">
+            <span>${item.name}</span>
+            <div class="item-stats">${getItemStats(item)}</div>
+            ${item.type === 'consumable' 
+                ? `<button onclick="window.useItem(${index})">Utiliser</button>`
+                : isEquipped
+                    ? `<button onclick="window.unequipItem('${item.type}')">Déséquiper</button>`
+                    : `<button onclick="window.equipItem(${index})">Équiper</button>`
+            }
+            ${!isEquipped ? `<button onclick="window.sellItem(${index})">Vendre</button>` : ''}
+        </div>
+    `;
 }
 
 function useItem(index) {
@@ -454,6 +501,16 @@ function useItem(index) {
             updateBattleLog(`Vous utilisez ${item.name} et récupérez ${item.value} points d'énergie.`);
         }
         player.inventory.splice(index, 1);
+        updatePlayerInfo();
+        openInventory();
+    }
+}
+
+function unequipItem(slot) {
+    const item = player.equippedItems[slot];
+    if (item) {
+        player.unequipItem(item);
+        player.inventory.push(item);
         updatePlayerInfo();
         openInventory();
     }
@@ -572,17 +629,13 @@ function updateBattleLog(message) {
 
 function updateExpeditionDisplay() {
     const expeditionInfo = document.getElementById('expedition-info');
-    if (expeditionInfo) {
-        if (currentExpedition) {
-            const minutes = Math.floor(currentExpedition.timeRemaining / 60);
-            const seconds = currentExpedition.timeRemaining % 60;
-            expeditionInfo.innerHTML = `
-                Expédition: ${currentExpedition.name}<br>
-                Temps restant: ${minutes}:${seconds.toString().padStart(2, '0')}
-            `;
-        } else {
-            expeditionInfo.innerHTML = 'Aucune expédition en cours';
-        }
+    if (expeditionInfo && currentExpedition) {
+        const minutes = Math.floor(currentExpedition.timeRemaining / 60);
+        const seconds = currentExpedition.timeRemaining % 60;
+        expeditionInfo.innerHTML = `
+            Expédition: ${currentExpedition.name}<br>
+            Temps restant: ${minutes}:${seconds.toString().padStart(2, '0')}
+        `;
     }
 }
 
@@ -675,10 +728,26 @@ function handleChallengeReceived({ challengerId }) {
 }
 
 function startMultiplayerBattle({ challengerId, accepterId }) {
-    enemy = new Character("Adversaire", player.maxHp, player.attack, player.defense);
-    showGameArea('battle-area');
-    updateBattleInfo();
-    console.log("Combat multijoueur commencé entre", challengerId, "et", accepterId);
+    const opponent = getOpponentInfo(challengerId === socket.id ? accepterId : challengerId);
+    if (opponent) {
+        enemy = new Character(opponent.name, opponent.hp, opponent.attack, opponent.defense);
+        showGameArea('battle-area');
+        updateBattleInfo();
+        console.log("Combat multijoueur commencé entre", challengerId, "et", accepterId);
+    } else {
+        console.error("Impossible de trouver les informations de l'adversaire");
+    }
+}
+
+function getOpponentInfo(opponentId) {
+    // Cette fonction devrait récupérer les informations de l'adversaire depuis le serveur
+    // Pour l'instant, nous utiliserons des données factices
+    return {
+        name: "Adversaire",
+        hp: 100,
+        attack: 10,
+        defense: 5
+    };
 }
 
 function requestTrade() {
@@ -912,6 +981,15 @@ function selectCompanion(index) {
     updateCompanionInfo();
     showGameArea('adventure-menu');
     console.log("Compagnon sélectionné:", companion);
+}
+
+function showLevelUpModal() {
+    const modal = document.getElementById('level-up-modal');
+    const newLevelSpan = document.getElementById('new-level');
+    if (modal && newLevelSpan) {
+        newLevelSpan.textContent = player.level;
+        modal.style.display = 'block';
+    }
 }
 
 // Initialisation du jeu
