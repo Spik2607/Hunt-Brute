@@ -1,144 +1,211 @@
-body {
-    font-family: Arial, sans-serif;
+/* Réinitialisation et styles de base */
+* {
     margin: 0;
     padding: 0;
-    background-color: #f0f0f0;
+    box-sizing: border-box;
 }
 
+body {
+    font-family: 'Cinzel', serif;
+    background: url('https://example.com/parchment-texture.jpg') repeat;
+    color: #2c2c2c;
+    line-height: 1.6;
+}
+
+/* Container principal */
 #game-container {
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
-    background-color: #fff;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    background-color: rgba(255, 253, 240, 0.9);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
 }
 
+/* En-tête */
 header {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #8B4513;
+    padding-bottom: 20px;
 }
 
 h1 {
-    color: #333;
+    font-size: 3em;
+    color: #8B4513;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
+/* Menu principal */
 nav {
     display: flex;
     justify-content: space-around;
-    margin-bottom: 20px;
-}
-
-button {
-    padding: 10px 15px;
-    font-size: 16px;
-    cursor: pointer;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-}
-
-button:hover {
-    background-color: #45a049;
-}
-
-.game-area {
-    display: none;
-    margin-top: 20px;
-}
-
-#player-info {
-    background-color: #f9f9f9;
+    margin-bottom: 30px;
+    background: linear-gradient(to bottom, #8B4513, #A0522D);
     padding: 10px;
     border-radius: 5px;
+}
+
+nav button {
+    font-family: 'Cinzel', serif;
+    font-size: 1em;
+    color: #FFF8DC;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 10px 15px;
+}
+
+nav button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+/* Zones de jeu */
+.game-area {
+    background-color: rgba(255, 253, 240, 0.7);
+    border: 2px solid #8B4513;
+    border-radius: 8px;
+    padding: 20px;
     margin-bottom: 20px;
+}
+
+/* Boutique */
+#shop-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.shop-item {
+    background-color: #FFF8DC;
+    border: 1px solid #A0522D;
+    border-radius: 5px;
+    padding: 15px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.shop-item:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.shop-item button {
+    background-color: #8B4513;
+    color: #FFF8DC;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.shop-item button:hover {
+    background-color: #A0522D;
+}
+
+/* Inventaire */
+#inventory-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.item {
+    background-color: #FFF8DC;
+    border: 1px solid #A0522D;
+    border-radius: 5px;
+    padding: 10px;
+    transition: all 0.3s ease;
+}
+
+.item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Styles pour les raretés d'items */
+.item-common { color: #2c2c2c; }
+.item-uncommon { color: #1a9850; }
+.item-rare { color: #2c7bb6; }
+.item-epic { color: #762a83; }
+.item-legendary { color: #feb24c; }
+
+/* Zone de combat */
+#battle-area {
+    background: url('https://example.com/battle-background.jpg') center/cover no-repeat;
+    color: #FFF8DC;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5);
 }
 
 #battle-log {
     height: 200px;
     overflow-y: scroll;
-    border: 1px solid #ddd;
-    padding: 10px;
-    margin-bottom: 10px;
-}
-
-#inventory-items, #shop-items {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 10px;
-}
-
-.item {
-    padding: 10px;
-    border: 1px solid #ddd;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 15px;
     border-radius: 5px;
+    margin-bottom: 20px;
 }
-
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.4);
-}
-
-.modal-content {
-    background-color: #fefefe;
-    margin: 15% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    max-width: 500px;
-}
-
-/* Nouveaux styles pour les améliorations */
 
 #action-buttons {
     display: flex;
     justify-content: space-around;
-    margin-top: 10px;
 }
 
 #action-buttons button {
-    padding: 5px 10px;
-    font-size: 14px;
+    font-family: 'Cinzel', serif;
+    font-size: 1em;
+    background-color: #8B4513;
+    color: #FFF8DC;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-#skill-distribution {
-    margin-top: 10px;
+#action-buttons button:hover {
+    background-color: #A0522D;
+    transform: translateY(-2px);
 }
 
-#skill-distribution div {
-    margin-bottom: 5px;
+/* Modal de level up */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-#skill-distribution button {
-    margin-left: 5px;
+.modal-content {
+    background: url('https://example.com/scroll-texture.jpg') center/cover no-repeat;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    max-width: 500px;
+    width: 90%;
 }
 
-.item {
-    padding: 5px;
-    margin-bottom: 5px;
-    border: 1px solid #ccc;
-    border-radius: 3px;
+/* Responsivité */
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+    }
+    
+    nav button {
+        margin-bottom: 10px;
+    }
+    
+    #shop-items, #inventory-items {
+        grid-template-columns: 1fr;
+    }
 }
-
-.equipped-item {
-    background-color: #f0f0f0;
-}
-
-.item-stats {
-    font-size: 12px;
-    margin-top: 3px;
-}
-
-/* Styles pour les différentes raretés d'items */
-.item-common { color: #ffffff; }
-.item-uncommon { color: #1eff00; }
-.item-rare { color: #0070dd; }
-.item-epic { color: #a335ee; }
-.item-legendary { color: #ff8000; }
