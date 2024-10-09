@@ -122,7 +122,9 @@ function setupEventListeners() {
         { id: 'join-fixed-room', event: 'click', handler: () => joinRoom(FIXED_ROOM) },
         { id: 'save-game', event: 'click', handler: saveGame },
         { id: 'load-game', event: 'click', handler: loadGame },
-        { id: 'back-to-main', event: 'click', handler: () => showGameArea('main-menu') }
+        { id: 'back-to-main', event: 'click', handler: () => showGameArea('main-menu') },
+        { id: 'close-inventory', event: 'click', handler: () => showGameArea('main-menu') },
+        { id: 'leave-shop', event: 'click', handler: () => showGameArea('main-menu') }
     ];
 
     listeners.forEach(({ id, event, handler }) => {
@@ -141,10 +143,10 @@ function showGameArea(areaId) {
     const areas = document.querySelectorAll('.game-area');
     areas.forEach(area => {
         if (area.id === areaId) {
-            area.classList.add('active');
+            area.style.display = 'block';
             console.log(`Zone ${areaId} affichée`);
         } else {
-            area.classList.remove('active');
+            area.style.display = 'none';
         }
     });
 }
@@ -358,6 +360,46 @@ function equipItem(index) {
         updatePlayerInfo();
         openInventory();
         console.log("Objet équipé:", item);
+    }
+}
+
+function openShop() {
+    console.log("Ouverture de la boutique");
+    const shopItems = document.getElementById('shop-items');
+    if (!shopItems) {
+        console.error("L'élément 'shop-items' n'a pas été trouvé");
+        return;
+    }
+    shopItems.innerHTML = '';
+    items.forEach(item => {
+        const itemElement = document.createElement('div');
+        itemElement.className = 'shop-item';
+        itemElement.innerHTML = `
+            <span>${item.name} - ${item.cost} or</span>
+            <button onclick="buyItem('${item.id}')" class="buy-button">Acheter</button>
+        `;
+        shopItems.appendChild(itemElement);
+    });
+    showGameArea('shop-area');
+}
+
+function buyItem(itemId) {
+    if (!player) {
+        console.error("Player not initialized");
+        return;
+    }
+    const item = items.find(i => i.id === itemId);
+    if (!item) {
+        console.error("Item not found");
+        return;
+    }
+    if (player.gold >= item.cost) {
+        player.gold -= item.cost;
+        player.inventory.push(item);
+        updatePlayerInfo();
+        alert(`Vous avez acheté ${item.name}`);
+    } else {
+        alert("Vous n'avez pas assez d'or !");
     }
 }
 
