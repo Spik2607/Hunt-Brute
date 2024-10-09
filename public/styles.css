@@ -53,12 +53,11 @@ button:active {
     border-radius: 10px;
     padding: 20px;
     margin-top: 20px;
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out;
+    display: none; /* Caché par défaut */
 }
 
 .game-area.active {
-    opacity: 1;
+    display: block; /* Affiché quand actif */
 }
 
 /* Informations du joueur */
@@ -267,4 +266,9 @@ button:active {
 .tooltip:hover .tooltiptext {
     visibility: visible;
     opacity: 1;
+}
+
+/* Ajout pour assurer la visibilité des zones actives */
+.game-area:not(.active) {
+    display: none;
 }
