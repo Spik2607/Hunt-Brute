@@ -112,16 +112,28 @@ function initializeSocket() {
 }
 
 function setupEventListeners() {
-    addSafeEventListener('create-character', 'click', createCharacter);
-    addSafeEventListener('start-mission', 'click', chooseMission);
-    addSafeEventListener('start-expedition', 'click', startExpedition);
-    addSafeEventListener('attack-button', 'click', playerAttack);
-    addSafeEventListener('open-inventory', 'click', openInventory);
-    addSafeEventListener('manage-companions', 'click', openCompanionsMenu);
-    addSafeEventListener('join-fixed-room', 'click', () => joinRoom(FIXED_ROOM));
-    addSafeEventListener('save-game', 'click', saveGame);
-    addSafeEventListener('load-game', 'click', loadGame);
+    const listeners = [
+        { id: 'create-character', event: 'click', handler: createCharacter },
+        { id: 'start-mission', event: 'click', handler: chooseMission },
+        { id: 'start-expedition', event: 'click', handler: startExpedition },
+        { id: 'attack-button', event: 'click', handler: playerAttack },
+        { id: 'open-inventory', event: 'click', handler: openInventory },
+        { id: 'manage-companions', event: 'click', handler: openCompanionsMenu },
+        { id: 'join-fixed-room', event: 'click', handler: () => joinRoom(FIXED_ROOM) },
+        { id: 'save-game', event: 'click', handler: saveGame },
+        { id: 'load-game', event: 'click', handler: loadGame }
+    ];
+
+    listeners.forEach(({ id, event, handler }) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener(event, handler);
+        } else {
+            console.warn(`Élément avec l'id '${id}' non trouvé.`);
+        }
+    });
 }
+
 
 function addSafeEventListener(id, event, callback) {
     const element = document.getElementById(id);
