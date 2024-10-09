@@ -397,13 +397,11 @@ function startMultiplayerGame(players) {
 function handleOpponentAction(action) {
     if (action.type === 'attack') {
         player.hp -= action.damage;
-        updateBattleLog(`${enemy.name} vous inflige ${action.damage} dégâts.`);
-        if (player.hp <= 0) {
-            endCombat(false);
-        } else {
-            updateBattleInfo();
-        }
+        updateBattleLog(`L'adversaire vous inflige ${action.damage} dégâts.`);
+        checkGameOver();
+        updateBattleInfo();
     }
+    // Handle other action types as needed
 }
 
 function showLevelUpModal() {
