@@ -19,12 +19,12 @@ io.on('connection', (socket) => {
         let room;
         if (roomId === FIXED_ROOM) {
             if (!rooms.has(FIXED_ROOM)) {
-                rooms.set(FIXED_ROOM, { players: [] });
+                rooms.set(FIXED_ROOM, { players: [], messages: [] });
             }
             room = rooms.get(FIXED_ROOM);
         } else {
             if (!rooms.has(roomId)) {
-                rooms.set(roomId, { players: [] });
+                rooms.set(roomId, { players: [], messages: [] });
             }
             room = rooms.get(roomId);
         }
@@ -33,9 +33,8 @@ io.on('connection', (socket) => {
             playerInfo.id = socket.id;
             room.players.push(playerInfo);
             socket.join(roomId);
-            socket.emit('roomJoined', { roomId, players: room.players });
+            socket.emit('roomJoined', { roomId, players: room.players, messages: room.messages });
             socket.to(roomId).emit('playerJoined', room.players);
-
             if (room.players.length === 2) {
                 io.to(roomId).emit('gameReady', room.players);
             }
@@ -44,8 +43,36 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('chatMessage', ({ roomId, message }) => {
+        const room = rooms.get(roomId);
+        if (room) {
+            room.messages.push(message);
+            io.to(roomId).emit('newMessage', message);
+        }
+    });
+
+    socket.on('initiateChallenge', ({ roomId, challengerId }) => {
+        io.to(roomId).emit('challengeReceived', { challengerId });
+    });
+
+    socket.on('acceptChallenge', ({ roomId, challengerId, accepterId }) => {
+        io.to(roomId).emit('battleStart', { challengerId, accepterId });
+    });
+
     socket.on('playerAction', ({ roomId, action }) => {
         socket.to(roomId).emit('opponentAction', action);
+    });
+
+    socket.on('initiateTradeRequest', ({ roomId, fromId, toId }) => {
+        io.to(roomId).emit('tradeRequestReceived', { fromId, toId });
+    });
+
+    socket.on('acceptTradeRequest', ({ roomId, fromId, toId }) => {
+        io.to(roomId).emit('tradeStart', { fromId, toId });
+    });
+
+    socket.on('tradeItem', ({ roomId, fromId, toId, item }) => {
+        io.to(roomId).emit('itemTraded', { fromId, toId, item });
     });
 
     socket.on('disconnect', () => {
