@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hunt Brute - V1.70</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <title>Hunt Brute - V2.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -37,13 +37,11 @@
                 <button id="start-mission">Commencer une mission</button>
                 <button id="start-expedition">Partir en expédition</button>
                 <div id="current-expedition"></div>
-                <button id="back-to-main">Retour au menu principal</button>
             </section>
 
             <section id="mission-choice" class="game-area">
                 <h2>Choisir une mission</h2>
                 <div id="mission-list"></div>
-                <button id="back-to-main">Retour au menu principal</button>
             </section>
 
             <section id="battle-area" class="game-area">
@@ -52,13 +50,7 @@
                 <div id="companion-stats"></div>
                 <div id="enemy-stats"></div>
                 <div id="battle-log"></div>
-                <div id="action-buttons">
-                    <button onclick="playerAttack()">Attaque normale</button>
-                    <button onclick="playerDefend()">Se défendre</button>
-                    <button onclick="playerUseSpecial()">Attaque spéciale</button>
-                    <button onclick="playerUseItem()">Utiliser un objet</button>
-                </div>
-                <button id="back-to-main">Abandonner le combat</button>
+                <div id="action-buttons"></div>
             </section>
 
             <section id="expedition-area" class="game-area">
@@ -66,7 +58,6 @@
                 <div id="expedition-info"></div>
                 <div id="expedition-log"></div>
                 <button id="cancel-expedition">Annuler l'expédition</button>
-                <button id="back-to-main">Retour au menu principal</button>
             </section>
 
             <section id="inventory-area" class="game-area">
@@ -80,20 +71,17 @@
                 <div id="inventory-items">
                     <h3>Objets en stock</h3>
                 </div>
-                <button id="close-inventory">Fermer l'inventaire</button>
             </section>
 
             <section id="companions-area" class="game-area">
                 <h2>Gestion des Compagnons</h2>
                 <div id="companions-list"></div>
                 <div id="active-companion"></div>
-                <button id="back-to-main">Retour au menu principal</button>
             </section>
 
             <section id="shop-area" class="game-area">
                 <h2>Boutique</h2>
                 <div id="shop-items"></div>
-                <button id="leave-shop">Quitter la boutique</button>
             </section>
 
             <section id="multiplayer-area" class="game-area">
@@ -108,7 +96,6 @@
                 </div>
                 <button id="challenge-player">Défier le joueur</button>
                 <button id="trade-request">Demander un échange</button>
-                <button id="back-to-main">Quitter le mode multijoueur</button>
             </section>
         </main>
 
@@ -134,7 +121,7 @@
                         <button id="intelligence-button">+</button>
                     </div>
                 </div>
-                <button id="confirm-level-up" disabled>Confirmer</button>
+                <button id="confirm-level-up">Confirmer</button>
             </div>
         </div>
     </div>
