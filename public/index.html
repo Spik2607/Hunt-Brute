@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hunt Brute - V1.60</title>
+    <title>Hunt Brute - V1.70</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -51,7 +51,12 @@
                 <div id="companion-stats"></div>
                 <div id="enemy-stats"></div>
                 <div id="battle-log"></div>
-                <button id="attack-button">Attaquer</button>
+                <div id="action-buttons">
+                    <button onclick="playerAttack()">Attaque normale</button>
+                    <button onclick="playerDefend()">Se défendre</button>
+                    <button onclick="playerUseSpecial()">Attaque spéciale</button>
+                    <button onclick="playerUseItem()">Utiliser un objet</button>
+                </div>
                 <button id="back-to-main">Abandonner le combat</button>
             </section>
 
@@ -110,7 +115,25 @@
             <div class="modal-content">
                 <h2>Niveau Supérieur !</h2>
                 <p>Vous avez atteint le niveau <span id="new-level"></span> !</p>
-                <button id="confirm-level-up">Confirmer</button>
+                <p>Points de compétence disponibles : <span id="skill-points"></span></p>
+                <div id="skill-distribution">
+                    <div>
+                        <label for="strength-skill">Force :</label>
+                        <span id="strength-skill"></span>
+                        <button id="strength-button">+</button>
+                    </div>
+                    <div>
+                        <label for="agility-skill">Agilité :</label>
+                        <span id="agility-skill"></span>
+                        <button id="agility-button">+</button>
+                    </div>
+                    <div>
+                        <label for="intelligence-skill">Intelligence :</label>
+                        <span id="intelligence-skill"></span>
+                        <button id="intelligence-button">+</button>
+                    </div>
+                </div>
+                <button id="confirm-level-up" disabled>Confirmer</button>
             </div>
         </div>
     </div>
