@@ -3,25 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hunt Brute - Nouvelle Interface</title>
+    <title>Hunt Brute - V1.50</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background: linear-gradient(45deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .game-area {
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .game-area.active {
+            opacity: 1;
+        }
+        button {
+            transition: transform 0.1s ease-in-out;
+        }
+        button:hover {
+            transform: scale(1.05);
+        }
+        #battle-log {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            font-family: monospace;
+        }
+        .battle-animation {
+            animation: shake 0.5s;
+        }
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+    </style>
 </head>
 <body>
     <div id="game-container">
         <header>
-            <h1>Hunt Brute</h1>
+            <h1 class="glow">Hunt Brute</h1>
             <div id="player-info"></div>
         </header>
         
         <nav id="main-menu">
-            <button id="start-solo"><i class="fas fa-user"></i> Mode Solo</button>
-            <button id="open-multiplayer"><i class="fas fa-users"></i> Mode Multijoueur</button>
-            <button id="open-shop"><i class="fas fa-store"></i> Boutique</button>
-            <button id="open-inventory"><i class="fas fa-briefcase"></i> Inventaire</button>
-            <button id="save-game"><i class="fas fa-save"></i> Sauvegarder</button>
-            <button id="load-game"><i class="fas fa-folder-open"></i> Charger</button>
-            <button id="back-to-main" style="display: none;"><i class="fas fa-arrow-left"></i> Retour au menu</button>
+            <button id="start-adventure" class="glow-button"><i class="fas fa-hiking"></i> Mode Aventure</button>
+            <button id="open-multiplayer" class="glow-button"><i class="fas fa-users"></i> Mode Multijoueur</button>
+            <button id="open-shop" class="glow-button"><i class="fas fa-store"></i> Boutique</button>
+            <button id="open-inventory" class="glow-button"><i class="fas fa-briefcase"></i> Inventaire</button>
+            <button id="save-game" class="glow-button"><i class="fas fa-save"></i> Sauvegarder</button>
+            <button id="load-game" class="glow-button"><i class="fas fa-folder-open"></i> Charger</button>
+            <button id="back-to-main" class="glow-button" style="display: none;"><i class="fas fa-arrow-left"></i> Retour au menu</button>
         </nav>
 
         <main id="game-content">
@@ -32,15 +80,17 @@
                 <input type="number" id="stat-attack" placeholder="Attaque" min="0">
                 <input type="number" id="stat-defense" placeholder="Défense" min="0">
                 <p>Points restants: <span id="remaining-points">15</span></p>
-                <button id="create-character">Créer le personnage</button>
-                <hr>
-                <h3>Ou charger une partie existante</h3>
-                <button id="load-existing-game">Charger une partie sauvegardée</button>
+                <button id="create-character" class="glow-button">Créer le personnage</button>
             </section>
 
-            <section id="solo-menu" class="game-area" style="display: none;">
-                <h2>Menu Solo</h2>
-                <button id="start-mission">Commencer une mission</button>
+            <section id="adventure-menu" class="game-area" style="display: none;">
+                <h2>Menu Aventure</h2>
+                <!-- Les boutons seront ajoutés dynamiquement ici -->
+            </section>
+
+            <section id="mission-choice" class="game-area" style="display: none;">
+                <h2>Choisissez une mission</h2>
+                <!-- Les missions seront ajoutées dynamiquement ici -->
             </section>
 
             <section id="mission-area" class="game-area" style="display: none;">
@@ -48,49 +98,43 @@
                 <div id="player-stats"></div>
                 <div id="enemy-stats"></div>
                 <div id="battle-log"></div>
-                <button id="attack-button">Attaquer</button>
+                <button id="attack-button" class="glow-button">Attaquer</button>
+                <button id="dodge-button" class="glow-button">Esquiver</button>
                 <div id="player-abilities"></div>
             </section>
 
             <section id="shop" class="game-area" style="display: none;">
                 <h2>Boutique</h2>
                 <div id="shop-items"></div>
-                <button id="leave-shop">Quitter la boutique</button>
+                <button id="leave-shop" class="glow-button">Quitter la boutique</button>
             </section>
 
             <section id="inventory-area" class="game-area" style="display: none;">
                 <h2>Inventaire</h2>
                 <div id="inventory"></div>
-                <h3>Objets équipés</h3>
-                <div id="equipped-items"></div>
-                <button id="close-inventory">Fermer l'inventaire</button>
+                <button id="close-inventory" class="glow-button">Fermer l'inventaire</button>
             </section>
 
-          <section id="multiplayer" class="game-area" style="display: none;">
-    <h2>Mode Multijoueur</h2>
-    <div id="room-options">
-        <button id="join-fixed-room">Rejoindre la salle fixe</button>
-        <p>ou</p>
-        <input type="text" id="room-id" placeholder="ID de la salle personnalisée">
-        <button id="create-room">Créer une salle</button>
-        <button id="join-room">Rejoindre une salle</button>
-    </div>
-</section>
+            <section id="multiplayer" class="game-area" style="display: none;">
+                <h2>Mode Multijoueur</h2>
+                <button id="join-fixed-room" class="glow-button">Rejoindre la salle fixe</button>
+            </section>
 
-<section id="waiting-area" class="game-area" style="display: none;">
-    <h2>En attente d'un autre joueur...</h2>
-    <p>ID de la salle: <span id="room-id-display"></span></p>
-    <div id="players-list"></div>
-</section>
+            <section id="waiting-area" class="game-area" style="display: none;">
+                <h2>En attente d'un autre joueur...</h2>
+                <p>ID de la salle: <span id="room-id-display"></span></p>
+                <div id="players-list"></div>
+            </section>
 
-<section id="multiplayer-battle" class="game-area" style="display: none;">
-    <h2>Combat Multijoueur</h2>
-    <div id="player-stats"></div>
-    <div id="opponent-stats"></div>
-    <div id="battle-log"></div>
-    <button id="multiplayer-attack-button">Attaquer</button>
-    <div id="player-abilities"></div>
-</section>
+            <section id="multiplayer-battle" class="game-area" style="display: none;">
+                <h2>Combat Multijoueur</h2>
+                <div id="multiplayer-player-stats"></div>
+                <div id="multiplayer-enemy-stats"></div>
+                <div id="multiplayer-battle-log"></div>
+                <button id="multiplayer-attack-button" class="glow-button">Attaquer</button>
+                <button id="multiplayer-dodge-button" class="glow-button">Esquiver</button>
+            </section>
+        </main>
 
         <div id="level-up-modal" class="modal" style="display: none;">
             <div class="modal-content">
@@ -100,12 +144,42 @@
                 <input type="number" id="level-up-hp" placeholder="PV" min="0">
                 <input type="number" id="level-up-attack" placeholder="Attaque" min="0">
                 <input type="number" id="level-up-defense" placeholder="Défense" min="0">
-                <button id="confirm-level-up">Confirmer</button>
+                <button id="confirm-level-up" class="glow-button">Confirmer</button>
             </div>
         </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.js"></script>
     <script src="gameData.js" type="module"></script>
     <script src="game.js" type="module"></script>
+    <script>
+        // Ajouter des effets visuels sans modifier game.js
+        document.addEventListener('DOMContentLoaded', function() {
+            const gameAreas = document.querySelectorAll('.game-area');
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                        const target = mutation.target;
+                        if (target.style.display === 'block') {
+                            setTimeout(() => target.classList.add('active'), 50);
+                        } else {
+                            target.classList.remove('active');
+                        }
+                    }
+                });
+            });
+
+            gameAreas.forEach(area => {
+                observer.observe(area, { attributes: true });
+            });
+
+            // Ajouter un effet de secousse lors d'une attaque
+            document.getElementById('attack-button').addEventListener('click', function() {
+                document.getElementById('mission-area').classList.add('battle-animation');
+                setTimeout(() => {
+                    document.getElementById('mission-area').classList.remove('battle-animation');
+                }, 500);
+            });
+        });
+    </script>
 </body>
 </html>
