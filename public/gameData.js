@@ -1,7 +1,7 @@
 // gameData.js
 
-// Définition de la classe Character (si elle n'est pas importée d'ailleurs)
-class Character {
+// Définition de la classe Character
+export class Character {
     constructor(name, hp, attack, defense, energy = 100) {
         this.name = name;
         this.level = 1;
@@ -30,6 +30,7 @@ class Character {
     }
 }
 
+// Liste des items du jeu
 export const items = [
     // Armes
     { id: 'sword', name: 'Épée en fer', type: 'weapon', attack: 5, cost: 50, rarity: 'common' },
@@ -43,12 +44,12 @@ export const items = [
     { id: 'shield', name: 'Bouclier en bois', type: 'armor', defense: 3, cost: 40, rarity: 'common' },
     { id: 'chainmail', name: 'Cotte de mailles', type: 'armor', defense: 5, cost: 80, rarity: 'common' },
     { id: 'plateArmor', name: 'Armure de plaques', type: 'armor', defense: 8, speedPenalty: 1, cost: 120, rarity: 'rare' },
-    { id: 'dragonScaleArmor', name: 'Armure d'écailles de dragon', type: 'armor', defense: 12, fireResistance: 50, cost: 300, rarity: 'legendary' },
+    { id: 'dragonScaleArmor', name: "Armure d'écailles de dragon", type: 'armor', defense: 12, fireResistance: 50, cost: 300, rarity: 'legendary' },
 
     // Accessoires
-    { id: 'ringOfAgility', name: 'Anneau d'agilité', type: 'accessory', effect: 'speedBoost', value: 10, cost: 80, rarity: 'uncommon' },
+    { id: 'ringOfAgility', name: "Anneau d'agilité", type: 'accessory', effect: 'speedBoost', value: 10, cost: 80, rarity: 'uncommon' },
     { id: 'amuletOfProtection', name: 'Amulette de protection', type: 'accessory', effect: 'damageReduction', value: 10, cost: 150, rarity: 'rare' },
-    { id: 'cloakOfInvisibility', name: 'Cape d'invisibilité', type: 'accessory', effect: 'stealth', cost: 200, rarity: 'legendary' },
+    { id: 'cloakOfInvisibility', name: "Cape d'invisibilité", type: 'accessory', effect: 'stealth', cost: 200, rarity: 'legendary' },
 
     // Consommables
     { id: 'potion', name: 'Potion de soin', type: 'consumable', effect: 'heal', value: 30, cost: 20, rarity: 'common' },
@@ -62,6 +63,7 @@ export const items = [
     { id: 'orbOfFrost', name: 'Orbe de givre', type: 'special', effect: 'freeze', freezeDuration: 3, cost: 150, rarity: 'rare' },
 ];
 
+// Fonction pour obtenir les statistiques d'un item
 export function getItemStats(item) {
     let stats = `${item.name} (${item.type}) :`;
     
@@ -96,6 +98,7 @@ export function getItemStats(item) {
     return stats;
 }
 
+// Liste des missions disponibles
 export const missions = [
     { name: "Éliminer des gobelins", enemyLevel: 1, goldReward: 15, expReward: 20, difficulty: 'Facile' },
     { name: "Chasser un loup géant", enemyLevel: 2, goldReward: 30, expReward: 40, difficulty: 'Moyenne' },
@@ -107,6 +110,7 @@ export const missions = [
     { name: "Chasser un troll des montagnes", enemyLevel: 8, goldReward: 250, expReward: 300, difficulty: 'Très Difficile' }
 ];
 
+// Taux de drop pour différentes difficultés
 export const dropRates = {
     'Facile': 0.1,
     'Moyenne': 0.15,
@@ -114,6 +118,7 @@ export const dropRates = {
     'Très Difficile': 0.25,
 };
 
+// Liste des ennemis
 export const enemies = [
     { name: "Gobelin", hp: 30, attack: 5, defense: 2 },
     { name: "Loup géant", hp: 50, attack: 8, defense: 3 },
@@ -125,14 +130,16 @@ export const enemies = [
     { name: "Sorcier maléfique", hp: 120, attack: 18, defense: 10 }
 ];
 
+// Types de compagnons et leurs noms possibles
 export const companionTypes = [
     { type: 'animal', names: ['Loup', 'Ours', 'Aigle', 'Panthère', 'Tigre', 'Serpent'] },
     { type: 'monster', names: ['Gobelin apprivoisé', 'Petit dragon', 'Golem de pierre'] },
     { type: 'slave', names: ['Écuyer', 'Porteur', 'Archer', 'Esclave'] },
-    { type: 'spirit', names: ['Esprit du feu', 'Esprit de l'eau', 'Esprit de l'air', 'Esprit de la terre'] },
+    { type: 'spirit', names: ['Esprit du feu', "Esprit de l'eau", "Esprit de l'air", 'Esprit de la terre'] },
     { type: 'shinigami', names: ['Faucheur d'âmes', 'Shinigami', 'Ombre'] }
 ];
 
+// Fonction pour obtenir un nom de compagnon aléatoire
 export function getRandomCompanionName(type) {
     const typeData = companionTypes.find(t => t.type === type);
     if (typeData) {
@@ -141,6 +148,7 @@ export function getRandomCompanionName(type) {
     return 'Compagnon inconnu';
 }
 
+// Fonction pour créer un compagnon aléatoire
 export function getRandomCompanion() {
     const types = ['animal', 'monster', 'slave', 'spirit', 'shinigami'];
     const type = types[Math.floor(Math.random() * types.length)];
@@ -148,8 +156,24 @@ export function getRandomCompanion() {
     return new Character(name, 50, 5, 3, 50); // Nom, HP, Attaque, Défense, Énergie
 }
 
+// Fonction pour obtenir un item aléatoire
 export function getRandomItem() {
     return items[Math.floor(Math.random() * items.length)];
+}
+
+// Fonction utilitaire pour obtenir un élément aléatoire d'un tableau
+export function getRandomElement(array) {
+    return array[Math.floor(Math.random() * array.length)];
+}
+
+// Fonction pour obtenir un ennemi aléatoire
+export function getRandomEnemy() {
+    return getRandomElement(enemies);
+}
+
+// Fonction pour obtenir une mission aléatoire
+export function getRandomMission() {
+    return getRandomElement(missions);
 }
 
 // Ajoutez d'autres fonctions utilitaires si nécessaire
