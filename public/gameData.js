@@ -1,38 +1,67 @@
 // gameData.js
 
+// Définition de la classe Character (si elle n'est pas importée d'ailleurs)
+class Character {
+    constructor(name, hp, attack, defense, energy = 100) {
+        this.name = name;
+        this.level = 1;
+        this.maxHp = hp;
+        this.hp = hp;
+        this.attack = attack;
+        this.defense = defense;
+        this.energy = energy;
+        this.maxEnergy = energy;
+        this.experience = 0;
+        this.gold = 0;
+        this.inventory = [];
+        this.equippedItems = {
+            weapon: null,
+            armor: null,
+            accessory: null
+        };
+        this.resources = { wood: 0, stone: 0, iron: 0 };
+        this.companions = [];
+        this.skillPoints = 0;
+        this.skills = {
+            strength: 0,
+            agility: 0,
+            intelligence: 0
+        };
+    }
+}
+
 export const items = [
     // Armes
     { id: 'sword', name: 'Épée en fer', type: 'weapon', attack: 5, cost: 50, rarity: 'common' },
     { id: 'axe', name: 'Hache de guerre', type: 'weapon', attack: 7, cost: 70, rarity: 'common' },
-    { id: 'dagger', name: 'Dague des ombres', type: 'weapon', attack: 3, critChance: 10, cost: 60, rarity: 'uncommon' }, // Critique : 10% chance d'attaque critique
-    { id: 'greatsword', name: 'Épée à deux mains', type: 'weapon', attack: 12, speedPenalty: 2, cost: 100, rarity: 'rare' }, // Pénalité de vitesse d'attaque
-    { id: 'flameBlade', name: 'Lame enflammée', type: 'weapon', attack: 10, fireDamage: 3, cost: 150, rarity: 'rare' }, // Dégâts de feu supplémentaires
-    { id: 'excalibur', name: 'Excalibur', type: 'weapon', attack: 20, holyDamage: 5, critChance: 15, cost: 500, rarity: 'legendary' }, // Dégâts sacrés, haute chance critique
+    { id: 'dagger', name: 'Dague des ombres', type: 'weapon', attack: 3, critChance: 10, cost: 60, rarity: 'uncommon' },
+    { id: 'greatsword', name: 'Épée à deux mains', type: 'weapon', attack: 12, speedPenalty: 2, cost: 100, rarity: 'rare' },
+    { id: 'flameBlade', name: 'Lame enflammée', type: 'weapon', attack: 10, fireDamage: 3, cost: 150, rarity: 'rare' },
+    { id: 'excalibur', name: 'Excalibur', type: 'weapon', attack: 20, holyDamage: 5, critChance: 15, cost: 500, rarity: 'legendary' },
 
     // Armures
     { id: 'shield', name: 'Bouclier en bois', type: 'armor', defense: 3, cost: 40, rarity: 'common' },
     { id: 'chainmail', name: 'Cotte de mailles', type: 'armor', defense: 5, cost: 80, rarity: 'common' },
-    { id: 'plateArmor', name: 'Armure de plaques', type: 'armor', defense: 8, speedPenalty: 1, cost: 120, rarity: 'rare' }, // Pénalité de vitesse
-    { id: 'dragonScaleArmor', name: 'Armure d’écailles de dragon', type: 'armor', defense: 12, fireResistance: 50, cost: 300, rarity: 'legendary' }, // Résistance au feu : 50%
+    { id: 'plateArmor', name: 'Armure de plaques', type: 'armor', defense: 8, speedPenalty: 1, cost: 120, rarity: 'rare' },
+    { id: 'dragonScaleArmor', name: 'Armure d'écailles de dragon', type: 'armor', defense: 12, fireResistance: 50, cost: 300, rarity: 'legendary' },
 
     // Accessoires
-    { id: 'ringOfAgility', name: 'Anneau d’agilité', type: 'accessory', effect: 'speedBoost', value: 10, cost: 80, rarity: 'uncommon' }, // Bonus de vitesse
-    { id: 'amuletOfProtection', name: 'Amulette de protection', type: 'accessory', effect: 'damageReduction', value: 10, cost: 150, rarity: 'rare' }, // Réduction des dégâts
-    { id: 'cloakOfInvisibility', name: 'Cape d’invisibilité', type: 'accessory', effect: 'stealth', cost: 200, rarity: 'legendary' }, // Capacité d’invisibilité temporaire
+    { id: 'ringOfAgility', name: 'Anneau d'agilité', type: 'accessory', effect: 'speedBoost', value: 10, cost: 80, rarity: 'uncommon' },
+    { id: 'amuletOfProtection', name: 'Amulette de protection', type: 'accessory', effect: 'damageReduction', value: 10, cost: 150, rarity: 'rare' },
+    { id: 'cloakOfInvisibility', name: 'Cape d'invisibilité', type: 'accessory', effect: 'stealth', cost: 200, rarity: 'legendary' },
 
     // Consommables
-    { id: 'potion', name: 'Potion de soin', type: 'consumable', effect: 'heal', value: 30, cost: 20, rarity: 'common' }, // Soigne 30 PV
-    { id: 'energyDrink', name: 'Boisson énergisante', type: 'consumable', effect: 'energy', value: 50, cost: 25, rarity: 'common' }, // Restaure 50 points d'énergie
-    { id: 'elixirOfVitality', name: 'Élixir de vitalité', type: 'consumable', effect: 'heal', value: 100, cost: 100, rarity: 'rare' }, // Soigne 100 PV
-    { id: 'manaPotion', name: 'Potion de mana', type: 'consumable', effect: 'mana', value: 40, cost: 30, rarity: 'common' }, // Restaure 40 points de mana
-    { id: 'phoenixFeather', name: 'Plume de Phénix', type: 'consumable', effect: 'revive', cost: 500, rarity: 'legendary' }, // Ressuscite le joueur avec 50% de PV
+    { id: 'potion', name: 'Potion de soin', type: 'consumable', effect: 'heal', value: 30, cost: 20, rarity: 'common' },
+    { id: 'energyDrink', name: 'Boisson énergisante', type: 'consumable', effect: 'energy', value: 50, cost: 25, rarity: 'common' },
+    { id: 'elixirOfVitality', name: 'Élixir de vitalité', type: 'consumable', effect: 'heal', value: 100, cost: 100, rarity: 'rare' },
+    { id: 'manaPotion', name: 'Potion de mana', type: 'consumable', effect: 'mana', value: 40, cost: 30, rarity: 'common' },
+    { id: 'phoenixFeather', name: 'Plume de Phénix', type: 'consumable', effect: 'revive', cost: 500, rarity: 'legendary' },
 
     // Objets spéciaux
-    { id: 'scrollOfFireball', name: 'Parchemin de boule de feu', type: 'special', effect: 'fireball', damage: 25, cost: 70, rarity: 'uncommon' }, // Lance une boule de feu infligeant 25 dégâts
-    { id: 'orbOfFrost', name: 'Orbe de givre', type: 'special', effect: 'freeze', freezeDuration: 3, cost: 150, rarity: 'rare' }, // Gèle l'ennemi pendant 3 tours
+    { id: 'scrollOfFireball', name: 'Parchemin de boule de feu', type: 'special', effect: 'fireball', damage: 25, cost: 70, rarity: 'uncommon' },
+    { id: 'orbOfFrost', name: 'Orbe de givre', type: 'special', effect: 'freeze', freezeDuration: 3, cost: 150, rarity: 'rare' },
 ];
 
-// Fonction pour afficher les statistiques des items
 export function getItemStats(item) {
     let stats = `${item.name} (${item.type}) :`;
     
@@ -99,9 +128,9 @@ export const enemies = [
 export const companionTypes = [
     { type: 'animal', names: ['Loup', 'Ours', 'Aigle', 'Panthère', 'Tigre', 'Serpent'] },
     { type: 'monster', names: ['Gobelin apprivoisé', 'Petit dragon', 'Golem de pierre'] },
-    { type: 'slave', names: ['Écuyer', 'Porteur', 'Archer','Esclave'] },
-    { type: 'spirit', names: ['Esprit du feu', 'Esprit de l eau', 'Esprit de l air', 'Esprit de la terre'] },
-    { type: 'shinigami', names: ['Faucheur d âmes', 'Shinigami', 'Ombre'] }
+    { type: 'slave', names: ['Écuyer', 'Porteur', 'Archer', 'Esclave'] },
+    { type: 'spirit', names: ['Esprit du feu', 'Esprit de l'eau', 'Esprit de l'air', 'Esprit de la terre'] },
+    { type: 'shinigami', names: ['Faucheur d'âmes', 'Shinigami', 'Ombre'] }
 ];
 
 export function getRandomCompanionName(type) {
@@ -111,3 +140,16 @@ export function getRandomCompanionName(type) {
     }
     return 'Compagnon inconnu';
 }
+
+export function getRandomCompanion() {
+    const types = ['animal', 'monster', 'slave', 'spirit', 'shinigami'];
+    const type = types[Math.floor(Math.random() * types.length)];
+    const name = getRandomCompanionName(type);
+    return new Character(name, 50, 5, 3, 50); // Nom, HP, Attaque, Défense, Énergie
+}
+
+export function getRandomItem() {
+    return items[Math.floor(Math.random() * items.length)];
+}
+
+// Ajoutez d'autres fonctions utilitaires si nécessaire
