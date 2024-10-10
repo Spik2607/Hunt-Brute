@@ -1,5 +1,5 @@
 // game.js
-import { items, missions, dropRates, getRandomCompanionName, getItemStats } from './gameData.js';
+import { items, missions, dropRates, getRandomCompanionName, getItemStats, enemies } from './gameData.js';
 import { expeditionEvents, getRandomExpeditionEvent } from './expedition.js';
 
 let player = null;
@@ -13,7 +13,7 @@ let currentRoom = null;
 const FIXED_ROOM = 'fixed-room';
 
 class Character {
-    constructor(name, hp, attack, defense) {
+    constructor(name, hp, attack, defense, energy = 100) {
         this.name = name;
         this.level = 1;
         this.maxHp = hp;
@@ -28,8 +28,8 @@ class Character {
             armor: null,
             accessory: null
         };
-        this.energy = 100;
-        this.maxEnergy = 100;
+        this.energy = energy;
+        this.maxEnergy = energy;
         this.resources = { wood: 0, stone: 0, iron: 0 };
         this.companions = [];
         this.skillPoints = 0;
@@ -81,6 +81,13 @@ class Character {
         }
     }
 
+    regenerateEnergy() {
+        if (this.energy < this.maxEnergy) {
+            this.energy = Math.min(this.energy + 5, this.maxEnergy);
+            updatePlayerInfo();
+        }
+    }
+
     equipItem(item) {
         if (item.type === 'weapon' || item.type === 'armor' || item.type === 'accessory') {
             const currentEquipped = this.equippedItems[item.type];
@@ -107,7 +114,6 @@ class Character {
             this.maxHp += item.maxHp;
             this.hp += item.maxHp;
         }
-        // Ajouter d'autres effets selon les propriétés de l'item
     }
 
     removeItemEffects(item) {
@@ -117,21 +123,13 @@ class Character {
             this.maxHp -= item.maxHp;
             this.hp = Math.min(this.hp, this.maxHp);
         }
-        // Retirer d'autres effets selon les propriétés de l'item
     }
 
     applySkills() {
         this.attack += this.skills.strength;
         this.defense += Math.floor(this.skills.agility / 2);
         this.maxHp += this.skills.intelligence * 5;
-        this.hp = this.maxHp; // Restaure les PV au maximum après l'application des compétences
-    }
-}
-
-class Companion extends Character {
-    constructor(name, type, hp, attack, defense) {
-        super(name, hp, attack, defense);
-        this.type = type;
+        this.hp = this.maxHp;
     }
 }
 
@@ -139,48 +137,55 @@ function initGame() {
     console.log("Initializing game...");
     initializeSocket();
     setupEventListeners();
-    showGameArea('main-menu');
+    showCreateHunterButton();
     setInterval(() => {
         if (player) {
             player.regenerateHP();
+            player.regenerateEnergy();
         }
         if (currentExpedition) {
             updateExpedition();
         }
-    }, 1000); // Mise à jour toutes les secondes
+    }, 1000);
 }
 
-if (typeof initializeMultiplayerChat === 'function') {
-    initializeMultiplayerChat();
-} else {
-    console.warn("La fonction initializeMultiplayerChat n'est pas définie. Le chat multijoueur peut ne pas fonctionner.");
+function showCreateHunterButton() {
+    const mainMenu = document.getElementById('main-menu');
+    const createHunterButton = document.createElement('button');
+    createHunterButton.id = 'create-hunter-button';
+    createHunterButton.textContent = 'Créer un Hunter';
+    createHunterButton.addEventListener('click', showCharacterCreationArea);
+    mainMenu.appendChild(createHunterButton);
 }
 
-function initializeSocket() {
-    socket = io('https://hunt-brute-server.onrender.com');
-    socket.on('connect', () => {
-        console.log('Connected to server');
-    });
-    socket.on('roomJoined', ({ roomId, players }) => {
-        console.log(`Joined room: ${roomId}`, players);
-        currentRoom = roomId;
-        updateWaitingAreaDisplay(players);
-    });
-    socket.on('playerJoined', (players) => {
-        console.log('Players in room:', players);
-        updateWaitingAreaDisplay(players);
-    });
-    socket.on('gameReady', (players) => {
-        console.log('Game is ready to start');
-        startMultiplayerGame(players);
-    });
-    socket.on('opponentAction', handleOpponentAction);
-    socket.on('newMessage', displayChatMessage);
-    socket.on('challengeReceived', handleChallengeReceived);
-    socket.on('battleStart', startMultiplayerBattle);
-    socket.on('tradeRequestReceived', handleTradeRequest);
-    socket.on('tradeStart', startTradeSession);
-    socket.on('itemTraded', handleItemTraded);
+function showCharacterCreationArea() {
+    showGameArea('character-creation');
+    const createHunterButton = document.getElementById('create-hunter-button');
+    if (createHunterButton) {
+        createHunterButton.style.display = 'none';
+    }
+}
+
+function createCharacter() {
+    const nameInput = document.getElementById('hero-name');
+    if (!nameInput) {
+        console.error("L'élément 'hero-name' n'a pas été trouvé");
+        return;
+    }
+    const name = nameInput.value.trim();
+    if (!name) {
+        alert("Veuillez entrer un nom pour votre personnage.");
+        return;
+    }
+    player = new Character(name, 100, 10, 5);
+    updatePlayerInfo();
+    showGameArea('adventure-menu');
+    console.log("Personnage créé:", player);
+    
+    const createHunterButton = document.getElementById('create-hunter-button');
+    if (createHunterButton) {
+        createHunterButton.style.display = 'none';
+    }
 }
 
 function setupEventListeners() {
@@ -227,23 +232,32 @@ function showGameArea(areaId) {
             area.style.display = 'none';
         }
     });
+
+    const createHunterButton = document.getElementById('create-hunter-button');
+    if (createHunterButton) {
+        createHunterButton.style.display = player ? 'none' : 'block';
+    }
 }
 
-function createCharacter() {
-    const nameInput = document.getElementById('hero-name');
-    if (!nameInput) {
-        console.error("L'élément 'hero-name' n'a pas été trouvé");
+function updatePlayerInfo() {
+    if (!player) {
+        console.error("Aucun joueur n'est initialisé");
         return;
     }
-    const name = nameInput.value.trim();
-    if (!name) {
-        alert("Veuillez entrer un nom pour votre personnage.");
+    const playerInfo = document.getElementById('player-info');
+    if (!playerInfo) {
+        console.error("L'élément 'player-info' n'a pas été trouvé");
         return;
     }
-    player = new Character(name, 100, 10, 5);
-    updatePlayerInfo();
-    showGameArea('adventure-menu');
-    console.log("Personnage créé:", player);
+    playerInfo.innerHTML = `
+        ${player.name} - Niveau ${player.level}<br>
+        PV: ${player.hp}/${player.maxHp}<br>
+        XP: ${player.experience}/${player.level * 100}<br>
+        Or: ${player.gold}<br>
+        Énergie: ${player.energy}/${player.maxEnergy}<br>
+        Attaque: ${player.attack} | Défense: ${player.defense}<br>
+        Ressources: Bois ${player.resources.wood}, Pierre ${player.resources.stone}, Fer ${player.resources.iron}
+    `;
 }
 
 function chooseMission() {
@@ -258,21 +272,166 @@ function chooseMission() {
     }
     missionList.innerHTML = '';
     missions.forEach((mission, index) => {
-        const missionButton = document.createElement('button');
-        missionButton.textContent = `${mission.name} (Niveau ${mission.enemyLevel})`;
-        missionButton.onclick = () => startMission(index);
-        missionList.appendChild(missionButton);
+        const missionElement = document.createElement('div');
+        missionElement.className = 'mission-item';
+        missionElement.innerHTML = `
+            <h3>${mission.name}</h3>
+            <p>Niveau ennemi : ${mission.enemyLevel}</p>
+            <p>Difficulté : ${mission.difficulty}</p>
+            <p>Récompenses : ${mission.goldReward} or, ${mission.expReward} XP</p>
+            <button onclick="startMission(${index})">Commencer la mission</button>
+        `;
+        missionList.appendChild(missionElement);
     });
     showGameArea('mission-choice');
 }
 
 function startMission(index) {
     currentMission = missions[index];
-    enemy = new Character(currentMission.name, currentMission.enemyLevel * 50, currentMission.enemyLevel * 5, currentMission.enemyLevel * 2);
-    enemy.name = currentMission.name; // Assurez-vous que le nom de l'ennemi est correctement défini
+    const enemyType = enemies[Math.floor(Math.random() * enemies.length)];
+    enemy = new Character(
+        enemyType.name,
+        enemyType.hp * currentMission.enemyLevel,
+        enemyType.attack * currentMission.enemyLevel,
+        enemyType.defense * currentMission.enemyLevel
+    );
     showGameArea('battle-area');
     updateBattleInfo();
     console.log("Mission commencée:", currentMission);
+}
+
+function updateBattleInfo() {
+    const playerStats = document.getElementById('player-combat-info');
+    const enemyStats = document.getElementById('enemy-combat-info');
+    const companionStats = document.getElementById('companion-combat-info');
+
+    if (playerStats && player) {
+        playerStats.querySelector('h3').textContent = player.name;
+        playerStats.querySelector('.health-text').textContent = `${player.hp}/${player.maxHp} PV`;
+        playerStats.querySelector('.health-bar-fill').style.width = `${(player.hp / player.maxHp) * 100}%`;
+        playerStats.querySelector('.energy-text').textContent = `${player.energy}/${player.maxEnergy} Énergie`;
+        playerStats.querySelector('.energy-bar-fill').style.width = `${(player.energy / player.maxEnergy) * 100}%`;
+    }
+    
+    if (enemyStats && enemy) {
+        enemyStats.querySelector('h3').textContent = enemy.name;
+        enemyStats.querySelector('.health-text').textContent = `${enemy.hp}/${enemy.maxHp} PV`;
+        enemyStats.querySelector('.health-bar-fill').style.width = `${(enemy.hp / enemy.maxHp) * 100}%`;
+    }
+    
+    if (companionStats) {
+        if (companion) {
+            companionStats.style.display = 'block';
+            companionStats.querySelector('h3').textContent = companion.name;
+            companionStats.querySelector('.health-text').textContent = `${companion.hp}/${companion.maxHp} PV`;
+            companionStats.querySelector('.health-bar-fill').style.width = `${(companion.hp / companion.maxHp) * 100}%`;
+        } else {
+            companionStats.style.display = 'none';
+        }
+    }
+}
+
+function playerAttack() {
+    if (!player || !enemy) return;
+    const damage = Math.max(player.attack - enemy.defense, 0);
+    enemy.hp -= damage;
+    updateBattleLog(`${player.name} inflige ${damage} dégâts à ${enemy.name}.`);
+    checkBattleEnd();
+}
+
+function playerDefend() {
+    player.defending = true;
+    updateBattleLog(`${player.name} se met en position défensive.`);
+    enemyTurn();
+}
+
+function playerUseSpecial() {
+    if (!player || !enemy) return;
+    const energyCost = 20;
+    if (player.energy < energyCost) {
+        updateBattleLog("Pas assez d'énergie pour utiliser une attaque spéciale.");
+        return;
+    }
+    const specialDamage = Math.max(player.attack * 1.5 - enemy.defense, 0);
+    enemy.hp -= specialDamage;
+    player.energy -= energyCost;
+    updateBattleLog(`${player.name} utilise une attaque spéciale et inflige ${specialDamage} dégâts à ${enemy.name}.`);
+    checkBattleEnd();
+}
+
+function playerUseItem() {
+    // Implémenter la logique pour utiliser un objet en combat
+    console.log("Fonction pour utiliser un objet à implémenter");
+}
+
+function enemyTurn() {
+    if (!player || !enemy) return;
+    let damage = Math.max(enemy.attack - player.defense, 0);
+    if (player.defending) {
+        damage = Math.floor(damage / 2);
+        player.defending = false;
+    }
+    player.hp -= damage;
+    updateBattleLog(`${enemy.name} inflige ${damage} dégâts à ${player.name}.`);
+    checkBattleEnd();
+}
+
+function checkBattleEnd() {
+    if (enemy.hp <= 0) {
+        endCombat(true);
+    } else if (player.hp <= 0) {
+        endCombat(false);
+    } else {
+        updateBattleInfo();
+        enemyTurn();
+    }
+}
+
+function endCombat(victory) {
+    if (victory) {
+        const expGain = currentMission.expReward;
+        const goldGain = currentMission.goldReward;
+        player.gainExperience(expGain);
+        player.gold += goldGain;
+        updateBattleLog(`Victoire ! Vous gagnez ${expGain} XP et ${goldGain} or.`);
+        
+        if (Math.random() < dropRates[currentMission.difficulty]) {
+            const droppedItem = getRandomItem();
+            player.inventory.push(droppedItem);
+            updateBattleLog(`Vous avez obtenu : ${droppedItem.name}`);
+        }
+        
+        if (Math.random() < 0.05) { // 5% de chance d'obtenir un compagnon
+            const newCompanion = getRandomCompanion();
+            player.companions.push(newCompanion);
+            updateBattleLog(`Vous avez obtenu un nouveau compagnon : ${newCompanion.name}`);
+        }
+    } else {
+        player.die();
+    }
+    enemy = null;
+    updatePlayerInfo();
+    showGameArea('adventure-menu');
+    console.log("Combat terminé, victoire:", victory);
+}
+
+function updateBattleLog(message) {
+    const battleLog = document.getElementById('battle-log');
+    if (battleLog) {
+        battleLog.innerHTML += `<p>${message}</p>`;
+        battleLog.scrollTop = battleLog.scrollHeight;
+    }
+}
+
+function getRandomItem() {
+    return items[Math.floor(Math.random() * items.length)];
+}
+
+function getRandomCompanion() {
+    const types = ['animal', 'monster', 'slave', 'spirit', 'shinigami'];
+    const type = types[Math.floor(Math.random() * types.length)];
+    const name = getRandomCompanionName(type);
+    return new Character(name, 50, 5, 3); // Simplified companion creation
 }
 
 function startExpedition() {
@@ -285,7 +444,7 @@ function startExpedition() {
         showGameArea('expedition-area');
         return;
     }
-    const expedition = expeditionEvents[Math.floor(Math.random() * expeditionEvents.length)];
+    const expedition = getRandomExpeditionEvent();
     currentExpedition = {
         name: expedition.name,
         duration: expedition.duration,
@@ -364,88 +523,40 @@ function finishExpedition() {
     console.log("Expédition terminée, récompenses attribuées");
 }
 
-function playerAttack() {
-    if (!player || !enemy) return;
-    const damage = Math.max(player.attack - enemy.defense, 0);
-    enemy.hp -= damage;
-    updateBattleLog(`${player.name} inflige ${damage} dégâts à ${enemy.name}.`);
-    checkBattleEnd();
-}
-
-function playerDefend() {
-    player.defending = true;
-    updateBattleLog(`${player.name} se met en position défensive.`);
-    enemyTurn();
-}
-
-function playerUseSpecial() {
-    if (!player || !enemy) return;
-    const specialDamage = Math.max(player.attack * 1.5 - enemy.defense, 0);
-    enemy.hp -= specialDamage;
-    updateBattleLog(`${player.name} utilise une attaque spéciale et inflige ${specialDamage} dégâts à ${enemy.name}.`);
-    checkBattleEnd();
-}
-
-function playerUseItem() {
-    // Implémenter la logique pour utiliser un objet en combat
-    console.log("Fonction pour utiliser un objet à implémenter");
-    // Vous pourriez ouvrir un menu pour choisir un objet à utiliser ici
-}
-
-function enemyTurn() {
-    if (!player || !enemy) return;
-    let damage = Math.max(enemy.attack - player.defense, 0);
-    if (player.defending) {
-        damage = Math.floor(damage / 2);
-        player.defending = false;
-    }
-    player.hp -= damage;
-    updateBattleLog(`${enemy.name} inflige ${damage} dégâts à ${player.name}.`);
-    checkBattleEnd();
-}
-
-function checkBattleEnd() {
-    if (enemy.hp <= 0) {
-        endCombat(true);
-    } else if (player.hp <= 0) {
-        endCombat(false);
-    } else {
-        updateBattleInfo();
+function updateExpeditionDisplay() {
+    const expeditionInfo = document.getElementById('expedition-info');
+    if (expeditionInfo && currentExpedition) {
+        const minutes = Math.floor(currentExpedition.timeRemaining / 60);
+        const seconds = currentExpedition.timeRemaining % 60;
+        expeditionInfo.innerHTML = `
+            Expédition: ${currentExpedition.name}<br>
+            Temps restant: ${minutes}:${seconds.toString().padStart(2, '0')}
+        `;
     }
 }
 
-function endCombat(victory) {
-    if (victory) {
-        player.gainExperience(enemy.level * 10);
-        player.gold += enemy.level * 5;
-        const droppedItem = getRandomItem();
-        if (droppedItem) {
-            player.inventory.push(droppedItem);
-            updateBattleLog(`Vous avez obtenu : ${droppedItem.name}`);
+function updateExpeditionLog(message) {
+    const expeditionLog = document.getElementById('expedition-log');
+    if (expeditionLog) {
+        expeditionLog.innerHTML += `<p>${message}</p>`;
+        expeditionLog.scrollTop = expeditionLog.scrollHeight;
+    }
+}
+
+function updateAdventureMenu() {
+    const currentExpeditionDiv = document.getElementById('current-expedition');
+    if (currentExpeditionDiv) {
+        if (currentExpedition) {
+            const minutes = Math.floor(currentExpedition.timeRemaining / 60);
+            const seconds = currentExpedition.timeRemaining % 60;
+            currentExpeditionDiv.innerHTML = `
+                <p>Expédition en cours : ${currentExpedition.name}</p>
+                <p>Temps restant : ${minutes}:${seconds.toString().padStart(2, '0')}</p>
+            `;
+        } else {
+            currentExpeditionDiv.innerHTML = '';
         }
-        if (Math.random() < 0.1) {
-            const newCompanion = getRandomCompanion();
-            player.companions.push(newCompanion);
-            updateBattleLog(`Vous avez obtenu un nouveau compagnon : ${newCompanion.name}`);
-        }
-    } else {
-        player.die();
     }
-    enemy = null;
-    updatePlayerInfo();
-    showGameArea('adventure-menu');
-    console.log("Combat terminé, victoire:", victory);
-}
-
-function getRandomItem() {
-    return items[Math.floor(Math.random() * items.length)];
-}
-
-function getRandomCompanion() {
-    const types = ['animal', 'monster', 'slave', 'spirit', 'shinigami'];
-    const type = types[Math.floor(Math.random() * types.length)];
-    const name = getRandomCompanionName(type);
-    return new Companion(name, type, 50, 5, 3);
 }
 
 function openInventory() {
@@ -1106,6 +1217,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Fonctions pour rendre accessibles globalement
+window.createCharacter = createCharacter;
 window.useItem = useItem;
 window.equipItem = equipItem;
 window.sellItem = sellItem;
@@ -1115,5 +1227,6 @@ window.playerAttack = playerAttack;
 window.playerDefend = playerDefend;
 window.playerUseSpecial = playerUseSpecial;
 window.playerUseItem = playerUseItem;
+window.startMission = startMission;
 
 console.log("Script game.js chargé");
