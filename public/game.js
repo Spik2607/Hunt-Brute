@@ -738,26 +738,6 @@ function buyItem(itemId) {
     }
 }
 
-function updatePlayerInfo() {
-    if (!player) {
-        console.error("Aucun joueur n'est initialisé");
-        return;
-    }
-    const playerInfo = document.getElementById('player-info');
-    if (!playerInfo) {
-        console.error("L'élément 'player-info' n'a pas été trouvé");
-        return;
-    }
-    playerInfo.innerHTML = `
-        ${player.name} - Niveau ${player.level}<br>
-        PV: ${player.hp}/${player.maxHp}<br>
-        XP: ${player.experience}/${player.level * 100}<br>
-        Or: ${player.gold}<br>
-        Énergie: ${player.energy}/${player.maxEnergy}<br>
-        Attaque: ${player.attack} | Défense: ${player.defense}<br>
-        Ressources: Bois ${player.resources.wood}, Pierre ${player.resources.stone}, Fer ${player.resources.iron}
-    `;
-}
 
 function updateBattleInfo() {
     const playerStats = document.getElementById('player-stats');
