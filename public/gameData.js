@@ -136,7 +136,7 @@ export const companionTypes = [
     { type: 'monster', names: ['Gobelin apprivoisé', 'Petit dragon', 'Golem de pierre'] },
     { type: 'slave', names: ['Écuyer', 'Porteur', 'Archer', 'Esclave'] },
     { type: 'spirit', names: ['Esprit du feu', "Esprit de l'eau", "Esprit de l'air", 'Esprit de la terre'] },
-    { type: 'shinigami', names: ['Faucheur d'âmes', 'Shinigami', 'Ombre'] }
+    { type: 'shinigami', names: ['Faucheur', 'Shinigami', 'Ombre'] }
 ];
 
 // Fonction pour obtenir un nom de compagnon aléatoire
