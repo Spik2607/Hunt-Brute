@@ -45,48 +45,38 @@
                 <div id="mission-list"></div>
             </section>
 
-           <section id="battle-area" class="game-area">
-    <h2>Combat</h2>
-    <div id="combatants">
-        <div id="player-combat-info" class="combatant">
-            <h3></h3>
-            <div class="health-bar">
-                <div class="health-bar-fill"></div>
-                <span class="health-text"></span>
-            </div>
-            <div class="energy-bar">
-                <div class="energy-bar-fill"></div>
-                <span class="energy-text"></span>
-            </div>
-        </div>
-        <div id="companion-combat-info" class="combatant">
-            <h3></h3>
-            <div class="health-bar">
-                <div class="health-bar-fill"></div>
-                <span class="health-text"></span>
-            </div>
-        </div>
-        <div id="enemy-combat-info" class="combatant">
-            <h3></h3>
-            <div class="health-bar">
-                <div class="health-bar-fill"></div>
-                <span class="health-text"></span>
-            </div>
-        </div>
-    </div>
-    <div id="battle-log"></div>
-    <div id="action-buttons">
-        <button onclick="playerAttack()">Attaque normale</button>
-        <button onclick="playerDefend()">Se défendre</button>
-        <button onclick="playerUseSpecial()">Attaque spéciale</button>
-        <button onclick="playerUseItem()">Utiliser un objet</button>
-    </div>
-</section>
-
-<section id="mission-choice" class="game-area">
-    <h2>Choisir une mission</h2>
-    <div id="mission-list"></div>
-</section>
+            <section id="battle-area" class="game-area">
+                <h2>Combat</h2>
+                <div id="combatants">
+                    <div id="player-combat-info" class="combatant">
+                        <h3></h3>
+                        <div class="health-bar">
+                            <div class="health-bar-fill"></div>
+                            <span class="health-text"></span>
+                        </div>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill"></div>
+                            <span class="energy-text"></span>
+                        </div>
+                    </div>
+                    <div id="companion-combat-info" class="combatant">
+                        <h3></h3>
+                        <div class="health-bar">
+                            <div class="health-bar-fill"></div>
+                            <span class="health-text"></span>
+                        </div>
+                    </div>
+                    <div id="enemy-combat-info" class="combatant">
+                        <h3></h3>
+                        <div class="health-bar">
+                            <div class="health-bar-fill"></div>
+                            <span class="health-text"></span>
+                        </div>
+                    </div>
+                </div>
+                <div id="battle-log"></div>
+                <div id="action-buttons"></div>
+            </section>
 
             <section id="expedition-area" class="game-area">
                 <h2>Expédition en cours</h2>
@@ -113,19 +103,18 @@
                 </div>
                 <div id="inventory-items">
                     <h3>Objets en stock</h3>
-                    <!-- Les objets seront ajoutés ici dynamiquement par JavaScript -->
                 </div>
+            </section>
+
+            <section id="shop-area" class="game-area">
+                <h2>Boutique</h2>
+                <div id="shop-items" class="inventory-grid"></div>
             </section>
 
             <section id="companions-area" class="game-area">
                 <h2>Gestion des Compagnons</h2>
                 <div id="companions-list"></div>
                 <div id="active-companion"></div>
-            </section>
-
-            <section id="shop-area" class="game-area">
-                <h2>Boutique</h2>
-                <div id="shop-items"></div>
             </section>
 
             <section id="multiplayer-area" class="game-area">
@@ -170,9 +159,10 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
     <script src="gameData.js" type="module"></script>
     <script src="expedition.js" type="module"></script>
+    <script src="combat.js" type="module"></script>
     <script src="game.js" type="module"></script>
 </body>
 </html>
