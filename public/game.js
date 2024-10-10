@@ -749,7 +749,7 @@ function buyItem(itemId) {
             <button onclick="playerUseItem()">Utiliser un objet</button>
         `;
     }
-}
+
 
 function updateBattleLog(message) {
     const battleLog = document.getElementById('battle-log');
