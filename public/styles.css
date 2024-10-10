@@ -231,8 +231,8 @@ input[type="text"], select {
     width: 100%;
 }
 
-/* Inventaire styles */
-#inventory-area {
+/* Inventory and Shop styles */
+#inventory-area, #shop-area {
     background-color: #f0e6d2;
     padding: 20px;
     border-radius: 8px;
@@ -250,7 +250,7 @@ input[type="text"], select {
     margin-right: 10px;
 }
 
-#inventory-items {
+.inventory-grid, #inventory-items, #shop-items {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 15px;
@@ -259,9 +259,8 @@ input[type="text"], select {
     padding-right: 10px;
 }
 
-.inventory-item {
-    background-color: #2c2c2c;
-    color: #ffffff;
+.inventory-item, .shop-item {
+    background-color: #fff;
     border: 2px solid #4a4a4a;
     border-radius: 5px;
     padding: 10px;
@@ -270,52 +269,55 @@ input[type="text"], select {
     transition: all 0.3s ease;
 }
 
-.inventory-item:hover {
+.inventory-item:hover, .shop-item:hover {
     transform: translateY(-3px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
-.inventory-item-name {
+.inventory-item-name, .shop-item-name {
     font-weight: bold;
     font-size: 1.1em;
     margin-bottom: 5px;
 }
 
-.inventory-item-stats {
+.inventory-item-stats, .shop-item-stats {
     font-size: 0.9em;
-    color: #cccccc;
+    color: #666;
     margin-bottom: 10px;
 }
 
-.inventory-item-buttons {
+.inventory-item-buttons, .shop-item-buttons {
     display: flex;
     justify-content: space-between;
 }
 
-/* Couleurs pour les raretés */
+/* Rarity colors */
 .item-common { border-color: #ffffff; }
 .item-uncommon { border-color: #1eff00; }
 .item-rare { border-color: #0070dd; }
 .item-epic { border-color: #a335ee; }
 .item-legendary { border-color: #ff8000; }
 
-/* Barre de défilement personnalisée */
-#inventory-items::-webkit-scrollbar {
-    width: 10px;
+/* Expedition styles */
+#expedition-area {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
 }
 
-#inventory-items::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 5px;
+#expedition-info {
+    font-size: 1.1em;
+    margin-bottom: 15px;
 }
 
-#inventory-items::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 5px;
-}
-
-#inventory-items::-webkit-scrollbar-thumb:hover {
-    background: #555;
+#expedition-log {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-top: 10px;
+    background-color: #fff;
 }
 
 /* Modal styles */
@@ -385,7 +387,7 @@ input[type="text"], select {
         flex-direction: column;
     }
     
-    #mission-list, #inventory-items {
+    #mission-list, #inventory-items, #shop-items {
         grid-template-columns: 1fr;
     }
     
