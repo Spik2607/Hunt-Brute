@@ -1,5 +1,6 @@
 // combat.js
 import { Character, items, missions, dropRates, getRandomCompanion, getRandomItem, getRandomEnemy } from './gameData.js';
+import { updatePlayerInfo, showGameArea } from './game.js';
 
 let player, enemy, currentMission;
 
@@ -7,10 +8,12 @@ export function initializeCombat(playerCharacter, missionIndex) {
     player = playerCharacter;
     currentMission = missions[missionIndex];
     enemy = getRandomEnemy();
-    enemy.hp *= currentMission.enemyLevel;
+    enemy.maxHp = enemy.hp * currentMission.enemyLevel;
+    enemy.hp = enemy.maxHp;
     enemy.attack *= currentMission.enemyLevel;
     enemy.defense *= currentMission.enemyLevel;
     updateBattleInfo();
+    console.log("Combat initialisé:", { player, enemy, currentMission });
 }
 
 export function updateBattleInfo() {
@@ -33,10 +36,14 @@ export function updateBattleInfo() {
 }
 
 export function playerAttack() {
-    if (!player || !enemy) return;
-    const damage = Math.max(player.attack - enemy.defense, 0);
-    enemy.hp -= damage;
+    if (!player || !enemy) {
+        console.error("Combat non initialisé correctement");
+        return;
+    }
+    const damage = Math.max(player.attack - enemy.defense, 1);
+    enemy.hp = Math.max(enemy.hp - damage, 0);
     updateBattleLog(`${player.name} inflige ${damage} dégâts à ${enemy.name}.`);
+    updateBattleInfo();
     checkBattleEnd();
 }
 
@@ -53,10 +60,11 @@ export function playerUseSpecial() {
         updateBattleLog("Pas assez d'énergie pour utiliser une attaque spéciale.");
         return;
     }
-    const specialDamage = Math.max(player.attack * 1.5 - enemy.defense, 0);
-    enemy.hp -= specialDamage;
+    const specialDamage = Math.max(player.attack * 1.5 - enemy.defense, 1);
+    enemy.hp = Math.max(enemy.hp - specialDamage, 0);
     player.energy -= energyCost;
     updateBattleLog(`${player.name} utilise une attaque spéciale et inflige ${specialDamage} dégâts à ${enemy.name}.`);
+    updateBattleInfo();
     checkBattleEnd();
 }
 
@@ -77,13 +85,14 @@ export function playerUseItem(item) {
 
 function enemyTurn() {
     if (!player || !enemy) return;
-    let damage = Math.max(enemy.attack - player.defense, 0);
+    let damage = Math.max(enemy.attack - player.defense, 1);
     if (player.defending) {
         damage = Math.floor(damage / 2);
         player.defending = false;
     }
-    player.hp -= damage;
+    player.hp = Math.max(player.hp - damage, 0);
     updateBattleLog(`${enemy.name} inflige ${damage} dégâts à ${player.name}.`);
+    updateBattleInfo();
     checkBattleEnd();
 }
 
@@ -93,7 +102,6 @@ function checkBattleEnd() {
     } else if (player.hp <= 0) {
         endCombat(false);
     } else {
-        updateBattleInfo();
         enemyTurn();
     }
 }
@@ -118,70 +126,25 @@ function endCombat(victory) {
             updateBattleLog(`Vous avez obtenu un nouveau compagnon : ${newCompanion.name}`);
         }
     } else {
-        player.die();
+        updateBattleLog("Défaite ! Vous avez perdu le combat.");
+        player.hp = Math.max(player.hp, Math.floor(player.maxHp * 0.1)); // Évite la mort totale
     }
     updatePlayerInfo();
-    showGameArea('adventure-menu');
+    setTimeout(() => showGameArea('adventure-menu'), 2000); // Délai pour lire le résultat
 }
 
 export function updateBattleLog(message) {
     const battleLog = document.getElementById('battle-log');
     if (battleLog) {
-        battleLog.innerHTML += `<p>${message}</p>`;
+        const messageElement = document.createElement('p');
+        messageElement.textContent = message;
+        battleLog.appendChild(messageElement);
         battleLog.scrollTop = battleLog.scrollHeight;
+    } else {
+        console.error("Élément 'battle-log' non trouvé");
     }
 }
 
-// Fonctions pour le combat multijoueur
-export function handleMultiplayerCombatAction(action) {
-    switch(action.type) {
-        case 'attack':
-            playerAttack();
-            break;
-        case 'defend':
-            playerDefend();
-            break;
-        case 'special':
-            playerUseSpecial();
-            break;
-        case 'useItem':
-            playerUseItem(action.item);
-            break;
-        default:
-            console.error("Action de combat non reconnue:", action.type);
-    }
-}
+// Exportez d'autres fonctions si nécessaire
 
-export function getCombatState() {
-    return {
-        player: {
-            hp: player.hp,
-            maxHp: player.maxHp,
-            energy: player.energy,
-            maxEnergy: player.maxEnergy
-        },
-        enemy: {
-            hp: enemy.hp,
-            maxHp: enemy.maxHp
-        }
-    };
-}
-
-export function setCombatState(state) {
-    player.hp = state.player.hp;
-    player.energy = state.player.energy;
-    enemy.hp = state.enemy.hp;
-    updateBattleInfo();
-}
-
-// Fonction pour mettre à jour les informations du joueur (à définir dans game.js)
-function updatePlayerInfo() {
-    // Cette fonction devrait être définie dans game.js et importée ici
-    console.log("Mise à jour des informations du joueur");
-}
-
-// Fonction pour changer la zone de jeu affichée (à définir dans game.js)
-function showGameArea(areaId) {
-    // Cette fonction devrait être définie dans game.js et importée ici
-    console.log("Changement de la zone de jeu vers:", areaId);
-}
+console.log("Module de combat chargé");
