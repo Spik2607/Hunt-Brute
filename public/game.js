@@ -739,23 +739,6 @@ function buyItem(itemId) {
 }
 
 
-function updateBattleInfo() {
-    const playerStats = document.getElementById('player-stats');
-    const enemyStats = document.getElementById('enemy-stats');
-    const companionStats = document.getElementById('companion-stats');
-
-    if (playerStats && player) playerStats.innerHTML = `${player.name}: ${player.hp}/${player.maxHp} PV`;
-    if (enemyStats && enemy) enemyStats.innerHTML = `${enemy.name}: ${enemy.hp}/${enemy.maxHp} PV`;
-    
-    if (companionStats) {
-        if (companion) {
-            companionStats.innerHTML = `${companion.name}: ${companion.hp}/${companion.maxHp} PV`;
-            companionStats.style.display = 'block';
-        } else {
-            companionStats.style.display = 'none';
-        }
-    }
-
     // Mise à jour des boutons d'action en combat
     const actionButtons = document.getElementById('action-buttons');
     if (actionButtons) {
