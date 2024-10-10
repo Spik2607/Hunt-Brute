@@ -945,41 +945,56 @@ function saveGame() {
 function loadGame() {
     const savedState = localStorage.getItem('huntBruteGameState');
     if (savedState) {
-        const gameState = JSON.parse(savedState);
-        player = new Character(
-            gameState.player.name, 
-            gameState.player.maxHp, 
-            gameState.player.attack, 
-            gameState.player.defense
-        );
-        Object.assign(player, gameState.player);
-        
-        if (gameState.companion) {
-            companion = new Companion(
-                gameState.companion.name,
-                gameState.companion.type,
-                gameState.companion.maxHp,
-                gameState.companion.attack,
-                gameState.companion.defense
+        try {
+            const gameState = JSON.parse(savedState);
+            
+            // Recréer le joueur
+            player = new Character(
+                gameState.player.name, 
+                gameState.player.maxHp, 
+                gameState.player.attack, 
+                gameState.player.defense,
+                gameState.player.energy
             );
-            Object.assign(companion, gameState.companion);
+            Object.assign(player, gameState.player);
+            
+            // Recréer le compagnon si existant
+            if (gameState.companion) {
+                companion = new Character(
+                    gameState.companion.name,
+                    gameState.companion.maxHp,
+                    gameState.companion.attack,
+                    gameState.companion.defense,
+                    gameState.companion.energy
+                );
+                Object.assign(companion, gameState.companion);
+            } else {
+                companion = null;
+            }
+            
+            // Restaurer l'état de la mission et de l'expédition
+            currentMission = gameState.currentMission;
+            currentExpedition = gameState.currentExpedition;
+            
+            // Mettre à jour l'interface utilisateur
+            updatePlayerInfo();
+            if (currentExpedition) {
+                updateExpeditionDisplay();
+            }
+            
+            // Afficher le menu d'aventure
+            showGameArea('adventure-menu');
+            
+            console.log('Partie chargée avec succès:', gameState);
+            alert('Partie chargée avec succès !');
+        } catch (error) {
+            console.error('Erreur lors du chargement de la partie:', error);
+            alert('Erreur lors du chargement de la partie. Veuillez réessayer.');
         }
-        
-        currentMission = gameState.currentMission;
-        currentExpedition = gameState.currentExpedition;
-        
-        updatePlayerInfo();
-        if (currentExpedition) {
-            updateExpeditionDisplay();
-        }
-        showGameArea('adventure-menu');
-        alert('Partie chargée avec succès !');
-        console.log('Partie chargée:', player);
     } else {
         alert('Aucune sauvegarde trouvée.');
     }
 }
-
 function updateCompanionInfo() {
     const activeCompanion = document.getElementById('active-companion');
     if (activeCompanion) {
