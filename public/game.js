@@ -1,6 +1,7 @@
 // game.js
 import { items, missions, dropRates, getRandomCompanionName, getItemStats, enemies } from './gameData.js';
 import { expeditionEvents, getRandomExpeditionEvent } from './expedition.js';
+import { initializeCombat, startMission, endCombat, updateBattleInfo, updateBattleLog } from './combat.js';
 
 let player = null;
 let enemy = null;
@@ -149,6 +150,69 @@ function initGame() {
     }, 1000);
 }
 
+function initializeSocket() {
+    socket = io();
+
+    socket.on('connect', () => {
+        console.log('Connecté au serveur');
+    });
+
+    socket.on('roomJoined', ({ roomId, players, messages }) => {
+        currentRoom = roomId;
+        updateWaitingAreaDisplay(players);
+        messages.forEach(displayChatMessage);
+    });
+
+    socket.on('playerJoined', (players) => {
+        updateWaitingAreaDisplay(players);
+    });
+
+    socket.on('gameReady', (players) => {
+        console.log('La partie peut commencer', players);
+        // Implémenter la logique pour démarrer le jeu
+    });
+
+    socket.on('roomError', (message) => {
+        alert(message);
+    });
+
+    socket.on('newMessage', (message) => {
+        displayChatMessage(message);
+    });
+
+    socket.on('challengeReceived', handleChallengeReceived);
+
+    socket.on('battleStart', startMultiplayerBattle);
+
+    socket.on('opponentAction', handleOpponentAction);
+
+    socket.on('tradeRequestReceived', handleTradeRequest);
+
+    socket.on('tradeStart', startTradeSession);
+
+    socket.on('itemOffered', ({ fromId, itemId }) => {
+        console.log(`Joueur ${fromId} offre l'objet ${itemId}`);
+    });
+
+    socket.on('tradeConfirmed', ({ playerId }) => {
+        console.log(`Échange confirmé par le joueur ${playerId}`);
+    });
+
+    socket.on('tradeCancelled', ({ playerId }) => {
+        console.log(`Échange annulé par le joueur ${playerId}`);
+        closeTradeInterface();
+    });
+
+    socket.on('playerLeft', (playerId) => {
+        console.log(`Le joueur ${playerId} a quitté la salle`);
+    });
+
+   socket.on('disconnect', () => {
+        console.log('Déconnecté du serveur');
+        // Gérer la déconnexion (par exemple, revenir au menu principal)
+    });
+}
+
 function showCreateHunterButton() {
     const mainMenu = document.getElementById('main-menu');
     const createHunterButton = document.createElement('button');
@@ -286,142 +350,7 @@ function chooseMission() {
     showGameArea('mission-choice');
 }
 
-function startMission(index) {
-    currentMission = missions[index];
-    const enemyType = enemies[Math.floor(Math.random() * enemies.length)];
-    enemy = new Character(
-        enemyType.name,
-        enemyType.hp * currentMission.enemyLevel,
-        enemyType.attack * currentMission.enemyLevel,
-        enemyType.defense * currentMission.enemyLevel
-    );
-    showGameArea('battle-area');
-    updateBattleInfo();
-    console.log("Mission commencée:", currentMission);
-}
-
-function updateBattleInfo() {
-    const playerStats = document.getElementById('player-combat-info');
-    const enemyStats = document.getElementById('enemy-combat-info');
-    const companionStats = document.getElementById('companion-combat-info');
-
-    if (playerStats && player) {
-        playerStats.querySelector('h3').textContent = player.name;
-        playerStats.querySelector('.health-text').textContent = `${player.hp}/${player.maxHp} PV`;
-        playerStats.querySelector('.health-bar-fill').style.width = `${(player.hp / player.maxHp) * 100}%`;
-        playerStats.querySelector('.energy-text').textContent = `${player.energy}/${player.maxEnergy} Énergie`;
-        playerStats.querySelector('.energy-bar-fill').style.width = `${(player.energy / player.maxEnergy) * 100}%`;
-    }
-    
-    if (enemyStats && enemy) {
-        enemyStats.querySelector('h3').textContent = enemy.name;
-        enemyStats.querySelector('.health-text').textContent = `${enemy.hp}/${enemy.maxHp} PV`;
-        enemyStats.querySelector('.health-bar-fill').style.width = `${(enemy.hp / enemy.maxHp) * 100}%`;
-    }
-    
-    if (companionStats) {
-        if (companion) {
-            companionStats.style.display = 'block';
-            companionStats.querySelector('h3').textContent = companion.name;
-            companionStats.querySelector('.health-text').textContent = `${companion.hp}/${companion.maxHp} PV`;
-            companionStats.querySelector('.health-bar-fill').style.width = `${(companion.hp / companion.maxHp) * 100}%`;
-        } else {
-            companionStats.style.display = 'none';
-        }
-    }
-}
-
-function playerAttack() {
-    if (!player || !enemy) return;
-    const damage = Math.max(player.attack - enemy.defense, 0);
-    enemy.hp -= damage;
-    updateBattleLog(`${player.name} inflige ${damage} dégâts à ${enemy.name}.`);
-    checkBattleEnd();
-}
-
-function playerDefend() {
-    player.defending = true;
-    updateBattleLog(`${player.name} se met en position défensive.`);
-    enemyTurn();
-}
-
-function playerUseSpecial() {
-    if (!player || !enemy) return;
-    const energyCost = 20;
-    if (player.energy < energyCost) {
-        updateBattleLog("Pas assez d'énergie pour utiliser une attaque spéciale.");
-        return;
-    }
-    const specialDamage = Math.max(player.attack * 1.5 - enemy.defense, 0);
-    enemy.hp -= specialDamage;
-    player.energy -= energyCost;
-    updateBattleLog(`${player.name} utilise une attaque spéciale et inflige ${specialDamage} dégâts à ${enemy.name}.`);
-    checkBattleEnd();
-}
-
-function playerUseItem() {
-    // Implémenter la logique pour utiliser un objet en combat
-    console.log("Fonction pour utiliser un objet à implémenter");
-}
-
-function enemyTurn() {
-    if (!player || !enemy) return;
-    let damage = Math.max(enemy.attack - player.defense, 0);
-    if (player.defending) {
-        damage = Math.floor(damage / 2);
-        player.defending = false;
-    }
-    player.hp -= damage;
-    updateBattleLog(`${enemy.name} inflige ${damage} dégâts à ${player.name}.`);
-    checkBattleEnd();
-}
-
-function checkBattleEnd() {
-    if (enemy.hp <= 0) {
-        endCombat(true);
-    } else if (player.hp <= 0) {
-        endCombat(false);
-    } else {
-        updateBattleInfo();
-        enemyTurn();
-    }
-}
-
-function endCombat(victory) {
-    if (victory) {
-        const expGain = currentMission.expReward;
-        const goldGain = currentMission.goldReward;
-        player.gainExperience(expGain);
-        player.gold += goldGain;
-        updateBattleLog(`Victoire ! Vous gagnez ${expGain} XP et ${goldGain} or.`);
-        
-        if (Math.random() < dropRates[currentMission.difficulty]) {
-            const droppedItem = getRandomItem();
-            player.inventory.push(droppedItem);
-            updateBattleLog(`Vous avez obtenu : ${droppedItem.name}`);
-        }
-        
-        if (Math.random() < 0.05) { // 5% de chance d'obtenir un compagnon
-            const newCompanion = getRandomCompanion();
-            player.companions.push(newCompanion);
-            updateBattleLog(`Vous avez obtenu un nouveau compagnon : ${newCompanion.name}`);
-        }
-    } else {
-        player.die();
-    }
-    enemy = null;
-    updatePlayerInfo();
-    showGameArea('adventure-menu');
-    console.log("Combat terminé, victoire:", victory);
-}
-
-function updateBattleLog(message) {
-    const battleLog = document.getElementById('battle-log');
-    if (battleLog) {
-        battleLog.innerHTML += `<p>${message}</p>`;
-        battleLog.scrollTop = battleLog.scrollHeight;
-    }
-}
+// Les fonctions liées au combat ont été déplacées dans combat.js
 
 function getRandomItem() {
     return items[Math.floor(Math.random() * items.length)];
@@ -570,7 +499,6 @@ function openInventory() {
         return;
     }
 
-    // Créer la structure de l'inventaire
     inventoryArea.innerHTML = `
         <h2>Inventaire</h2>
         <div id="equipped-items">
@@ -584,7 +512,14 @@ function openInventory() {
         </div>
     `;
 
-    // Afficher l'équipement porté
+    updateEquippedItems();
+    updateInventoryItems();
+
+    showGameArea('inventory-area');
+    console.log("Inventaire ouvert");
+}
+
+function updateEquippedItems() {
     const equippedWeapon = document.getElementById('equipped-weapon');
     const equippedArmor = document.getElementById('equipped-armor');
     const equippedAccessory = document.getElementById('equipped-accessory');
@@ -606,18 +541,17 @@ function openInventory() {
     } else {
         equippedAccessory.innerHTML = '<p>Aucun accessoire équipé</p>';
     }
+}
 
-    // Afficher les objets en stock
+function updateInventoryItems() {
     const inventoryItems = document.getElementById('inventory-items');
+    inventoryItems.innerHTML = '';
     player.inventory.forEach((item, index) => {
         const itemElement = document.createElement('div');
         itemElement.className = 'inventory-item';
         itemElement.innerHTML = createItemHTML(item, index, false);
         inventoryItems.appendChild(itemElement);
     });
-
-    showGameArea('inventory-area');
-    console.log("Inventaire ouvert");
 }
 
 function createItemHTML(item, index, isEquipped) {
@@ -631,17 +565,17 @@ function createItemHTML(item, index, isEquipped) {
 
     const itemColor = rarityColors[item.rarity] || '#ffffff';
 
-    return `
+   return `
         <div class="item ${isEquipped ? 'equipped-item' : ''}" style="color: ${itemColor}; ${isEquipped ? 'font-weight: bold;' : ''}">
             <span>${item.name}</span>
             <div class="item-stats">${getItemStats(item)}</div>
             ${item.type === 'consumable' 
-                ? `<button onclick="window.useItem(${index})">Utiliser</button>`
+                ? `<button onclick="useItem(${index})">Utiliser</button>`
                 : isEquipped
-                    ? `<button onclick="window.unequipItem('${item.type}')">Déséquiper</button>`
-                    : `<button onclick="window.equipItem(${index})">Équiper</button>`
+                    ? `<button onclick="unequipItem('${item.type}')">Déséquiper</button>`
+                    : `<button onclick="equipItem(${index})">Équiper</button>`
             }
-            ${!isEquipped ? `<button onclick="window.sellItem(${index})">Vendre</button>` : ''}
+            ${!isEquipped ? `<button onclick="sellItem(${index})">Vendre</button>` : ''}
         </div>
     `;
 }
@@ -664,16 +598,6 @@ function useItem(index) {
     }
 }
 
-function unequipItem(slot) {
-    const item = player.equippedItems[slot];
-    if (item) {
-        player.unequipItem(item);
-        player.inventory.push(item);
-        updatePlayerInfo();
-        openInventory();
-    }
-}
-
 function equipItem(index) {
     if (!player || !player.inventory[index]) return;
     const item = player.inventory[index];
@@ -683,6 +607,16 @@ function equipItem(index) {
         updatePlayerInfo();
         openInventory();
         console.log("Objet équipé:", item);
+    }
+}
+
+function unequipItem(slot) {
+    const item = player.equippedItems[slot];
+    if (item) {
+        player.unequipItem(item);
+        player.inventory.push(item);
+        updatePlayerInfo();
+        openInventory();
     }
 }
 
@@ -710,7 +644,7 @@ function openShop() {
         itemElement.className = 'shop-item';
         itemElement.innerHTML = `
             <span>${item.name} - ${item.cost} or</span>
-            <button onclick="window.buyItem('${item.id}')">Acheter</button>
+            <button onclick="buyItem('${item.id}')">Acheter</button>
         `;
         shopItems.appendChild(itemElement);
     });
@@ -738,19 +672,6 @@ function buyItem(itemId) {
     }
 }
 
-
-    // Mise à jour des boutons d'action en combat
-    const actionButtons = document.getElementById('action-buttons');
-    if (actionButtons) {
-        actionButtons.innerHTML = `
-            <button onclick="playerAttack()">Attaque normale</button>
-            <button onclick="playerDefend()">Se défendre</button>
-            <button onclick="playerUseSpecial()">Attaque spéciale</button>
-            <button onclick="playerUseItem()">Utiliser un objet</button>
-        `;
-    }
-
-// Fonctions pour le mode multijoueur
 function startMultiplayerMode() {
     showGameArea('multiplayer-area');
     console.log("Mode multijoueur activé");
@@ -889,34 +810,6 @@ function offerTradeItem(index) {
     socket.emit('offerTradeItem', { roomId: currentRoom, itemId: item.id });
 }
 
-function handleItemTraded({ fromId, toId, item }) {
-    if (fromId === socket.id) {
-        const itemIndex = player.inventory.findIndex(i => i.id === item.id);
-        if (itemIndex !== -1) {
-            player.inventory.splice(itemIndex, 1);
-        }
-    } else {
-        player.inventory.push(item);
-    }
-    updateInventoryDisplay();
-    updateTradeInterface();
-}
-
-function updateTradeInterface() {
-    const playerTradeItems = document.getElementById('player-trade-items');
-    if (playerTradeItems) {
-        playerTradeItems.innerHTML = '';
-        player.inventory.forEach((item, index) => {
-            const itemElement = document.createElement('div');
-            itemElement.innerHTML = `
-                <span>${item.name}</span>
-                <button onclick="offerTradeItem(${index})">Offrir</button>
-            `;
-            playerTradeItems.appendChild(itemElement);
-        });
-    }
-}
-
 function confirmTrade() {
     socket.emit('confirmTrade', { roomId: currentRoom });
     closeTradeInterface();
@@ -931,27 +824,6 @@ function closeTradeInterface() {
     const tradeInterface = document.getElementById('trade-interface');
     if (tradeInterface) {
         tradeInterface.remove();
-    }
-}
-
-function handleOpponentAction(action) {
-    if (action.type === 'attack') {
-        player.hp -= action.damage;
-        updateBattleLog(`L'adversaire vous inflige ${action.damage} dégâts.`);
-        checkGameOver();
-        updateBattleInfo();
-    }
-    // Gérer d'autres types d'actions si nécessaire
-}
-
-function checkGameOver() {
-    if (player.hp <= 0) {
-        alert("Game Over! Votre personnage est mort.");
-        player = null;
-        companion = null;
-        currentMission = null;
-        currentExpedition = null;
-        showGameArea('main-menu');
     }
 }
 
@@ -977,7 +849,6 @@ function loadGame() {
         try {
             const gameState = JSON.parse(savedState);
             
-            // Recréer le joueur
             player = new Character(
                 gameState.player.name, 
                 gameState.player.maxHp, 
@@ -987,7 +858,6 @@ function loadGame() {
             );
             Object.assign(player, gameState.player);
             
-            // Recréer le compagnon si existant
             if (gameState.companion) {
                 companion = new Character(
                     gameState.companion.name,
@@ -1001,17 +871,14 @@ function loadGame() {
                 companion = null;
             }
             
-            // Restaurer l'état de la mission et de l'expédition
             currentMission = gameState.currentMission;
             currentExpedition = gameState.currentExpedition;
             
-            // Mettre à jour l'interface utilisateur
             updatePlayerInfo();
             if (currentExpedition) {
                 updateExpeditionDisplay();
             }
             
-            // Afficher le menu d'aventure
             showGameArea('adventure-menu');
             
             console.log('Partie chargée avec succès:', gameState);
@@ -1024,110 +891,11 @@ function loadGame() {
         alert('Aucune sauvegarde trouvée.');
     }
 }
-function updateCompanionInfo() {
-    const activeCompanion = document.getElementById('active-companion');
-    if (activeCompanion) {
-        if (companion) {
-            activeCompanion.innerHTML = `
-                Compagnon actif : ${companion.name} (${companion.type})<br>
-                PV : ${companion.hp}/${companion.maxHp}<br>
-                Attaque : ${companion.attack} | Défense : ${companion.defense}
-            `;
-        } else {
-            activeCompanion.innerHTML = 'Aucun compagnon actif';
-        }
-    }
-}
-
-function openCompanionsMenu() {
-    if (!player) {
-        console.error("Aucun joueur n'est initialisé");
-        return;
-    }
-    const companionsList = document.getElementById('companions-list');
-    if (!companionsList) {
-        console.error("L'élément 'companions-list' n'a pas été trouvé");
-        return;
-    }
-    companionsList.innerHTML = '';
-    player.companions.forEach((comp, index) => {
-        const compElement = document.createElement('div');
-        compElement.textContent = `${comp.name} (${comp.type})`;
-        const selectButton = document.createElement('button');
-        selectButton.textContent = 'Sélectionner';
-        selectButton.onclick = () => selectCompanion(index);
-        compElement.appendChild(selectButton);
-        companionsList.appendChild(compElement);
-    });
-    showGameArea('companions-area');
-    console.log("Menu des compagnons ouvert");
-}
-
-function selectCompanion(index) {
-    if (!player || !player.companions[index]) {
-        console.error("Joueur non initialisé ou compagnon non trouvé");
-        return;
-    }
-    companion = player.companions[index];
-    updateCompanionInfo();
-    showGameArea('adventure-menu');
-    console.log("Compagnon sélectionné:", companion);
-}
-
-function showLevelUpModal() {
-    const modal = document.getElementById('level-up-modal');
-    const newLevelSpan = document.getElementById('new-level');
-    const skillPointsSpan = document.getElementById('skill-points');
-    if (modal && newLevelSpan && skillPointsSpan) {
-        newLevelSpan.textContent = player.level;
-        skillPointsSpan.textContent = player.skillPoints;
-        modal.style.display = 'block';
-        document.getElementById('strength-skill').textContent = player.skills.strength;
-        document.getElementById('agility-skill').textContent = player.skills.agility;
-        document.getElementById('intelligence-skill').textContent = player.skills.intelligence;
-    }
-}
-
-function distributeSkillPoint(skill) {
-    if (player.skillPoints > 0) {
-        player.skills[skill]++;
-        player.skillPoints--;
-        document.getElementById(`${skill}-skill`).textContent = player.skills[skill];
-        document.getElementById('skill-points').textContent = player.skillPoints;
-    }
-    if (player.skillPoints === 0) {
-        document.getElementById('confirm-level-up').disabled = false;
-    }
-}
-
-function confirmLevelUp() {
-    player.applySkills();
-    document.getElementById('level-up-modal').style.display = 'none';
-    updatePlayerInfo();
-}
-
-function initializeMultiplayerChat() {
-    const chatInput = document.getElementById('chat-input');
-    const sendButton = document.getElementById('send-message');
-
-    if (chatInput && sendButton) {
-        sendButton.addEventListener('click', sendChatMessage);
-        chatInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                sendChatMessage();
-            }
-        });
-    } else {
-        console.warn("Les éléments de chat n'ont pas été trouvés. Le chat peut ne pas fonctionner correctement.");
-    }
-}
 
 // Initialisation du jeu
 document.addEventListener('DOMContentLoaded', () => {
     initGame();
-    initializeMultiplayerChat();
     
-    // Ajout des gestionnaires d'événements pour la distribution des points de compétence
     document.getElementById('strength-button').addEventListener('click', () => distributeSkillPoint('strength'));
     document.getElementById('agility-button').addEventListener('click', () => distributeSkillPoint('agility'));
     document.getElementById('intelligence-button').addEventListener('click', () => distributeSkillPoint('intelligence'));
