@@ -1,24 +1,16 @@
 // combat.js
-
-import { updatePlayerInfo, showGameArea, getRandomItem, getRandomCompanion } from './game.js';
-import { missions, dropRates } from './gameData.js';
+import { Character, items, missions, dropRates, getRandomCompanion, getRandomItem, getRandomEnemy } from './gameData.js';
 
 let player, enemy, currentMission;
 
 export function initializeCombat(playerCharacter, missionIndex) {
     player = playerCharacter;
     currentMission = missions[missionIndex];
-    const enemyType = currentMission.enemyType;
-    enemy = {
-        name: enemyType.name,
-        hp: enemyType.hp * currentMission.enemyLevel,
-        maxHp: enemyType.hp * currentMission.enemyLevel,
-        attack: enemyType.attack * currentMission.enemyLevel,
-        defense: enemyType.defense * currentMission.enemyLevel
-    };
+    enemy = getRandomEnemy();
+    enemy.hp *= currentMission.enemyLevel;
+    enemy.attack *= currentMission.enemyLevel;
+    enemy.defense *= currentMission.enemyLevel;
     updateBattleInfo();
-    showGameArea('battle-area');
-    console.log("Combat initialisé:", currentMission);
 }
 
 export function updateBattleInfo() {
@@ -130,7 +122,6 @@ function endCombat(victory) {
     }
     updatePlayerInfo();
     showGameArea('adventure-menu');
-    console.log("Combat terminé, victoire:", victory);
 }
 
 export function updateBattleLog(message) {
@@ -141,7 +132,7 @@ export function updateBattleLog(message) {
     }
 }
 
-// Fonction pour gérer les actions de combat en multijoueur
+// Fonctions pour le combat multijoueur
 export function handleMultiplayerCombatAction(action) {
     switch(action.type) {
         case 'attack':
@@ -181,4 +172,16 @@ export function setCombatState(state) {
     player.energy = state.player.energy;
     enemy.hp = state.enemy.hp;
     updateBattleInfo();
+}
+
+// Fonction pour mettre à jour les informations du joueur (à définir dans game.js)
+function updatePlayerInfo() {
+    // Cette fonction devrait être définie dans game.js et importée ici
+    console.log("Mise à jour des informations du joueur");
+}
+
+// Fonction pour changer la zone de jeu affichée (à définir dans game.js)
+function showGameArea(areaId) {
+    // Cette fonction devrait être définie dans game.js et importée ici
+    console.log("Changement de la zone de jeu vers:", areaId);
 }
