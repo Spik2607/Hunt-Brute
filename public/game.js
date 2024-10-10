@@ -1,13 +1,12 @@
 // game.js
 import { items, missions, dropRates, getRandomCompanionName, getItemStats, enemies } from './gameData.js';
 import { expeditionEvents, getRandomExpeditionEvent } from './expedition.js';
-import { initializeCombat, startMission, endCombat, updateBattleInfo, updateBattleLog } from './combat.js';
+import { initializeCombat, playerAttack, playerDefend, playerUseSpecial, updateBattleInfo, updateBattleLog } from './combat.js';
 
 let player = null;
-let enemy = null;
+let companion = null;
 let currentMission = null;
 let currentExpedition = null;
-let companion = null;
 let socket;
 let currentRoom = null;
 
@@ -169,7 +168,6 @@ function initializeSocket() {
 
     socket.on('gameReady', (players) => {
         console.log('La partie peut commencer', players);
-        // Implémenter la logique pour démarrer le jeu
     });
 
     socket.on('roomError', (message) => {
@@ -207,9 +205,8 @@ function initializeSocket() {
         console.log(`Le joueur ${playerId} a quitté la salle`);
     });
 
-   socket.on('disconnect', () => {
+    socket.on('disconnect', () => {
         console.log('Déconnecté du serveur');
-        // Gérer la déconnexion (par exemple, revenir au menu principal)
     });
 }
 
@@ -283,6 +280,13 @@ function setupEventListeners() {
             console.warn(`Élément avec l'id '${id}' non trouvé.`);
         }
     });
+
+    // Combat event listeners
+    document.getElementById('attack-button').addEventListener('click', playerAttack);
+    document.getElementById('defend-button').addEventListener('click', playerDefend);
+    document.getElementById('special-button').addEventListener('click', playerUseSpecial);
+    // L'utilisation d'objets nécessite une logique supplémentaire
+    // document.getElementById('use-item-button').addEventListener('click', handleUseItem);
 }
 
 function showGameArea(areaId) {
@@ -350,17 +354,11 @@ function chooseMission() {
     showGameArea('mission-choice');
 }
 
-// Les fonctions liées au combat ont été déplacées dans combat.js
-
-function getRandomItem() {
-    return items[Math.floor(Math.random() * items.length)];
-}
-
-function getRandomCompanion() {
-    const types = ['animal', 'monster', 'slave', 'spirit', 'shinigami'];
-    const type = types[Math.floor(Math.random() * types.length)];
-    const name = getRandomCompanionName(type);
-    return new Character(name, 50, 5, 3); // Simplified companion creation
+function startMission(index) {
+    currentMission = missions[index];
+    initializeCombat(player, index);
+    showGameArea('battle-area');
+    console.log("Mission commencée:", currentMission);
 }
 
 function startExpedition() {
@@ -565,7 +563,7 @@ function createItemHTML(item, index, isEquipped) {
 
     const itemColor = rarityColors[item.rarity] || '#ffffff';
 
-   return `
+    return `
         <div class="item ${isEquipped ? 'equipped-item' : ''}" style="color: ${itemColor}; ${isEquipped ? 'font-weight: bold;' : ''}">
             <span>${item.name}</span>
             <div class="item-stats">${getItemStats(item)}</div>
@@ -610,8 +608,8 @@ function equipItem(index) {
     }
 }
 
-function unequipItem(slot) {
-    const item = player.equippedItems[slot];
+function unequipItem(type) {
+    const item = player.equippedItems[type];
     if (item) {
         player.unequipItem(item);
         player.inventory.push(item);
@@ -738,9 +736,8 @@ function handleChallengeReceived({ challengerId }) {
 function startMultiplayerBattle({ challengerId, accepterId }) {
     const opponent = getOpponentInfo(challengerId === socket.id ? accepterId : challengerId);
     if (opponent) {
-        enemy = new Character(opponent.name, opponent.hp, opponent.attack, opponent.defense);
+        initializeCombat(player, -1, opponent); // -1 indique un combat multijoueur
         showGameArea('battle-area');
-        updateBattleInfo();
         console.log("Combat multijoueur commencé entre", challengerId, "et", accepterId);
     } else {
         console.error("Impossible de trouver les informations de l'adversaire");
@@ -753,14 +750,22 @@ function getOpponentInfo(opponentId) {
     return {
         name: "Adversaire",
         hp: 100,
+        maxHp: 100,
         attack: 10,
         defense: 5
     };
 }
 
+function handleOpponentAction(action) {
+    // Cette fonction devrait être implémentée dans combat.js
+    // et appelée ici pour gérer les actions de l'adversaire en multijoueur
+    console.log("Action de l'adversaire:", action);
+    // Exemple : updateBattleInfo();
+}
+
 function requestTrade() {
     if (currentRoom) {
-        const otherPlayerId = socket.id; // À remplacer par l'ID réel de l'autre joueur
+        const otherPlayerId = getOtherPlayerId(); // Implémenter cette fonction
         socket.emit('initiateTradeRequest', { roomId: currentRoom, fromId: socket.id, toId: otherPlayerId });
     }
 }
@@ -892,6 +897,38 @@ function loadGame() {
     }
 }
 
+function distributeSkillPoint(skill) {
+    if (player.skillPoints > 0) {
+        player.skills[skill]++;
+        player.skillPoints--;
+        document.getElementById(`${skill}-skill`).textContent = player.skills[skill];
+        document.getElementById('skill-points').textContent = player.skillPoints;
+    }
+    if (player.skillPoints === 0) {
+        document.getElementById('confirm-level-up').disabled = false;
+    }
+}
+
+function confirmLevelUp() {
+    player.applySkills();
+    document.getElementById('level-up-modal').style.display = 'none';
+    updatePlayerInfo();
+}
+
+function showLevelUpModal() {
+    const modal = document.getElementById('level-up-modal');
+    const newLevelSpan = document.getElementById('new-level');
+    const skillPointsSpan = document.getElementById('skill-points');
+    if (modal && newLevelSpan && skillPointsSpan) {
+        newLevelSpan.textContent = player.level;
+        skillPointsSpan.textContent = player.skillPoints;
+        modal.style.display = 'block';
+        document.getElementById('strength-skill').textContent = player.skills.strength;
+        document.getElementById('agility-skill').textContent = player.skills.agility;
+        document.getElementById('intelligence-skill').textContent = player.skills.intelligence;
+    }
+}
+
 // Initialisation du jeu
 document.addEventListener('DOMContentLoaded', () => {
     initGame();
@@ -906,13 +943,24 @@ document.addEventListener('DOMContentLoaded', () => {
 window.createCharacter = createCharacter;
 window.useItem = useItem;
 window.equipItem = equipItem;
+window.unequipItem = unequipItem;
 window.sellItem = sellItem;
 window.buyItem = buyItem;
 window.offerTradeItem = offerTradeItem;
 window.playerAttack = playerAttack;
 window.playerDefend = playerDefend;
 window.playerUseSpecial = playerUseSpecial;
-window.playerUseItem = playerUseItem;
 window.startMission = startMission;
+
+// Exports pour l'utilisation dans d'autres modules
+export {
+    player,
+    companion,
+    currentMission,
+    currentExpedition,
+    updatePlayerInfo,
+    showGameArea,
+    updateBattleLog
+};
 
 console.log("Script game.js chargé");
