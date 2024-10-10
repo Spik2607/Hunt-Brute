@@ -832,6 +832,41 @@ function closeTradeInterface() {
     }
 }
 
+function openCompanionsMenu() {
+    if (!player) {
+        console.error("Aucun joueur n'est initialisé");
+        return;
+    }
+    const companionsList = document.getElementById('companions-list');
+    if (!companionsList) {
+        console.error("L'élément 'companions-list' n'a pas été trouvé");
+        return;
+    }
+    companionsList.innerHTML = '';
+    player.companions.forEach((comp, index) => {
+        const compElement = document.createElement('div');
+        compElement.textContent = `${comp.name} (${comp.type})`;
+        const selectButton = document.createElement('button');
+        selectButton.textContent = 'Sélectionner';
+        selectButton.onclick = () => selectCompanion(index);
+        compElement.appendChild(selectButton);
+        companionsList.appendChild(compElement);
+    });
+    showGameArea('companions-area');
+    console.log("Menu des compagnons ouvert");
+}
+
+function selectCompanion(index) {
+    if (!player || !player.companions[index]) {
+        console.error("Joueur non initialisé ou compagnon non trouvé");
+        return;
+    }
+    companion = player.companions[index];
+    updateCompanionInfo();
+    showGameArea('adventure-menu');
+    console.log("Compagnon sélectionné:", companion);
+}
+
 function saveGame() {
     if (!player) {
         alert("Aucun personnage à sauvegarder.");
