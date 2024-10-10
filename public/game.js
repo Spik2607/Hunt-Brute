@@ -750,51 +750,6 @@ function buyItem(itemId) {
         `;
     }
 
-
-function updateBattleLog(message) {
-    const battleLog = document.getElementById('battle-log');
-    if (battleLog) {
-        battleLog.innerHTML += `<p>${message}</p>`;
-        battleLog.scrollTop = battleLog.scrollHeight;
-    }
-}
-
-function updateExpeditionDisplay() {
-    const expeditionInfo = document.getElementById('expedition-info');
-    if (expeditionInfo && currentExpedition) {
-        const minutes = Math.floor(currentExpedition.timeRemaining / 60);
-        const seconds = currentExpedition.timeRemaining % 60;
-        expeditionInfo.innerHTML = `
-            Expédition: ${currentExpedition.name}<br>
-            Temps restant: ${minutes}:${seconds.toString().padStart(2, '0')}
-        `;
-    }
-}
-
-function updateExpeditionLog(message) {
-    const expeditionLog = document.getElementById('expedition-log');
-    if (expeditionLog) {
-        expeditionLog.innerHTML += `<p>${message}</p>`;
-        expeditionLog.scrollTop = expeditionLog.scrollHeight;
-    }
-}
-
-function updateAdventureMenu() {
-    const currentExpeditionDiv = document.getElementById('current-expedition');
-    if (currentExpeditionDiv) {
-        if (currentExpedition) {
-            const minutes = Math.floor(currentExpedition.timeRemaining / 60);
-            const seconds = currentExpedition.timeRemaining % 60;
-            currentExpeditionDiv.innerHTML = `
-                <p>Expédition en cours : ${currentExpedition.name}</p>
-                <p>Temps restant : ${minutes}:${seconds.toString().padStart(2, '0')}</p>
-            `;
-        } else {
-            currentExpeditionDiv.innerHTML = '';
-        }
-    }
-}
-
 // Fonctions pour le mode multijoueur
 function startMultiplayerMode() {
     showGameArea('multiplayer-area');
