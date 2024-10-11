@@ -84,7 +84,11 @@ function initGame() {
     console.log("Initializing game...");
     initializeSocket();
     setupEventListeners();
-    showCreateHunterButton();
+    if (!player) {
+        showCreateHunterButton();
+    } else {
+        showGameArea('adventure-menu');
+    }
     setInterval(() => {
         if (player) {
             player.regenerateHP();
@@ -158,20 +162,17 @@ function initializeSocket() {
 }
 
 function showCreateHunterButton() {
-    const mainMenu = document.getElementById('main-menu');
+    const gameContent = document.getElementById('game-content');
+    gameContent.innerHTML = ''; // Efface tout le contenu existant
     const createHunterButton = document.createElement('button');
     createHunterButton.id = 'create-hunter-button';
     createHunterButton.textContent = 'Créer un Hunter';
     createHunterButton.addEventListener('click', showCharacterCreationArea);
-    mainMenu.appendChild(createHunterButton);
+    gameContent.appendChild(createHunterButton);
 }
 
 function showCharacterCreationArea() {
     showGameArea('character-creation');
-    const createHunterButton = document.getElementById('create-hunter-button');
-    if (createHunterButton) {
-        createHunterButton.style.display = 'none';
-    }
 }
 
 function createCharacter() {
@@ -189,11 +190,6 @@ function createCharacter() {
     updatePlayerInfo();
     showGameArea('adventure-menu');
     console.log("Personnage créé:", player);
-    
-    const createHunterButton = document.getElementById('create-hunter-button');
-    if (createHunterButton) {
-        createHunterButton.style.display = 'none';
-    }
 }
 
 function setupEventListeners() {
@@ -232,8 +228,6 @@ function setupEventListeners() {
     document.getElementById('attack-button').addEventListener('click', playerAttack);
     document.getElementById('defend-button').addEventListener('click', playerDefend);
     document.getElementById('special-button').addEventListener('click', playerUseSpecial);
-    // L'utilisation d'objets nécessite une logique supplémentaire
-    // document.getElementById('use-item-button').addEventListener('click', handleUseItem);
 }
 
 function showGameArea(areaId) {
@@ -247,11 +241,6 @@ function showGameArea(areaId) {
             area.style.display = 'none';
         }
     });
-
-    const createHunterButton = document.getElementById('create-hunter-button');
-    if (createHunterButton) {
-        createHunterButton.style.display = player ? 'none' : 'block';
-    }
 }
 
 function updatePlayerInfo() {
@@ -320,6 +309,78 @@ function selectEnemyForMission(mission) {
     } else {
         return enemies[0];
     }
+}
+
+function updateBattleInfo() {
+    const playerStats = document.getElementById('player-combat-info');
+    const enemyStats = document.getElementById('enemy-combat-info');
+    const companionStats = document.getElementById('companion-combat-info');
+
+    if (playerStats && player) {
+        playerStats.querySelector('h3').textContent = player.name;
+        playerStats.querySelector('h3').style.color = 'blue';
+        playerStats.querySelector('.health-text').textContent = `${player.hp}/${player.maxHp} PV`;
+        playerStats.querySelector('.health-bar-fill').style.width = `${(player.hp / player.maxHp) * 100}%`;
+        playerStats.querySelector('.energy-text').textContent = `${player.energy}/${player.maxEnergy} Énergie`;
+        playerStats.querySelector('.energy-bar-fill').style.width = `${(player.energy / player.maxEnergy) * 100}%`;
+    }
+    
+    if (enemyStats && enemy) {
+        enemyStats.querySelector('h3').textContent = enemy.name;
+        enemyStats.querySelector('h3').style.color = 'red';
+        enemyStats.querySelector('.health-text').textContent = `${enemy.hp}/${enemy.maxHp} PV`;
+        enemyStats.querySelector('.health-bar-fill').style.width = `${(enemy.hp / enemy.maxHp) * 100}%`;
+    }
+
+    if (companionStats && companion) {
+        companionStats.style.display = 'block';
+        companionStats.querySelector('h3').textContent = companion.name;
+        companionStats.querySelector('h3').style.color = 'green';
+        companionStats.querySelector('.health-text').textContent = `${companion.hp}/${companion.maxHp} PV`;
+        companionStats.querySelector('.health-bar-fill').style.width = `${(companion.hp / companion.maxHp) * 100}%`;
+    } else if (companionStats) {
+        companionStats.style.display = 'none';
+    }
+}
+
+function checkBattleEnd() {
+    if (enemy.hp <= 0) {
+        updateBattleLog(`Vous avez vaincu ${enemy.name}!`);
+        endCombat(true);
+    } else if (player.hp <= 0) {
+        updateBattleLog(`Vous avez été vaincu par ${enemy.name}.`);
+        endCombat(false);
+    }
+
+    function endCombat(victory) {
+    if (victory) {
+        const expGain = currentMission.expReward;
+        const goldGain = currentMission.goldReward;
+        player.gainExperience(expGain);
+        player.gold += goldGain;
+        updateBattleLog(`Victoire ! Vous gagnez ${expGain} XP et ${goldGain} or.`);
+        
+        if (Math.random() < dropRates[currentMission.difficulty]) {
+            const droppedItem = getRandomItem();
+            player.inventory.push(droppedItem);
+            updateBattleLog(`Vous avez obtenu : ${droppedItem.name}`);
+        }
+        
+        if (Math.random() < 0.05) { // 5% de chance d'obtenir un compagnon
+            const newCompanion = getRandomCompanion();
+            player.companions.push(newCompanion);
+            updateBattleLog(`Vous avez obtenu un nouveau compagnon : ${newCompanion.name}`);
+        }
+    } else {
+        updateBattleLog("Défaite ! Vous avez perdu le combat.");
+        player.hp = Math.max(player.hp, Math.floor(player.maxHp * 0.1)); // Évite la mort totale
+    }
+    updatePlayerInfo();
+    setTimeout(() => {
+        showGameArea('adventure-menu');
+        currentMission = null;
+        enemy = null;
+    }, 2000); // Délai pour lire le résultat
 }
 
 function startExpedition() {
@@ -758,7 +819,7 @@ function showTradeInterface() {
     document.body.appendChild(tradeInterface);
 
     const playerTradeItems = document.getElementById('player-trade-items');
-   player.inventory.forEach((item, index) => {
+    player.inventory.forEach((item, index) => {
         const itemElement = document.createElement('div');
         itemElement.innerHTML = `
             <span>${item.name}</span>
@@ -943,14 +1004,7 @@ function showLevelUpModal() {
 }
 
 // Initialisation du jeu
-document.addEventListener('DOMContentLoaded', () => {
-    initGame();
-    
-    document.getElementById('strength-button').addEventListener('click', () => distributeSkillPoint('strength'));
-    document.getElementById('agility-button').addEventListener('click', () => distributeSkillPoint('agility'));
-    document.getElementById('intelligence-button').addEventListener('click', () => distributeSkillPoint('intelligence'));
-    document.getElementById('confirm-level-up').addEventListener('click', confirmLevelUp);
-});
+document.addEventListener('DOMContentLoaded', initGame);
 
 // Fonctions pour rendre accessibles globalement
 window.createCharacter = createCharacter;
