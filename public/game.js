@@ -12,34 +12,6 @@ let currentRoom = null;
 
 const FIXED_ROOM = 'fixed-room';
 
-class Character {
-    constructor(name, hp, attack, defense, energy = 100) {
-        this.name = name;
-        this.level = 1;
-        this.maxHp = hp;
-        this.hp = hp;
-        this.attack = attack;
-        this.defense = defense;
-        this.experience = 0;
-        this.gold = 0;
-        this.inventory = [];
-        this.equippedItems = {
-            weapon: null,
-            armor: null,
-            accessory: null
-        };
-        this.energy = energy;
-        this.maxEnergy = energy;
-        this.resources = { wood: 0, stone: 0, iron: 0 };
-        this.companions = [];
-        this.skillPoints = 0;
-        this.skills = {
-            strength: 0,
-            agility: 0,
-            intelligence: 0
-        };
-        this.statusEffects = [];
-    }
 
     levelUp() {
         this.level++;
