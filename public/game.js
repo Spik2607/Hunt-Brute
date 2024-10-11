@@ -989,6 +989,16 @@ window.playerUseSpecial = playerUseSpecial;
 window.startMission = startMission;
 
 // Exports pour l'utilisation dans d'autres modules
-export { player, companion, currentMission, currentExpedition, showGameArea, updateBattleLog, skills, statusEffects, itemEffects };
+export {
+    player,
+    companion,
+    currentMission,
+    currentExpedition,
+    updatePlayerInfo,
+    showGameArea,
+    skills,
+    statusEffects,
+    itemEffects
+};
 
 console.log("Script game.js chargé");
