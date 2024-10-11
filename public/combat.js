@@ -1,17 +1,20 @@
 // combat.js
-import { Character, items, missions, dropRates, getRandomCompanion, getRandomItem, getRandomEnemy } from './gameData.js';
+import { Character, items, missions, dropRates, getRandomCompanion, getRandomItem } from './gameData.js';
 import { updatePlayerInfo, showGameArea } from './game.js';
 
 let player, enemy, currentMission;
 
-export function initializeCombat(playerCharacter, missionIndex) {
+export function initializeCombat(playerCharacter, missionIndex, chosenEnemy) {
     player = playerCharacter;
     currentMission = missions[missionIndex];
-    enemy = getRandomEnemy();
+    enemy = chosenEnemy;
+    
+    // Ajuster les statistiques de l'ennemi en fonction du niveau de la mission
     enemy.maxHp = enemy.hp * currentMission.enemyLevel;
     enemy.hp = enemy.maxHp;
     enemy.attack *= currentMission.enemyLevel;
     enemy.defense *= currentMission.enemyLevel;
+    
     updateBattleInfo();
     console.log("Combat initialisé:", { player, enemy, currentMission });
 }
@@ -102,7 +105,9 @@ function checkBattleEnd() {
     } else if (player.hp <= 0) {
         endCombat(false);
     } else {
-        enemyTurn();
+        setTimeout(() => {
+            enemyTurn();
+        }, 1000);
     }
 }
 
@@ -144,7 +149,5 @@ export function updateBattleLog(message) {
         console.error("Élément 'battle-log' non trouvé");
     }
 }
-
-// Exportez d'autres fonctions si nécessaire
 
 console.log("Module de combat chargé");
