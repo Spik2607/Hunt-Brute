@@ -1,6 +1,5 @@
 // gameData.js
 
-// Définition de la classe Character
 export class Character {
     constructor(name, hp, attack, defense, energy = 100) {
         this.name = name;
@@ -9,8 +8,6 @@ export class Character {
         this.hp = hp;
         this.attack = attack;
         this.defense = defense;
-        this.energy = energy;
-        this.maxEnergy = energy;
         this.experience = 0;
         this.gold = 0;
         this.inventory = [];
@@ -19,6 +16,8 @@ export class Character {
             armor: null,
             accessory: null
         };
+        this.energy = energy;
+        this.maxEnergy = energy;
         this.resources = { wood: 0, stone: 0, iron: 0 };
         this.companions = [];
         this.skillPoints = 0;
@@ -30,7 +29,6 @@ export class Character {
     }
 }
 
-// Liste des items du jeu
 export const items = [
     // Armes
     { id: 'sword', name: 'Épée en fer', type: 'weapon', attack: 5, cost: 50, rarity: 'common' },
@@ -52,7 +50,7 @@ export const items = [
     { id: 'cloakOfInvisibility', name: "Cape d'invisibilité", type: 'accessory', effect: 'stealth', cost: 200, rarity: 'legendary' },
 
     // Consommables
-    { id: 'potion', name: 'Potion de soin', type: 'consumable', effect: 'heal', value: 30, cost: 20, rarity: 'common' },
+    { id: 'healingPotion', name: 'Potion de soin', type: 'consumable', effect: 'heal', value: 30, cost: 20, rarity: 'common' },
     { id: 'energyDrink', name: 'Boisson énergisante', type: 'consumable', effect: 'energy', value: 50, cost: 25, rarity: 'common' },
     { id: 'elixirOfVitality', name: 'Élixir de vitalité', type: 'consumable', effect: 'heal', value: 100, cost: 100, rarity: 'rare' },
     { id: 'manaPotion', name: 'Potion de mana', type: 'consumable', effect: 'mana', value: 40, cost: 30, rarity: 'common' },
@@ -63,7 +61,43 @@ export const items = [
     { id: 'orbOfFrost', name: 'Orbe de givre', type: 'special', effect: 'freeze', freezeDuration: 3, cost: 150, rarity: 'rare' },
 ];
 
-// Fonction pour obtenir les statistiques d'un item
+export const missions = [
+    { name: "Éliminer des gobelins", enemyLevel: 1, goldReward: 15, expReward: 20, difficulty: 'Facile' },
+    { name: "Chasser un loup géant", enemyLevel: 2, goldReward: 30, expReward: 40, difficulty: 'Moyenne' },
+    { name: "Vaincre un bandit", enemyLevel: 3, goldReward: 50, expReward: 60, difficulty: 'Moyenne' },
+    { name: "Affronter un ogre", enemyLevel: 4, goldReward: 80, expReward: 90, difficulty: 'Difficile' },
+    { name: "Explorer une grotte hantée", enemyLevel: 5, goldReward: 120, expReward: 130, difficulty: 'Difficile' },
+    { name: "Combattre un dragon", enemyLevel: 7, goldReward: 200, expReward: 250, difficulty: 'Très Difficile' },
+    { name: "Infiltrer un repaire de bandits", enemyLevel: 6, goldReward: 150, expReward: 180, difficulty: 'Difficile' },
+    { name: "Chasser un troll des montagnes", enemyLevel: 8, goldReward: 250, expReward: 300, difficulty: 'Très Difficile' }
+];
+
+export const dropRates = {
+    'Facile': 0.1,
+    'Moyenne': 0.15,
+    'Difficile': 0.2,
+    'Très Difficile': 0.25,
+};
+
+export const enemies = [
+    { name: "Gobelin", level: 1, hp: 30, attack: 5, defense: 2 },
+    { name: "Loup géant", level: 2, hp: 50, attack: 8, defense: 3 },
+    { name: "Bandit", level: 3, hp: 70, attack: 10, defense: 5 },
+    { name: "Ogre", level: 4, hp: 100, attack: 15, defense: 8 },
+    { name: "Fantôme", level: 5, hp: 80, attack: 12, defense: 10 },
+    { name: "Dragon", level: 7, hp: 200, attack: 25, defense: 15 },
+    { name: "Troll", level: 6, hp: 150, attack: 20, defense: 12 },
+    { name: "Sorcier maléfique", level: 5, hp: 120, attack: 18, defense: 10 }
+];
+
+export const companionTypes = [
+    { type: 'animal', names: ['Loup', 'Ours', 'Aigle', 'Panthère', 'Tigre', 'Serpent'] },
+    { type: 'monster', names: ['Gobelin apprivoisé', 'Petit dragon', 'Golem de pierre'] },
+    { type: 'slave', names: ['Écuyer', 'Porteur', 'Archer', 'Esclave'] },
+    { type: 'spirit', names: ['Esprit du feu', "Esprit de l'eau", "Esprit de l'air", 'Esprit de la terre'] },
+    { type: 'shinigami', names: ['Faucheur', 'Shinigami', 'Ombre'] }
+];
+
 export function getItemStats(item) {
     let stats = `${item.name} (${item.type}) :`;
     
@@ -98,48 +132,6 @@ export function getItemStats(item) {
     return stats;
 }
 
-// Liste des missions disponibles
-export const missions = [
-    { name: "Éliminer des gobelins", enemyLevel: 1, goldReward: 15, expReward: 20, difficulty: 'Facile' },
-    { name: "Chasser un loup géant", enemyLevel: 2, goldReward: 30, expReward: 40, difficulty: 'Moyenne' },
-    { name: "Vaincre un bandit", enemyLevel: 3, goldReward: 50, expReward: 60, difficulty: 'Moyenne' },
-    { name: "Affronter un ogre", enemyLevel: 4, goldReward: 80, expReward: 90, difficulty: 'Difficile' },
-    { name: "Explorer une grotte hantée", enemyLevel: 5, goldReward: 120, expReward: 130, difficulty: 'Difficile' },
-    { name: "Combattre un dragon", enemyLevel: 7, goldReward: 200, expReward: 250, difficulty: 'Très Difficile' },
-    { name: "Infiltrer un repaire de bandits", enemyLevel: 6, goldReward: 150, expReward: 180, difficulty: 'Difficile' },
-    { name: "Chasser un troll des montagnes", enemyLevel: 8, goldReward: 250, expReward: 300, difficulty: 'Très Difficile' }
-];
-
-// Taux de drop pour différentes difficultés
-export const dropRates = {
-    'Facile': 0.1,
-    'Moyenne': 0.15,
-    'Difficile': 0.2,
-    'Très Difficile': 0.25,
-};
-
-// Liste des ennemis
-export const enemies = [
-    { name: "Gobelin", hp: 30, attack: 5, defense: 2 },
-    { name: "Loup géant", hp: 50, attack: 8, defense: 3 },
-    { name: "Bandit", hp: 70, attack: 10, defense: 5 },
-    { name: "Ogre", hp: 100, attack: 15, defense: 8 },
-    { name: "Fantôme", hp: 80, attack: 12, defense: 10 },
-    { name: "Dragon", hp: 200, attack: 25, defense: 15 },
-    { name: "Troll", hp: 150, attack: 20, defense: 12 },
-    { name: "Sorcier maléfique", hp: 120, attack: 18, defense: 10 }
-];
-
-// Types de compagnons et leurs noms possibles
-export const companionTypes = [
-    { type: 'animal', names: ['Loup', 'Ours', 'Aigle', 'Panthère', 'Tigre', 'Serpent'] },
-    { type: 'monster', names: ['Gobelin apprivoisé', 'Petit dragon', 'Golem de pierre'] },
-    { type: 'slave', names: ['Écuyer', 'Porteur', 'Archer', 'Esclave'] },
-    { type: 'spirit', names: ['Esprit du feu', "Esprit de l'eau", "Esprit de l'air", 'Esprit de la terre'] },
-    { type: 'shinigami', names: ['Faucheur', 'Shinigami', 'Ombre'] }
-];
-
-// Fonction pour obtenir un nom de compagnon aléatoire
 export function getRandomCompanionName(type) {
     const typeData = companionTypes.find(t => t.type === type);
     if (typeData) {
@@ -148,7 +140,6 @@ export function getRandomCompanionName(type) {
     return 'Compagnon inconnu';
 }
 
-// Fonction pour créer un compagnon aléatoire
 export function getRandomCompanion() {
     const types = ['animal', 'monster', 'slave', 'spirit', 'shinigami'];
     const type = types[Math.floor(Math.random() * types.length)];
@@ -156,24 +147,20 @@ export function getRandomCompanion() {
     return new Character(name, 50, 5, 3, 50); // Nom, HP, Attaque, Défense, Énergie
 }
 
-// Fonction pour obtenir un item aléatoire
 export function getRandomItem() {
     return items[Math.floor(Math.random() * items.length)];
 }
 
-// Fonction utilitaire pour obtenir un élément aléatoire d'un tableau
 export function getRandomElement(array) {
     return array[Math.floor(Math.random() * array.length)];
 }
 
-// Fonction pour obtenir un ennemi aléatoire
 export function getRandomEnemy() {
     return getRandomElement(enemies);
 }
 
-// Fonction pour obtenir une mission aléatoire
 export function getRandomMission() {
     return getRandomElement(missions);
 }
 
-// Ajoutez d'autres fonctions utilitaires si nécessaire
+console.log("Module gameData chargé");
