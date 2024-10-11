@@ -1,5 +1,5 @@
 // game.js
-import { Character, items, missions, dropRates, getRandomCompanion, getRandomItem, enemies } from './gameData.js';
+import { Character, items, missions, dropRates, getRandomCompanion, getRandomItem, enemies, getItemStats } from './gameData.js';
 import { expeditionEvents, getRandomExpeditionEvent } from './expedition.js';
 import { initializeCombat, playerAttack, playerDefend, playerUseSpecial, updateBattleInfo, updateBattleLog } from './combat.js';
 
@@ -11,157 +11,6 @@ let socket;
 let currentRoom = null;
 
 const FIXED_ROOM = 'fixed-room';
-
-
-    levelUp() {
-        this.level++;
-        this.maxHp += 10;
-        this.hp = this.maxHp;
-        this.attack += 2;
-        this.defense += 1;
-        this.experience = this.experience - (this.level - 1) * 100;
-        this.energy = this.maxEnergy;
-        this.skillPoints += 3;
-        showLevelUpModal();
-    }
-
-    gainExperience(amount) {
-        this.experience += amount;
-        while (this.experience >= this.level * 100) {
-            this.levelUp();
-        }
-        updatePlayerInfo();
-    }
-
-    die() {
-        this.experience = 0;
-        this.hp = this.maxHp / 2;
-        const lostItems = Math.floor(Math.random() * 3);
-        for (let i = 0; i < lostItems; i++) {
-            if (this.inventory.length > 0) {
-                const index = Math.floor(Math.random() * this.inventory.length);
-                this.inventory.splice(index, 1);
-            }
-        }
-        updatePlayerInfo();
-        alert("Vous êtes mort ! Vous avez perdu toute votre expérience et quelques objets.");
-    }
-
-    regenerateHP() {
-        if (this.hp < this.maxHp) {
-            this.hp = Math.min(this.hp + 1, this.maxHp);
-            updatePlayerInfo();
-        }
-    }
-
-    regenerateEnergy() {
-        if (this.energy < this.maxEnergy) {
-            this.energy = Math.min(this.energy + 5, this.maxEnergy);
-            updatePlayerInfo();
-        }
-    }
-
-    equipItem(item) {
-        if (item.type === 'weapon' || item.type === 'armor' || item.type === 'accessory') {
-            const currentEquipped = this.equippedItems[item.type];
-            if (currentEquipped) {
-                this.inventory.push(currentEquipped);
-                this.unequipItem(currentEquipped);
-            }
-            this.equippedItems[item.type] = item;
-            this.applyItemEffects(item);
-        }
-    }
-
-    unequipItem(item) {
-        if (item.type === 'weapon' || item.type === 'armor' || item.type === 'accessory') {
-            this.equippedItems[item.type] = null;
-            this.removeItemEffects(item);
-        }
-    }
-
-    applyItemEffects(item) {
-        if (item.attack) this.attack += item.attack;
-        if (item.defense) this.defense += item.defense;
-        if (item.maxHp) {
-            this.maxHp += item.maxHp;
-            this.hp += item.maxHp;
-        }
-    }
-
-    removeItemEffects(item) {
-        if (item.attack) this.attack -= item.attack;
-        if (item.defense) this.defense -= item.defense;
-        if (item.maxHp) {
-            this.maxHp -= item.maxHp;
-            this.hp = Math.min(this.hp, this.maxHp);
-        }
-    }
-
-    applySkills() {
-        this.attack += this.skills.strength;
-        this.defense += Math.floor(this.skills.agility / 2);
-        this.maxHp += this.skills.intelligence * 5;
-        this.hp = this.maxHp;
-    }
-
-    useSkill(skillName, target) {
-        const skill = skills[skillName];
-        if (!skill || this.energy < skill.energyCost) {
-            console.log("Impossible d'utiliser cette compétence");
-            return false;
-        }
-        
-        this.energy -= skill.energyCost;
-        
-        if (skill.type === "offensive") {
-            const damage = skill.damage(this);
-            target.hp -= damage;
-            console.log(`${this.name} utilise ${skill.name} et inflige ${damage} dégâts à ${target.name}`);
-        } else if (skill.type === "defensive") {
-            skill.effect(this);
-            console.log(`${this.name} utilise ${skill.name}`);
-        }
-        
-        return true;
-    }
-
-    applyStatusEffect(effectName) {
-        const effect = statusEffects[effectName];
-        if (effect) {
-            this.statusEffects.push({...effect, remainingDuration: effect.duration});
-            console.log(`${this.name} subit l'effet ${effect.name}`);
-        }
-    }
-
-    handleStatusEffects() {
-        if (this.statusEffects.length > 0) {
-            this.statusEffects.forEach(effect => {
-                effect.effect(this);
-                effect.remainingDuration--;
-            });
-            this.statusEffects = this.statusEffects.filter(effect => effect.remainingDuration > 0);
-        }
-    }
-
-    useItem(itemName) {
-        const itemIndex = this.inventory.findIndex(item => item.name === itemName);
-        if (itemIndex === -1) {
-            console.log("Cet objet n'est pas dans l'inventaire");
-            return false;
-        }
-        
-        const item = this.inventory[itemIndex];
-        if (itemEffects[item.id]) {
-            itemEffects[item.id](this);
-            this.inventory.splice(itemIndex, 1);
-            return true;
-        } else {
-            console.log("Cet objet n'a pas d'effet défini");
-            return false;
-        }
-    }
-}
 
 const skills = {
     fireballSpell: {
@@ -909,7 +758,7 @@ function showTradeInterface() {
     document.body.appendChild(tradeInterface);
 
     const playerTradeItems = document.getElementById('player-trade-items');
-    player.inventory.forEach((item, index) => {
+   player.inventory.forEach((item, index) => {
         const itemElement = document.createElement('div');
         itemElement.innerHTML = `
             <span>${item.name}</span>
@@ -979,6 +828,22 @@ function selectCompanion(index) {
     console.log("Compagnon sélectionné:", companion);
 }
 
+function updateCompanionInfo() {
+    const activeCompanionDiv = document.getElementById('active-companion');
+    if (activeCompanionDiv && companion) {
+        activeCompanionDiv.innerHTML = `
+            <h3>Compagnon actif</h3>
+            <p>Nom: ${companion.name}</p>
+            <p>Type: ${companion.type}</p>
+            <p>PV: ${companion.hp}/${companion.maxHp}</p>
+            <p>Attaque: ${companion.attack}</p>
+            <p>Défense: ${companion.defense}</p>
+        `;
+    } else if (activeCompanionDiv) {
+        activeCompanionDiv.innerHTML = '<p>Aucun compagnon actif</p>';
+    }
+}
+
 function saveGame() {
     if (!player) {
         alert("Aucun personnage à sauvegarder.");
@@ -1027,6 +892,7 @@ function loadGame() {
             currentExpedition = gameState.currentExpedition;
             
             updatePlayerInfo();
+            updateCompanionInfo();
             if (currentExpedition) {
                 updateExpeditionDisplay();
             }
@@ -1107,7 +973,10 @@ export {
     currentExpedition,
     updatePlayerInfo,
     showGameArea,
-    updateBattleLog
+    updateBattleLog,
+    skills,
+    statusEffects,
+    itemEffects
 };
 
 console.log("Script game.js chargé");
