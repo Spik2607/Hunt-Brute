@@ -311,37 +311,6 @@ function selectEnemyForMission(mission) {
     }
 }
 
-function updateBattleInfo() {
-    const playerStats = document.getElementById('player-combat-info');
-    const enemyStats = document.getElementById('enemy-combat-info');
-    const companionStats = document.getElementById('companion-combat-info');
-
-    if (playerStats && player) {
-        playerStats.querySelector('h3').textContent = player.name;
-        playerStats.querySelector('h3').style.color = 'blue';
-        playerStats.querySelector('.health-text').textContent = `${player.hp}/${player.maxHp} PV`;
-        playerStats.querySelector('.health-bar-fill').style.width = `${(player.hp / player.maxHp) * 100}%`;
-        playerStats.querySelector('.energy-text').textContent = `${player.energy}/${player.maxEnergy} Énergie`;
-        playerStats.querySelector('.energy-bar-fill').style.width = `${(player.energy / player.maxEnergy) * 100}%`;
-    }
-    
-    if (enemyStats && enemy) {
-        enemyStats.querySelector('h3').textContent = enemy.name;
-        enemyStats.querySelector('h3').style.color = 'red';
-        enemyStats.querySelector('.health-text').textContent = `${enemy.hp}/${enemy.maxHp} PV`;
-        enemyStats.querySelector('.health-bar-fill').style.width = `${(enemy.hp / enemy.maxHp) * 100}%`;
-    }
-
-    if (companionStats && companion) {
-        companionStats.style.display = 'block';
-        companionStats.querySelector('h3').textContent = companion.name;
-        companionStats.querySelector('h3').style.color = 'green';
-        companionStats.querySelector('.health-text').textContent = `${companion.hp}/${companion.maxHp} PV`;
-        companionStats.querySelector('.health-bar-fill').style.width = `${(companion.hp / companion.maxHp) * 100}%`;
-    } else if (companionStats) {
-        companionStats.style.display = 'none';
-    }
-}
 
 function checkBattleEnd() {
     if (enemy.hp <= 0) {
