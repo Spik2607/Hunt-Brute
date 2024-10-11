@@ -1,5 +1,5 @@
 // game.js
-import { items, missions, dropRates, getRandomCompanionName, getItemStats, enemies } from './gameData.js';
+import { Character, items, missions, dropRates, getRandomCompanion, getRandomItem, enemies } from './gameData.js';
 import { expeditionEvents, getRandomExpeditionEvent } from './expedition.js';
 import { initializeCombat, playerAttack, playerDefend, playerUseSpecial, updateBattleInfo, updateBattleLog } from './combat.js';
 
@@ -38,6 +38,7 @@ class Character {
             agility: 0,
             intelligence: 0
         };
+        this.statusEffects = [];
     }
 
     levelUp() {
@@ -131,7 +132,132 @@ class Character {
         this.maxHp += this.skills.intelligence * 5;
         this.hp = this.maxHp;
     }
+
+    useSkill(skillName, target) {
+        const skill = skills[skillName];
+        if (!skill || this.energy < skill.energyCost) {
+            console.log("Impossible d'utiliser cette compétence");
+            return false;
+        }
+        
+        this.energy -= skill.energyCost;
+        
+        if (skill.type === "offensive") {
+            const damage = skill.damage(this);
+            target.hp -= damage;
+            console.log(`${this.name} utilise ${skill.name} et inflige ${damage} dégâts à ${target.name}`);
+        } else if (skill.type === "defensive") {
+            skill.effect(this);
+            console.log(`${this.name} utilise ${skill.name}`);
+        }
+        
+        return true;
+    }
+
+    applyStatusEffect(effectName) {
+        const effect = statusEffects[effectName];
+        if (effect) {
+            this.statusEffects.push({...effect, remainingDuration: effect.duration});
+            console.log(`${this.name} subit l'effet ${effect.name}`);
+        }
+    }
+
+    handleStatusEffects() {
+        if (this.statusEffects.length > 0) {
+            this.statusEffects.forEach(effect => {
+                effect.effect(this);
+                effect.remainingDuration--;
+            });
+            this.statusEffects = this.statusEffects.filter(effect => effect.remainingDuration > 0);
+        }
+    }
+
+    useItem(itemName) {
+        const itemIndex = this.inventory.findIndex(item => item.name === itemName);
+        if (itemIndex === -1) {
+            console.log("Cet objet n'est pas dans l'inventaire");
+            return false;
+        }
+        
+        const item = this.inventory[itemIndex];
+        if (itemEffects[item.id]) {
+            itemEffects[item.id](this);
+            this.inventory.splice(itemIndex, 1);
+            return true;
+        } else {
+            console.log("Cet objet n'a pas d'effet défini");
+            return false;
+        }
+    }
 }
+
+const skills = {
+    fireballSpell: {
+        name: "Boule de feu",
+        type: "offensive",
+        energyCost: 30,
+        damage: (player) => player.skills.intelligence * 2,
+        description: "Lance une boule de feu sur l'ennemi"
+    },
+    powerStrike: {
+        name: "Frappe puissante",
+        type: "offensive",
+        energyCost: 25,
+        damage: (player) => player.skills.strength * 1.5,
+        description: "Une attaque physique puissante"
+    },
+    magicBarrier: {
+        name: "Barrière magique",
+        type: "defensive",
+        energyCost: 40,
+        effect: (player) => { player.defense += player.skills.intelligence; },
+        duration: 3,
+        description: "Crée une barrière magique qui augmente la défense"
+    },
+    quickReflexes: {
+        name: "Réflexes rapides",
+        type: "defensive",
+        energyCost: 20,
+        effect: (player) => { player.evasion = 0.3; },
+        duration: 2,
+        description: "Augmente temporairement les chances d'esquiver les attaques"
+    }
+};
+
+const statusEffects = {
+    burn: {
+        name: "Brûlure",
+        effect: (character) => { character.hp -= character.maxHp * 0.05; },
+        duration: 3
+    },
+    poison: {
+        name: "Poison",
+        effect: (character) => { character.hp -= 10; },
+        duration: 5
+    },
+    stun: {
+        name: "Étourdissement",
+        effect: (character) => { character.canAct = false; },
+        duration: 1
+    }
+};
+
+const itemEffects = {
+    healingPotion: (character) => {
+        const healAmount = character.maxHp * 0.3;
+        character.hp = Math.min(character.hp + healAmount, character.maxHp);
+        console.log(`${character.name} se soigne de ${healAmount} PV`);
+    },
+    energyElixir: (character) => {
+        const energyAmount = character.maxEnergy * 0.5;
+        character.energy = Math.min(character.energy + energyAmount, character.maxEnergy);
+        console.log(`${character.name} récupère ${energyAmount} points d'énergie`);
+    },
+    strengthBoost: (character) => {
+        character.attack *= 1.5;
+        console.log(`L'attaque de ${character.name} augmente temporairement`);
+    }
+};
 
 function initGame() {
     console.log("Initializing game...");
@@ -356,9 +482,23 @@ function chooseMission() {
 
 function startMission(index) {
     currentMission = missions[index];
-    initializeCombat(player, index);
+    const chosenEnemy = selectEnemyForMission(currentMission);
+    initializeCombat(player, index, chosenEnemy);
     showGameArea('battle-area');
     console.log("Mission commencée:", currentMission);
+}
+
+function selectEnemyForMission(mission) {
+    const suitableEnemies = enemies.filter(enemy => 
+        enemy.level >= mission.enemyLevel - 1 && 
+        enemy.level <= mission.enemyLevel + 1
+    );
+    
+    if (suitableEnemies.length > 0) {
+        return suitableEnemies[Math.floor(Math.random() * suitableEnemies.length)];
+    } else {
+        return enemies[0];
+    }
 }
 
 function startExpedition() {
