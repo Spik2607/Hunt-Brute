@@ -1,13 +1,11 @@
 // combat.js
-import { Character, items, missions, dropRates, getRandomCompanion, getRandomItem } from './gameData.js';
-import { updatePlayerInfo, showGameArea } from './game.js';
 
 let player, enemy, currentMission;
 
 export function initializeCombat(playerCharacter, missionIndex, chosenEnemy) {
     player = playerCharacter;
-    currentMission = missions[missionIndex];
     enemy = chosenEnemy;
+    currentMission = missionIndex;
     
     // Ajuster les statistiques de l'ennemi en fonction du niveau de la mission
     enemy.maxHp = enemy.hp * currentMission.enemyLevel;
@@ -40,12 +38,12 @@ export function updateBattleInfo() {
         enemyStats.querySelector('.health-bar-fill').style.width = `${(enemy.hp / enemy.maxHp) * 100}%`;
     }
 
-    if (companionStats && companion) {
+    if (companionStats && player.companion) {
         companionStats.style.display = 'block';
-        companionStats.querySelector('h3').textContent = companion.name;
+        companionStats.querySelector('h3').textContent = player.companion.name;
         companionStats.querySelector('h3').style.color = 'green';
-        companionStats.querySelector('.health-text').textContent = `${companion.hp}/${companion.maxHp} PV`;
-        companionStats.querySelector('.health-bar-fill').style.width = `${(companion.hp / companion.maxHp) * 100}%`;
+        companionStats.querySelector('.health-text').textContent = `${player.companion.hp}/${player.companion.maxHp} PV`;
+        companionStats.querySelector('.health-bar-fill').style.width = `${(player.companion.hp / player.companion.maxHp) * 100}%`;
     } else if (companionStats) {
         companionStats.style.display = 'none';
     }
@@ -84,21 +82,6 @@ export function playerUseSpecial() {
     checkBattleEnd();
 }
 
-export function playerUseItem(item) {
-    if (item.type === 'consumable') {
-        if (item.effect === 'heal') {
-            const healAmount = item.value;
-            player.hp = Math.min(player.hp + healAmount, player.maxHp);
-            updateBattleLog(`${player.name} utilise ${item.name} et récupère ${healAmount} PV.`);
-        } else if (item.effect === 'energy') {
-            player.energy = Math.min(player.energy + item.value, player.maxEnergy);
-            updateBattleLog(`${player.name} utilise ${item.name} et récupère ${item.value} points d'énergie.`);
-        }
-        updateBattleInfo();
-        enemyTurn();
-    }
-}
-
 function enemyTurn() {
     if (!player || !enemy) return;
     let damage = Math.max(enemy.attack - player.defense, 1);
@@ -114,13 +97,13 @@ function enemyTurn() {
 
 function checkBattleEnd() {
     if (enemy.hp <= 0) {
+        updateBattleLog(`Vous avez vaincu ${enemy.name}!`);
         endCombat(true);
     } else if (player.hp <= 0) {
+        updateBattleLog(`Vous avez été vaincu par ${enemy.name}.`);
         endCombat(false);
     } else {
-        setTimeout(() => {
-            enemyTurn();
-        }, 1000);
+        setTimeout(enemyTurn, 1000); // Délai avant le tour de l'ennemi
     }
 }
 
@@ -131,24 +114,12 @@ function endCombat(victory) {
         player.gainExperience(expGain);
         player.gold += goldGain;
         updateBattleLog(`Victoire ! Vous gagnez ${expGain} XP et ${goldGain} or.`);
-        
-        if (Math.random() < dropRates[currentMission.difficulty]) {
-            const droppedItem = getRandomItem();
-            player.inventory.push(droppedItem);
-            updateBattleLog(`Vous avez obtenu : ${droppedItem.name}`);
-        }
-        
-        if (Math.random() < 0.05) { // 5% de chance d'obtenir un compagnon
-            const newCompanion = getRandomCompanion();
-            player.companions.push(newCompanion);
-            updateBattleLog(`Vous avez obtenu un nouveau compagnon : ${newCompanion.name}`);
-        }
     } else {
         updateBattleLog("Défaite ! Vous avez perdu le combat.");
         player.hp = Math.max(player.hp, Math.floor(player.maxHp * 0.1)); // Évite la mort totale
     }
-    updatePlayerInfo();
-    setTimeout(() => showGameArea('adventure-menu'), 2000); // Délai pour lire le résultat
+    // Notifier game.js que le combat est terminé
+    window.dispatchEvent(new CustomEvent('combatEnd', { detail: { victory } }));
 }
 
 export function updateBattleLog(message) {
