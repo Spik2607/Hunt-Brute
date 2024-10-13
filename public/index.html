@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hunt Brute - V2.0</title>
+    <title>Hunt Brute - V2.5</title>
     <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
@@ -92,12 +92,63 @@
                 </div>
             </section>
 
-            <!-- ... (les autres sections restent inchangées) ... -->
+            <section id="inventory-area" class="game-area">
+                <h2>Inventaire</h2>
+                <div id="equipped-items"></div>
+                <div id="inventory-items"></div>
+                <button id="close-inventory">Fermer l'inventaire</button>
+            </section>
+
+            <section id="shop-area" class="game-area">
+                <h2>Boutique</h2>
+                <div id="shop-items"></div>
+                <button id="leave-shop">Quitter la boutique</button>
+            </section>
+
+            <section id="companions-area" class="game-area">
+                <h2>Compagnons</h2>
+                <div id="companions-list"></div>
+                <div id="active-companion"></div>
+            </section>
+
+            <section id="multiplayer-area" class="game-area">
+                <h2>Mode Multijoueur</h2>
+                <div id="waiting-area"></div>
+                <div id="chat-area">
+                    <div id="chat-messages"></div>
+                    <input type="text" id="chat-input" placeholder="Entrez votre message">
+                    <button id="send-message">Envoyer</button>
+                </div>
+                <button id="challenge-player">Défier un joueur</button>
+                <button id="trade-request">Demander un échange</button>
+            </section>
 
         </main>
 
         <div id="level-up-modal" class="modal">
-            <!-- ... (le contenu du modal reste inchangé) ... -->
+            <div class="modal-content">
+                <h2>Niveau supérieur !</h2>
+                <p>Vous avez atteint le niveau <span id="new-level"></span></p>
+                <p>Points de compétence disponibles : <span id="skill-points"></span></p>
+                <div class="skill-distribution">
+                    <div>
+                        <label for="strength-skill">Force :</label>
+                        <span id="strength-skill"></span>
+                        <button onclick="distributeSkillPoint('strength')">+</button>
+                    </div>
+                    <div>
+                        <label for="agility-skill">Agilité :</label>
+                        <span id="agility-skill"></span>
+                        <button onclick="distributeSkillPoint('agility')">+</button>
+                    </div>
+                    <div>
+                        <label for="intelligence-skill">Intelligence :</label>
+                        <span id="intelligence-skill"></span>
+                        <button onclick="distributeSkillPoint('intelligence')">+</button>
+                    </div>
+                </div>
+                <button id="confirm-level-up">Confirmer</button>
+            </div>
         </div>
     </div>
 
