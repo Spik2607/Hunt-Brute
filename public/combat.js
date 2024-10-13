@@ -117,7 +117,8 @@ function endCombat(victory) {
         updateBattleLog("Défaite ! Vous avez perdu le combat.");
         player.hp = Math.max(player.hp, Math.floor(player.maxHp * 0.1)); // Évite la mort totale
     }
-    // Notifier game.js que le combat est terminé
+    
+    // Déclencher un événement personnalisé pour signaler la fin du combat
     window.dispatchEvent(new CustomEvent('combatEnd', { detail: { victory } }));
 }
 
