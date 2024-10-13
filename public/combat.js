@@ -1,17 +1,19 @@
 // combat.js
 
+import { missions } from './gameData.js';
+
 let player, enemy, currentMission;
 
 export function initializeCombat(playerCharacter, missionIndex, chosenEnemy) {
     player = playerCharacter;
-    enemy = chosenEnemy;
-    currentMission = missionIndex;
+    enemy = { ...chosenEnemy }; // Créer une copie de l'ennemi pour éviter de modifier l'original
+    currentMission = missions[missionIndex];
     
     // Ajuster les statistiques de l'ennemi en fonction du niveau de la mission
-    enemy.maxHp = enemy.hp * currentMission.enemyLevel;
+    enemy.maxHp = Math.round(enemy.hp * currentMission.enemyLevel);
     enemy.hp = enemy.maxHp;
-    enemy.attack *= currentMission.enemyLevel;
-    enemy.defense *= currentMission.enemyLevel;
+    enemy.attack = Math.round(enemy.attack * currentMission.enemyLevel);
+    enemy.defense = Math.round(enemy.defense * currentMission.enemyLevel);
     
     updateBattleInfo();
     console.log("Combat initialisé:", { player, enemy, currentMission });
@@ -20,7 +22,6 @@ export function initializeCombat(playerCharacter, missionIndex, chosenEnemy) {
 export function updateBattleInfo() {
     const playerStats = document.getElementById('player-combat-info');
     const enemyStats = document.getElementById('enemy-combat-info');
-    const companionStats = document.getElementById('companion-combat-info');
 
     if (playerStats && player) {
         playerStats.querySelector('h3').textContent = player.name;
@@ -37,16 +38,6 @@ export function updateBattleInfo() {
         enemyStats.querySelector('.health-text').textContent = `${enemy.hp}/${enemy.maxHp} PV`;
         enemyStats.querySelector('.health-bar-fill').style.width = `${(enemy.hp / enemy.maxHp) * 100}%`;
     }
-
-    if (companionStats && player.companion) {
-        companionStats.style.display = 'block';
-        companionStats.querySelector('h3').textContent = player.companion.name;
-        companionStats.querySelector('h3').style.color = 'green';
-        companionStats.querySelector('.health-text').textContent = `${player.companion.hp}/${player.companion.maxHp} PV`;
-        companionStats.querySelector('.health-bar-fill').style.width = `${(player.companion.hp / player.companion.maxHp) * 100}%`;
-    } else if (companionStats) {
-        companionStats.style.display = 'none';
-    }
 }
 
 export function playerAttack() {
@@ -58,13 +49,18 @@ export function playerAttack() {
     enemy.hp = Math.max(enemy.hp - damage, 0);
     updateBattleLog(`${player.name} inflige ${damage} dégâts à ${enemy.name}.`);
     updateBattleInfo();
-    checkBattleEnd();
+    
+    if (enemy.hp > 0) {
+        setTimeout(enemyTurn, 1000);
+    } else {
+        checkBattleEnd();
+    }
 }
 
 export function playerDefend() {
     player.defending = true;
     updateBattleLog(`${player.name} se met en position défensive.`);
-    enemyTurn();
+    setTimeout(enemyTurn, 1000);
 }
 
 export function playerUseSpecial() {
@@ -79,7 +75,12 @@ export function playerUseSpecial() {
     player.energy -= energyCost;
     updateBattleLog(`${player.name} utilise une attaque spéciale et inflige ${specialDamage} dégâts à ${enemy.name}.`);
     updateBattleInfo();
-    checkBattleEnd();
+    
+    if (enemy.hp > 0) {
+        setTimeout(enemyTurn, 1000);
+    } else {
+        checkBattleEnd();
+    }
 }
 
 function enemyTurn() {
@@ -102,8 +103,6 @@ function checkBattleEnd() {
     } else if (player.hp <= 0) {
         updateBattleLog(`Vous avez été vaincu par ${enemy.name}.`);
         endCombat(false);
-    } else {
-        setTimeout(enemyTurn, 1000); // Délai avant le tour de l'ennemi
     }
 }
 
