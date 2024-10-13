@@ -340,9 +340,9 @@ function selectEnemyForMission(mission) {
     );
     
     if (suitableEnemies.length > 0) {
-        return suitableEnemies[Math.floor(Math.random() * suitableEnemies.length)];
+        return { ...suitableEnemies[Math.floor(Math.random() * suitableEnemies.length)] };
     } else {
-        return enemies[0];
+        return { ...enemies[0] };
     }
 }
 
