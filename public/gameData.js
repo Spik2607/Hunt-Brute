@@ -27,6 +27,89 @@ export class Character {
             intelligence: 0
         };
     }
+
+    levelUp() {
+        this.level++;
+        this.maxHp += 10;
+        this.hp = this.maxHp;
+        this.attack += 2;
+        this.defense += 1;
+        this.skillPoints += 3;
+        console.log(`${this.name} a atteint le niveau ${this.level}!`);
+    }
+
+    gainExperience(amount) {
+        this.experience += amount;
+        console.log(`${this.name} a gagné ${amount} points d'expérience.`);
+        while (this.experience >= this.level * 100) {
+            this.experience -= this.level * 100;
+            this.levelUp();
+        }
+    }
+
+    regenerateHP() {
+        const regenAmount = Math.floor(this.maxHp * 0.05);
+        this.hp = Math.min(this.hp + regenAmount, this.maxHp);
+    }
+
+    regenerateEnergy() {
+        const regenAmount = Math.floor(this.maxEnergy * 0.1);
+        this.energy = Math.min(this.energy + regenAmount, this.maxEnergy);
+    }
+
+    equip(item) {
+        if (item.type in this.equippedItems) {
+            if (this.equippedItems[item.type]) {
+                this.unequip(item.type);
+            }
+            this.equippedItems[item.type] = item;
+            this.applyItemEffects(item);
+            console.log(`${this.name} a équipé ${item.name}.`);
+        }
+    }
+
+    unequip(itemType) {
+        const item = this.equippedItems[itemType];
+        if (item) {
+            this.removeItemEffects(item);
+            this.equippedItems[itemType] = null;
+            this.inventory.push(item);
+            console.log(`${this.name} a déséquipé ${item.name}.`);
+        }
+    }
+
+    applyItemEffects(item) {
+        if (item.attack) this.attack += item.attack;
+        if (item.defense) this.defense += item.defense;
+        if (item.maxHp) {
+            this.maxHp += item.maxHp;
+            this.hp += item.maxHp;
+        }
+    }
+
+    removeItemEffects(item) {
+        if (item.attack) this.attack -= item.attack;
+        if (item.defense) this.defense -= item.defense;
+        if (item.maxHp) {
+            this.maxHp -= item.maxHp;
+            this.hp = Math.min(this.hp, this.maxHp);
+        }
+    }
+
+    useItem(item) {
+        if (item.type === 'consumable') {
+            if (item.effect === 'heal') {
+                this.hp = Math.min(this.hp + item.value, this.maxHp);
+            } else if (item.effect === 'energy') {
+                this.energy = Math.min(this.energy + item.value, this.maxEnergy);
+            }
+            const index = this.inventory.indexOf(item);
+            if (index > -1) {
+                this.inventory.splice(index, 1);
+            }
+            console.log(`${this.name} a utilisé ${item.name}.`);
+        }
+    }
 }
 
 export const items = [
@@ -36,25 +119,31 @@ export const items = [
     { id: 'dagger', name: 'Dague des ombres', type: 'weapon', attack: 3, critChance: 10, cost: 60, rarity: 'uncommon' },
     { id: 'greatsword', name: 'Épée à deux mains', type: 'weapon', attack: 12, speedPenalty: 2, cost: 100, rarity: 'rare' },
     { id: 'flameBlade', name: 'Lame enflammée', type: 'weapon', attack: 10, fireDamage: 3, cost: 150, rarity: 'rare' },
-    { id: 'excalibur', name: 'Excalibur', type: 'weapon', attack: 20, holyDamage: 5, critChance: 15, cost: 500, rarity: 'legendary' },
+    { id: 'excalibur', name: 'Excalibur', type: 'weapon', attack: 40, holyDamage: 5, critChance: 15, cost: 500, rarity: 'legendary' },
+    { id: 'longbow', name: 'Arc long', type: 'weapon', attack: 8, range: 2, cost: 90, rarity: 'uncommon' },
+    { id: 'frostStaff', name: 'Bâton de givre', type: 'weapon', attack: 6, iceDamage: 4, cost: 130, rarity: 'rare' },
 
     // Armures
     { id: 'shield', name: 'Bouclier en bois', type: 'armor', defense: 3, cost: 40, rarity: 'common' },
-    { id: 'chainmail', name: 'Cotte de mailles', type: 'armor', defense: 5, cost: 80, rarity: 'common' },
-    { id: 'plateArmor', name: 'Armure de plaques', type: 'armor', defense: 8, speedPenalty: 1, cost: 120, rarity: 'rare' },
-    { id: 'dragonScaleArmor', name: "Armure d'écailles de dragon", type: 'armor', defense: 12, fireResistance: 50, cost: 300, rarity: 'legendary' },
+    { id: 'chainmail', name: 'Cotte de mailles', type: 'armor', defense: 8, cost: 80, rarity: 'common' },
+    { id: 'plateArmor', name: 'Armure de plaques', type: 'armor', defense: 20, speedPenalty: 1, cost: 500, rarity: 'rare' },
+    { id: 'dragonScaleArmor', name: "Armure d'écailles de dragon", type: 'armor', defense: 50, fireResistance: 50, cost: 1000, rarity: 'legendary' },
+    { id: 'leatherArmor', name: 'Armure de cuir', type: 'armor', defense: 15, cost: 60, rarity: 'common' },
 
     // Accessoires
     { id: 'ringOfAgility', name: "Anneau d'agilité", type: 'accessory', effect: 'speedBoost', value: 10, cost: 80, rarity: 'uncommon' },
-    { id: 'amuletOfProtection', name: 'Amulette de protection', type: 'accessory', effect: 'damageReduction', value: 10, cost: 150, rarity: 'rare' },
-    { id: 'cloakOfInvisibility', name: "Cape d'invisibilité", type: 'accessory', effect: 'stealth', cost: 200, rarity: 'legendary' },
+    { id: 'amuletOfProtection', name: 'Amulette de protection', type: 'accessory', effect: 'damageReduction', value: 10, cost: 500, rarity: 'rare' },
+    { id: 'cloakOfInvisibility', name: "Cape d'invisibilité", type: 'accessory', effect: 'stealth', cost: 1000, rarity: 'legendary' },
+    { id: 'ringOfHealth', name: 'Anneau de santé', type: 'accessory', effect: 'healthBoost', value: 20, cost: 300, rarity: 'uncommon' },
+    { id: 'speedBoots', name: 'Bottes de célérité', type: 'accessory', effect: 'moveSpeed', value: 15, cost: 250, rarity: 'rare' },
 
     // Consommables
     { id: 'healingPotion', name: 'Potion de soin', type: 'consumable', effect: 'heal', value: 30, cost: 20, rarity: 'common' },
     { id: 'energyDrink', name: 'Boisson énergisante', type: 'consumable', effect: 'energy', value: 50, cost: 25, rarity: 'common' },
     { id: 'elixirOfVitality', name: 'Élixir de vitalité', type: 'consumable', effect: 'heal', value: 100, cost: 100, rarity: 'rare' },
     { id: 'manaPotion', name: 'Potion de mana', type: 'consumable', effect: 'mana', value: 40, cost: 30, rarity: 'common' },
-    { id: 'phoenixFeather', name: 'Plume de Phénix', type: 'consumable', effect: 'revive', cost: 500, rarity: 'legendary' },
+    { id: 'phoenixFeather', name: 'Plume de Phénix', type: 'consumable', effect: 'revive', cost: 900, rarity: 'legendary' },
+    { id: 'throwingKnives', name: 'Couteaux de lancer', type: 'consumable', effect: 'damage', value: 100, cost: 200, rarity: 'common' },
 
     // Objets spéciaux
     { id: 'scrollOfFireball', name: 'Parchemin de boule de feu', type: 'special', effect: 'fireball', damage: 25, cost: 70, rarity: 'uncommon' },
@@ -69,25 +158,35 @@ export const missions = [
     { name: "Explorer une grotte hantée", enemyLevel: 5, goldReward: 120, expReward: 130, difficulty: 'Difficile' },
     { name: "Combattre un dragon", enemyLevel: 7, goldReward: 200, expReward: 250, difficulty: 'Très Difficile' },
     { name: "Infiltrer un repaire de bandits", enemyLevel: 6, goldReward: 150, expReward: 180, difficulty: 'Difficile' },
-    { name: "Chasser un troll des montagnes", enemyLevel: 8, goldReward: 250, expReward: 300, difficulty: 'Très Difficile' }
+    { name: "Chasser un troll des montagnes", enemyLevel: 8, goldReward: 250, expReward: 300, difficulty: 'Très Difficile' },
+    { name: "Nettoyer les égouts de la ville", enemyLevel: 2, goldReward: 40, expReward: 50, difficulty: 'Moyenne' },
+    { name: "Escorter une caravane marchande", enemyLevel: 3, goldReward: 70, expReward: 80, difficulty: 'Moyenne' },
+    { name: "Détruire un nid de harpies", enemyLevel: 5, goldReward: 140, expReward: 150, difficulty: 'Difficile' },
+    { name: "Récupérer un artefact dans des ruines anciennes", enemyLevel: 6, goldReward: 180, expReward: 200, difficulty: 'Difficile' },
+    { name: "Vaincre un géant des tempêtes", enemyLevel: 8, goldReward: 300, expReward: 350, difficulty: 'Très Difficile' },
 ];
 
 export const dropRates = {
-    'Facile': 0.1,
-    'Moyenne': 0.15,
+    'Facile': 0.05,
+    'Moyenne': 0.075,
     'Difficile': 0.2,
     'Très Difficile': 0.25,
 };
 
 export const enemies = [
-    { name: "Gobelin", level: 1, hp: 30, attack: 5, defense: 2 },
-    { name: "Loup géant", level: 2, hp: 50, attack: 8, defense: 3 },
-    { name: "Bandit", level: 3, hp: 70, attack: 10, defense: 5 },
-    { name: "Ogre", level: 4, hp: 100, attack: 15, defense: 8 },
-    { name: "Fantôme", level: 5, hp: 80, attack: 12, defense: 10 },
-    { name: "Dragon", level: 7, hp: 200, attack: 25, defense: 15 },
+    { name: "Gobelin", level: 1, hp: 70, attack: 7, defense: 4 },
+    { name: "Loup géant", level: 2, hp: 145, attack: 17, defense: 14 },
+    { name: "Bandit", level: 3, hp: 200, attack: 25, defense: 20 },
+    { name: "Ogre", level: 4, hp: 400, attack: 45, defense: 36 },
+    { name: "Fantôme", level: 5, hp: 300, attack: 55, defense: 36 },
+    { name: "Dragon", level: 7, hp: 700, attack: 85, defense: 90 },
     { name: "Troll", level: 6, hp: 150, attack: 20, defense: 12 },
-    { name: "Sorcier maléfique", level: 5, hp: 120, attack: 18, defense: 10 }
+    { name: "Sorcier", level: 5, hp: 120, attack: 18, defense: 10 },
+    { name: "Harpie", level: 4, hp: 90, attack: 14, defense: 6 },
+    { name: "Golem de pierre", level: 5, hp: 750, attack: 90, defense: 114 },
+    { name: "Assassin", level: 6, hp: 400, attack: 60, defense: 45 },
+    { name: "Géant des tempêtes", level: 8, hp: 1250, attack: 130, defense: 118 },
+    { name: "Liche", level: 9, hp: 1800, attack: 235, defense: 220 },
 ];
 
 export const companionTypes = [
@@ -105,6 +204,9 @@ export function getItemStats(item) {
         stats += `\n- Attaque : ${item.attack}`;
         if (item.critChance) stats += `\n- Chance de critique : ${item.critChance}%`;
         if (item.fireDamage) stats += `\n- Dégâts de feu : ${item.fireDamage}`;
+        if (item.iceDamage) stats += `\n- Dégâts de glace : ${item.iceDamage}`;
+        if (item.holyDamage) stats += `\n- Dégâts sacrés : ${item.holyDamage}`;
+        if (item.range) stats += `\n- Portée : ${item.range}`;
     }
 
     if (item.type === 'armor') {
@@ -161,6 +263,61 @@ export function getRandomEnemy() {
 
 export function getRandomMission() {
     return getRandomElement(missions);
+}
+
+export function createEnemy(baseName, level) {
+    const baseEnemy = enemies.find(e => e.name === baseName);
+    if (!baseEnemy) return null;
+
+    const levelDifference = level - baseEnemy.level;
+    const scalingFactor = 1 + (levelDifference * 0.1);
+
+    return {
+        name: baseEnemy.name,
+        level: level,
+        hp: Math.round(baseEnemy.hp * scalingFactor),
+        attack: Math.round(baseEnemy.attack * scalingFactor),
+        defense: Math.round(baseEnemy.defense * scalingFactor)
+    };
+}
+
+export function generateRandomLoot(enemyLevel) {
+    const lootChance = Math.random();
+    if (lootChance < 0.6) {
+        // 60% chance de ne rien obtenir
+        return null;
+    } else if (lootChance < 0.9) {
+        // 30% chance d'obtenir un objet aléatoire
+        return getRandomItem();
+    } else {
+        // 10% chance d'obtenir un objet rare ou mieux
+        const rareItems = items.filter(item => ['rare', 'legendary'].includes(item.rarity));
+        return rareItems[Math.floor(Math.random() * rareItems.length)];
+    }
+}
+
+export function calculateDamage(attacker, defender) {
+    const baseDamage = Math.max(attacker.attack - defender.defense, 1);
+    const criticalHit = Math.random() < 0.1; // 10% chance de coup critique
+    const damageMultiplier = criticalHit ? 1.5 : 1;
+    const finalDamage = Math.round(baseDamage * damageMultiplier);
+
+    return {
+        damage: finalDamage,
+        isCritical: criticalHit
+    };
+}
+
+export function levelUpCharacter(character) {
+    character.level++;
+    character.maxHp += 10;
+    character.hp = character.maxHp;
+    character.attack += 2;
+    character.defense += 1;
+    character.skillPoints += 3;
+    
+    console.log(`${character.name} a atteint le niveau ${character.level}!`);
+    console.log(`PV max: +10, Attaque: +2, Défense: +1, Points de compétence: +3`);
 }
 
 console.log("Module gameData chargé");
