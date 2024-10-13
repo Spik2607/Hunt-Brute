@@ -151,19 +151,19 @@ export const items = [
 ];
 
 export const missions = [
-    { name: "Éliminer des gobelins", enemyLevel: 1, goldReward: 15, expReward: 20, difficulty: 'Facile' },
-    { name: "Chasser un loup géant", enemyLevel: 2, goldReward: 30, expReward: 40, difficulty: 'Moyenne' },
-    { name: "Vaincre un bandit", enemyLevel: 3, goldReward: 50, expReward: 60, difficulty: 'Moyenne' },
-    { name: "Affronter un ogre", enemyLevel: 4, goldReward: 80, expReward: 90, difficulty: 'Difficile' },
-    { name: "Explorer une grotte hantée", enemyLevel: 5, goldReward: 120, expReward: 130, difficulty: 'Difficile' },
-    { name: "Combattre un dragon", enemyLevel: 7, goldReward: 200, expReward: 250, difficulty: 'Très Difficile' },
-    { name: "Infiltrer un repaire de bandits", enemyLevel: 6, goldReward: 150, expReward: 180, difficulty: 'Difficile' },
-    { name: "Chasser un troll des montagnes", enemyLevel: 8, goldReward: 250, expReward: 300, difficulty: 'Très Difficile' },
-    { name: "Nettoyer les égouts de la ville", enemyLevel: 2, goldReward: 40, expReward: 50, difficulty: 'Moyenne' },
-    { name: "Escorter une caravane marchande", enemyLevel: 3, goldReward: 70, expReward: 80, difficulty: 'Moyenne' },
-    { name: "Détruire un nid de harpies", enemyLevel: 5, goldReward: 140, expReward: 150, difficulty: 'Difficile' },
-    { name: "Récupérer un artefact dans des ruines anciennes", enemyLevel: 6, goldReward: 180, expReward: 200, difficulty: 'Difficile' },
-    { name: "Vaincre un géant des tempêtes", enemyLevel: 8, goldReward: 300, expReward: 350, difficulty: 'Très Difficile' },
+    { name: "Éliminer des gobelins", enemy: "Gobelin", enemyLevel: 1, goldReward: 15, expReward: 20, difficulty: 'Facile' },
+    { name: "Chasser un loup géant", enemy: "Loup géant", enemyLevel: 2, goldReward: 30, expReward: 40, difficulty: 'Moyenne' },
+    { name: "Vaincre un bandit", enemy: "Bandit", enemyLevel: 3, goldReward: 50, expReward: 60, difficulty: 'Moyenne' },
+    { name: "Affronter un ogre", enemy: "Ogre", enemyLevel: 4, goldReward: 80, expReward: 90, difficulty: 'Difficile' },
+    { name: "Explorer une grotte hantée", enemy: "Fantôme", enemyLevel: 5, goldReward: 120, expReward: 130, difficulty: 'Difficile' },
+    { name: "Combattre un dragon", enemy: "Dragon", enemyLevel: 7, goldReward: 200, expReward: 250, difficulty: 'Très Difficile' },
+    { name: "Infiltrer un repaire de bandits", enemy: "Assassin", enemyLevel: 6, goldReward: 150, expReward: 180, difficulty: 'Difficile' },
+    { name: "Chasser un troll des montagnes", enemy: "Troll", enemyLevel: 6, goldReward: 250, expReward: 300, difficulty: 'Très Difficile' },
+    { name: "Nettoyer les égouts de la ville", enemy: "Gobelin", enemyLevel: 2, goldReward: 40, expReward: 50, difficulty: 'Moyenne' },
+    { name: "Escorter une caravane marchande", enemy: "Bandit", enemyLevel: 3, goldReward: 70, expReward: 80, difficulty: 'Moyenne' },
+    { name: "Détruire un nid de harpies", enemy: "Harpie", enemyLevel: 5, goldReward: 140, expReward: 150, difficulty: 'Difficile' },
+    { name: "Récupérer un artefact dans des ruines anciennes", enemy: "Golem de pierre", enemyLevel: 6, goldReward: 180, expReward: 200, difficulty: 'Difficile' },
+    { name: "Vaincre un géant des tempêtes", enemy: "Géant des tempêtes", enemyLevel: 8, goldReward: 300, expReward: 350, difficulty: 'Très Difficile' },
 ];
 
 export const dropRates = {
