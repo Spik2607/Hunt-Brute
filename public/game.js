@@ -2,11 +2,13 @@
 import { Character, items, missions, dropRates, getRandomCompanion, getRandomItem, enemies, getItemStats } from './gameData.js';
 import { expeditionEvents, getRandomExpeditionEvent } from './expedition.js';
 import { initializeCombat, playerAttack, playerDefend, playerUseSpecial, updateBattleInfo, updateBattleLog } from './combat.js';
+import { generateUniqueEnemy, generateDonjonReward, generateDonjonEvent, generateDonjonBoss, generateBossReward } from './donjon.js';
 
 let player = null;
 let companion = null;
 let currentMission = null;
 let currentExpedition = null;
+let currentDonjon = null;
 let socket;
 let currentRoom = null;
 
@@ -184,7 +186,7 @@ function initializeSocket() {
 
         console.log('Initialisation de Socket.io réussie');
     } catch (error) {
-        console.error('Erreur lors de linitialisation de Socket.io:', error);
+        console.error('Erreur lors de l'initialisation de Socket.io:', error);
     }
 }
 
@@ -260,7 +262,10 @@ function setupEventListeners() {
         { id: 'open-multiplayer', event: 'click', handler: startMultiplayerMode },
         { id: 'send-message', event: 'click', handler: sendChatMessage },
         { id: 'challenge-player', event: 'click', handler: challengePlayer },
-        { id: 'trade-request', event: 'click', handler: requestTrade }
+        { id: 'trade-request', event: 'click', handler: requestTrade },
+        { id: 'start-donjon', event: 'click', handler: startDonjon },
+        { id: 'next-donjon-event', event: 'click', handler: nextDonjonEvent },
+        { id: 'exit-donjon', event: 'click', handler: exitDonjon }
     ];
 
     listeners.forEach(({ id, event, handler }) => {
@@ -481,6 +486,93 @@ function updateAdventureMenu() {
     }
 }
 
+function startDonjon() {
+    if (!player) {
+        console.error("Aucun joueur n'est initialisé");
+        return;
+    }
+    currentDonjon = {
+        floor: 1,
+        events: []
+    };
+    generateDonjonFloor();
+    updateDonjonInfo();
+    showGameArea('donjon-area');
+    console.log("Donjon commencé");
+}
+
+function generateDonjonFloor() {
+    currentDonjon.events = [];
+    for (let i = 0; i < 5; i++) {
+        currentDonjon.events.push(generateDonjonEvent(currentDonjon.floor));
+    }
+}
+
+function updateDonjonInfo() {
+    const donjonInfo = document.getElementById('donjon-info');
+    if (donjonInfo) {
+        donjonInfo.innerHTML = `
+            <h3>Étage ${currentDonjon.floor}</h3>
+            <p>Événements restants : ${currentDonjon.events.length}</p>
+        `;
+    }
+}
+
+function nextDonjonEvent() {
+    if (!currentDonjon || currentDonjon.events.length === 0) {
+        console.log("Fin de l'étage du donjon");
+        currentDonjon.floor++;
+        generateDonjonFloor();
+        updateDonjonInfo();
+        return;
+    }
+
+    const event = currentDonjon.events.shift();
+    handleDonjonEvent(event);
+}
+
+function handleDonjonEvent(event) {
+    const eventArea = document.getElementById('donjon-events');
+    if (!eventArea) return;
+
+    switch (event.type) {
+        case 'combat':
+            eventArea.innerHTML = `<p>Vous rencontrez un ${event.enemy.name} !</p>`;
+            initializeCombat(player, -1, event.enemy);
+            showGameArea('battle-area');
+            break;
+        case 'treasure':
+            const reward = event.reward;
+            player.gold += reward.gold;
+            player.gainExperience(reward.exp);
+            player.inventory.push(reward.item);
+            eventArea.innerHTML = `
+                <p>Vous avez trouvé un trésor !</p>
+                <p>Or : ${reward.gold}</p>
+                <p>Expérience : ${reward.exp}</p>
+                <p>Objet : ${reward.item.name}</p>
+            `;
+            updatePlayerInfo();
+            break;
+        case 'trap':
+            player.hp -= event.damage;
+            eventArea.innerHTML = `<p>Vous êtes tombé dans un piège ! Vous perdez ${event.damage} PV.</p>`;
+            updatePlayerInfo();
+            break;
+        case 'rest':
+            player.hp = Math.min(player.hp + event.healAmount, player.maxHp);
+            eventArea.innerHTML = `<p>Vous trouvez un endroit sûr pour vous reposer. Vous récupérez ${event.healAmount} PV.</p>`;
+            updatePlayerInfo();
+            break;
+    }
+}
+
+function exitDonjon() {
+    currentDonjon = null;
+    showGameArea('adventure-menu');
+    console.log("Sortie du donjon");
+}
+
 function openInventory() {
     if (!player) {
         console.error("Aucun joueur n'est initialisé");
@@ -548,20 +640,15 @@ function updateInventoryItems() {
 }
 
 function createItemHTML(item, index, isEquipped) {
-    const rarityColors = {
-        common: '#ffffff',
-        uncommon: '#1eff00',
-        rare: '#0070dd',
-        epic: '#a335ee',
-        legendary: '#ff8000'
-    };
-
-    const itemColor = rarityColors[item.rarity] || '#ffffff';
+    let statsHtml = '';
+    if (item.attack) statsHtml += `<br>Attaque: ${item.attack}`;
+    if (item.defense) statsHtml += `<br>Défense: ${item.defense}`;
+    if (item.hp) statsHtml += `<br>PV: ${item.hp}`;
 
     return `
-        <div class="item ${isEquipped ? 'equipped-item' : ''}" style="color: ${itemColor}; ${isEquipped ? 'font-weight: bold;' : ''}">
+        <div class="item ${isEquipped ? 'equipped-item' : ''}">
             <span>${item.name}</span>
-            <div class="item-stats">${getItemStats(item)}</div>
+            <div class="item-stats">${statsHtml}</div>
             ${item.type === 'consumable' 
                 ? `<button onclick="useItem(${index})">Utiliser</button>`
                 : isEquipped
@@ -573,21 +660,71 @@ function createItemHTML(item, index, isEquipped) {
     `;
 }
 
-function useItem(index) {
-    if (!player || !player.inventory[index]) return;
-    const item = player.inventory[index];
-    if (item.type === 'consumable') {
-        if (item.effect === 'heal') {
-            const healAmount = item.value;
-            player.hp = Math.min(player.hp + healAmount, player.maxHp);
-            updateBattleLog(`Vous utilisez ${item.name} et récupérez ${healAmount} PV.`);
-        } else if (item.effect === 'energy') {
-            player.energy = Math.min(player.energy + item.value, player.maxEnergy);
-            updateBattleLog(`Vous utilisez ${item.name} et récupérez ${item.value} points d'énergie.`);
+function openShop() {
+    console.log("Ouverture de la boutique");
+    const shopItems = document.getElementById('shop-items');
+    if (!shopItems) {
+        console.error("L'élément 'shop-items' n'a pas été trouvé");
+        return;
+    }
+    shopItems.innerHTML = '';
+    
+    // Ajout des objets standards
+    items.forEach(item => {
+        const itemElement = document.createElement('div');
+        itemElement.className = 'shop-item';
+        itemElement.innerHTML = `
+            <span>${item.name} - ${item.cost} or</span>
+            <button onclick="buyItem('${item.id}')">Acheter</button>
+        `;
+        shopItems.appendChild(itemElement);
+    });
+    
+    // Ajout des objets uniques de l'inventaire du joueur
+    player.inventory.forEach((item, index) => {
+        if (item.value) { // Vérifie si l'objet a une valeur (c'est un objet unique)
+            const itemElement = document.createElement('div');
+            itemElement.className = 'shop-item';
+            itemElement.innerHTML = `
+                <span>${item.name} - ${item.value} or</span>
+                <button onclick="sellUniqueItem(${index})">Vendre</button>
+            `;
+            shopItems.appendChild(itemElement);
         }
+    });
+    
+    showGameArea('shop-area');
+}
+
+function buyItem(itemId) {
+    if (!player) {
+        console.error("Player not initialized");
+        return;
+    }
+    const item = items.find(i => i.id === itemId);
+    if (!item) {
+        console.error("Item not found");
+        return;
+    }
+    if (player.gold >= item.cost) {
+        player.gold -= item.cost;
+        player.inventory.push(item);
+        updatePlayerInfo();
+        openShop(); // Rafraîchir la boutique
+        alert(`Vous avez acheté ${item.name}`);
+    } else {
+        alert("Vous n'avez pas assez d'or !");
+    }
+}
+
+function sellUniqueItem(index) {
+    const item = player.inventory[index];
+    if (item && item.value) {
+        player.gold += item.value;
         player.inventory.splice(index, 1);
         updatePlayerInfo();
-        openInventory();
+        openShop(); // Rafraîchir la boutique
+        alert(`Vous avez vendu ${item.name} pour ${item.value} or.`);
     }
 }
 
@@ -613,55 +750,21 @@ function unequipItem(type) {
     }
 }
 
-function sellItem(index) {
+function useItem(index) {
     if (!player || !player.inventory[index]) return;
     const item = player.inventory[index];
-    const sellPrice = Math.floor(item.cost * 0.5);
-    player.gold += sellPrice;
-    player.inventory.splice(index, 1);
-    updatePlayerInfo();
-    openInventory();
-    alert(`Vous avez vendu ${item.name} pour ${sellPrice} or.`);
-}
-
-function openShop() {
-    console.log("Ouverture de la boutique");
-    const shopItems = document.getElementById('shop-items');
-    if (!shopItems) {
-        console.error("L'élément 'shop-items' n'a pas été trouvé");
-        return;
-    }
-    shopItems.innerHTML = '';
-    items.forEach(item => {
-        const itemElement = document.createElement('div');
-        itemElement.className = 'shop-item';
-        itemElement.innerHTML = `
-            <span>${item.name} - ${item.cost} or</span>
-            <button onclick="buyItem('${item.id}')">Acheter</button>
-        `;
-        shopItems.appendChild(itemElement);
-    });
-    showGameArea('shop-area');
-}
-
-function buyItem(itemId) {
-    if (!player) {
-        console.error("Player not initialized");
-        return;
-    }
-    const item = items.find(i => i.id === itemId);
-    if (!item) {
-        console.error("Item not found");
-        return;
-    }
-    if (player.gold >= item.cost) {
-        player.gold -= item.cost;
-        player.inventory.push(item);
+    if (item.type === 'consumable') {
+        if (item.effect === 'heal') {
+            const healAmount = item.value;
+            player.hp = Math.min(player.hp + healAmount, player.maxHp);
+            updateBattleLog(`Vous utilisez ${item.name} et récupérez ${healAmount} PV.`);
+        } else if (item.effect === 'energy') {
+            player.energy = Math.min(player.energy + item.value, player.maxEnergy);
+            updateBattleLog(`Vous utilisez ${item.name} et récupérez ${item.value} points d'énergie.`);
+        }
+        player.inventory.splice(index, 1);
         updatePlayerInfo();
-        openShop(); // Rafraîchir la boutique
-        alert(`Vous avez acheté ${item.name}`);
-    } else {
-        alert("Vous n'avez pas assez d'or !");
+        openInventory();
     }
 }
 
@@ -1014,7 +1117,10 @@ export {
     openInventory,
     openShop,
     startMultiplayerMode,
-    openCompanionsMenu
+    openCompanionsMenu,
+    startDonjon,
+    nextDonjonEvent,
+    exitDonjon
 };
 
 console.log("Script game.js chargé");
