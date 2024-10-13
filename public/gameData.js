@@ -319,5 +319,16 @@ export function levelUpCharacter(character) {
     console.log(`${character.name} a atteint le niveau ${character.level}!`);
     console.log(`PV max: +10, Attaque: +2, Défense: +1, Points de compétence: +3`);
 }
+export function createEnemyForMission(mission) {
+    const enemyBase = enemies.find(e => e.name === mission.enemy);
+    if (!enemyBase) return null;
 
+    return {
+        name: enemyBase.name,
+        level: mission.enemyLevel,
+        hp: Math.round(enemyBase.hp * (mission.enemyLevel / enemyBase.level)),
+        attack: Math.round(enemyBase.attack * (mission.enemyLevel / enemyBase.level)),
+        defense: Math.round(enemyBase.defense * (mission.enemyLevel / enemyBase.level))
+    };
+}
 console.log("Module gameData chargé");
