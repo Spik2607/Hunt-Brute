@@ -6,7 +6,7 @@ function getRandomElement(array) {
 }
 
 const prefixes = ['Ancien', 'Démoniaque', 'Glacial', 'Flamboyant', 'Vengeur', 'Mystique', 'Corrompu', 'Céleste', 'Maudit', 'Béni'];
-const suffixes = ['du Chaos', 'de la Tempête', 'de l'Abysse', 'du Dragon', 'du Phénix', 'de l'Éternité', 'du Vide', 'de la Lumière', 'des Ombres', 'du Destin'];
+const suffixes = ['du Chaos', 'de la Tempête', 'de l Abysse', 'du Dragon', 'du Phénix', 'de l Éternité', 'du Vide', 'de la Lumière', 'des Ombres', 'du Destin'];
 
 const enemyTypes = ['Golem', 'Spectre', 'Démon', 'Chimère', 'Wyrm', 'Banshee', 'Titan', 'Liche', 'Léviathan', 'Behemoth'];
 
