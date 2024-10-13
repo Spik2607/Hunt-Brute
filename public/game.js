@@ -184,7 +184,7 @@ function initializeSocket() {
 
         console.log('Initialisation de Socket.io réussie');
     } catch (error) {
-        console.error('Erreur lors de l'initialisation de Socket.io:', error);
+        console.error('Erreur lors de linitialisation de Socket.io:', error);
     }
 }
 
