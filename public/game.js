@@ -922,6 +922,14 @@ export {
     openInventory,
     buyItem,
     sellItem,
+    createCharacter,
+    distributeSkillPoint,
+    confirmLevelUp,
+    showLevelUpModal,
+    openShop,
+    sendChatMessage,
+    offerTradeItem,
+    selectCompanion
 };
 
 console.log("Script game.js chargé");
