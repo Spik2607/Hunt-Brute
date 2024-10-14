@@ -195,9 +195,9 @@ function createCharacter() {
         return;
     }
     player = new Character(name, 100, 10, 5);
+    console.log("Nouveau personnage créé:", player);
     updatePlayerInfo();
     showGameArea('adventure-menu');
-    console.log("Personnage créé:", player);
 }
 
 function openShop() {
