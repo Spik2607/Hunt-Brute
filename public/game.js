@@ -115,7 +115,7 @@ function showCharacterCreationArea() {
     showGameArea('character-creation');
 }
 
-export function createCharacter() {
+ function createCharacter() {
     const nameInput = document.getElementById('hero-name');
     if (!nameInput) {
         console.error("L'élément 'hero-name' n'a pas été trouvé");
@@ -134,7 +134,7 @@ export function createCharacter() {
     showGameArea('adventure-menu');
 }
 
-export function updatePlayerInfo() {
+ function updatePlayerInfo() {
     if (!player) {
         console.error("Aucun joueur n'est initialisé");
         return;
@@ -183,7 +183,7 @@ function chooseMission() {
     showGameArea('mission-choice');
 }
 
-export function startMission(index) {
+ function startMission(index) {
     currentMission = missions[index];
     const chosenEnemy = selectEnemyForMission(currentMission);
     initializeCombat(player, companion, chosenEnemy, currentMission);
@@ -449,7 +449,7 @@ function openInventory() {
     }
 }
 
-export function distributeSkillPoint(skill) {
+ function distributeSkillPoint(skill) {
     if (player.skillPoints > 0) {
         player.skills[skill]++;
         player.skillPoints--;
@@ -461,13 +461,13 @@ export function distributeSkillPoint(skill) {
     }
 }
 
-export function confirmLevelUp() {
+ function confirmLevelUp() {
     player.applySkills();
     document.getElementById('level-up-modal').style.display = 'none';
     updatePlayerInfo();
 }
 
-export function showLevelUpModal() {
+ function showLevelUpModal() {
     const modal = document.getElementById('level-up-modal');
     const newLevelSpan = document.getElementById('new-level');
     const skillPointsSpan = document.getElementById('skill-points');
@@ -626,7 +626,7 @@ function updateWaitingAreaDisplay(players) {
     }
 }
 
-export function sendChatMessage() {
+ function sendChatMessage() {
     const chatInput = document.getElementById('chat-input');
     const message = chatInput.value.trim();
     if (message && currentRoom) {
@@ -721,7 +721,7 @@ function showTradeInterface() {
     document.getElementById('cancel-trade').addEventListener('click', cancelTrade);
 }
 
-export function offerTradeItem(index) {
+ function offerTradeItem(index) {
     const item = player.inventory[index];
     socket.emit('offerTradeItem', { roomId: currentRoom, itemId: item.id });
 }
@@ -859,7 +859,7 @@ export {
     currentExpedition,
     currentDonjon,
     initGame,
-    updatePlayerInfo,
+    updatePlayerInfo,  // Assurez-vous que cette ligne n'apparaît qu'une seule fois
     showGameArea,
     showGameMessage,
     handleCombatEnd,
