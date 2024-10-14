@@ -3,7 +3,7 @@
 import { items, getItemStats } from './gameData.js';
 
 export function equipItem(player, index) {
-    if (!player || !player.inventory || index < 0 || index >= player.inventory.length) {
+    if (!player || !Array.isArray(player.inventory) || index < 0 || index >= player.inventory.length) {
         console.error("Équipement impossible : joueur ou index invalide");
         return;
     }
@@ -11,12 +11,16 @@ export function equipItem(player, index) {
     const item = player.inventory[index];
     
     if (item.type === 'weapon' || item.type === 'armor' || item.type === 'accessory') {
-        player.equip(item);
-        player.inventory.splice(index, 1);
-        updatePlayerInfo(player);
-        updateInventoryDisplay(player);
-        updateEquippedItemsDisplay(player);
-        showGameMessage(`${player.name} a équipé ${item.name}`);
+        if (typeof player.equip === 'function') {
+            player.equip(item);
+            player.inventory.splice(index, 1);
+            updatePlayerInfo(player);
+            updateInventoryDisplay(player);
+            updateEquippedItemsDisplay(player);
+            showGameMessage(`${player.name} a équipé ${item.name}`);
+        } else {
+            console.error("La méthode 'equip' n'existe pas sur l'objet player");
+        }
     } else {
         showGameMessage("Cet objet ne peut pas être équipé");
     }
@@ -29,16 +33,20 @@ export function unequipItem(player, type) {
     }
     const item = player.equippedItems[type];
     if (item) {
-        player.unequip(type);
-        updatePlayerInfo(player);
-        updateInventoryDisplay(player);
-        updateEquippedItemsDisplay(player);
-        showGameMessage(`${player.name} a déséquipé ${item.name}`);
+        if (typeof player.unequip === 'function') {
+            player.unequip(type);
+            updatePlayerInfo(player);
+            updateInventoryDisplay(player);
+            updateEquippedItemsDisplay(player);
+            showGameMessage(`${player.name} a déséquipé ${item.name}`);
+        } else {
+            console.error("La méthode 'unequip' n'existe pas sur l'objet player");
+        }
     }
 }
 
 export function useItem(player, index) {
-    if (!player || !player.inventory || index < 0 || index >= player.inventory.length) {
+    if (!player || !Array.isArray(player.inventory) || index < 0 || index >= player.inventory.length) {
         console.error("Utilisation impossible : joueur ou index invalide");
         return;
     }
@@ -46,19 +54,23 @@ export function useItem(player, index) {
     const item = player.inventory[index];
     
     if (item.type === 'consumable') {
-        player.useItem(item);
-        player.inventory.splice(index, 1);
-        updatePlayerInfo(player);
-        updateInventoryDisplay(player);
-        showGameMessage(`${player.name} a utilisé ${item.name}`);
+        if (typeof player.useItem === 'function') {
+            player.useItem(item);
+            player.inventory.splice(index, 1);
+            updatePlayerInfo(player);
+            updateInventoryDisplay(player);
+            showGameMessage(`${player.name} a utilisé ${item.name}`);
+        } else {
+            console.error("La méthode 'useItem' n'existe pas sur l'objet player");
+        }
     } else {
         showGameMessage("Cet objet ne peut pas être utilisé");
     }
 }
 
 export function updateInventoryDisplay(player) {
-    if (!player) {
-        console.error("Mise à jour de l'inventaire impossible : joueur invalide");
+    if (!player || !Array.isArray(player.inventory)) {
+        console.error("Mise à jour de l'inventaire impossible : joueur invalide ou inventaire non défini");
         return;
     }
     const inventoryElement = document.getElementById('inventory-items');
@@ -84,7 +96,7 @@ export function updateInventoryDisplay(player) {
 }
 
 export function updateEquippedItemsDisplay(player) {
-    if (!player) {
+    if (!player || !player.equippedItems) {
         console.error("Mise à jour des objets équipés impossible : joueur invalide");
         return;
     }
@@ -127,18 +139,20 @@ export function openShop(player) {
         shopElement.appendChild(itemElement);
     });
 
-    player.inventory.forEach((item, index) => {
-        if (item.value) {
-            const itemElement = document.createElement('div');
-            itemElement.className = 'shop-item unique-item';
-            itemElement.innerHTML = `
-                <span>${item.name} - ${item.value} or</span>
-                <button onclick="window.inventoryModule.sellUniqueItem(window.player, ${index})">Vendre</button>
-            `;
-            itemElement.title = getItemStats(item);
-            shopElement.appendChild(itemElement);
-        }
-    });
+    if (Array.isArray(player.inventory)) {
+        player.inventory.forEach((item, index) => {
+            if (item.value) {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'shop-item unique-item';
+                itemElement.innerHTML = `
+                    <span>${item.name} - ${item.value} or</span>
+                    <button onclick="window.inventoryModule.sellUniqueItem(window.player, ${index})">Vendre</button>
+                `;
+                itemElement.title = getItemStats(item);
+                shopElement.appendChild(itemElement);
+            }
+        });
+    }
 
     showGameArea('shop-area');
 }
@@ -155,17 +169,21 @@ export function buyItem(player, itemId) {
     }
     if (player.gold >= item.cost) {
         player.gold -= item.cost;
-        player.inventory.push(item);
-        updatePlayerInfo(player);
-        updateInventoryDisplay(player);
-        showGameMessage(`${player.name} a acheté ${item.name}`);
+        if (Array.isArray(player.inventory)) {
+            player.inventory.push(item);
+            updatePlayerInfo(player);
+            updateInventoryDisplay(player);
+            showGameMessage(`${player.name} a acheté ${item.name}`);
+        } else {
+            console.error("L'inventaire du joueur n'est pas un tableau");
+        }
     } else {
         showGameMessage("Vous n'avez pas assez d'or !");
     }
 }
 
 export function sellItem(player, index) {
-    if (!player || !player.inventory || index < 0 || index >= player.inventory.length) {
+    if (!player || !Array.isArray(player.inventory) || index < 0 || index >= player.inventory.length) {
         console.error("Vente impossible : joueur ou index invalide");
         return;
     }
@@ -189,15 +207,17 @@ export function addItemToInventory(player, item) {
         console.error("Ajout d'item impossible : joueur ou item invalide");
         return;
     }
-    player.inventory.push(item);
-    updateInventoryDisplay(player);
-    showGameMessage(`${player.name} a obtenu ${item.name}`);
+    if (Array.isArray(player.inventory)) {
+        player.inventory.push(item);
+        updateInventoryDisplay(player);
+        showGameMessage(`${player.name} a obtenu ${item.name}`);
+    } else {
+        console.error("L'inventaire du joueur n'est pas un tableau");
+    }
 }
 
 function updatePlayerInfo(player) {
-    // Cette fonction devrait être définie dans game.js et importée ici
-    // ou vous pouvez la redéfinir ici si nécessaire
-    if (window.updatePlayerInfo) {
+    if (typeof window.updatePlayerInfo === 'function') {
         window.updatePlayerInfo(player);
     } else {
         console.error("La fonction updatePlayerInfo n'est pas définie globalement");
@@ -205,7 +225,7 @@ function updatePlayerInfo(player) {
 }
 
 function showGameMessage(message) {
-    if (window.showGameMessage) {
+    if (typeof window.showGameMessage === 'function') {
         window.showGameMessage(message);
     } else {
         console.log(message);
@@ -213,14 +233,13 @@ function showGameMessage(message) {
 }
 
 function showGameArea(areaId) {
-    if (window.showGameArea) {
+    if (typeof window.showGameArea === 'function') {
         window.showGameArea(areaId);
     } else {
         console.error("La fonction showGameArea n'est pas définie globalement");
     }
 }
 
-// Exportez un objet contenant toutes les fonctions pour faciliter l'accès global
 export const inventoryModule = {
     equipItem,
     unequipItem,
