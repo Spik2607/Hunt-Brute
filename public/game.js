@@ -907,24 +907,10 @@ export {
     companion,
     currentMission,
     currentExpedition,
-    updatePlayerInfo,
-    showGameArea,
     skills,
-    initGame,
-    chooseMission,
-    startExpedition,
-    cancelExpedition,
-    startDonjon,
-    nextDonjonEvent,
-    exitDonjon,
-    openCompanionsMenu,
-    startMultiplayerMode,
-    joinRoom,
-    challengePlayer,
-    requestTrade,
-    showGameMessage,
-    openInventory,
-    buyItem,
-    sellItem // Ajouté ici s'il n'était pas présent auparavant
+    // Supprimez d'ici toutes les fonctions qui sont déjà exportées individuellement plus haut dans le fichier.
+    // Par exemple, si updatePlayerInfo, showGameArea, initGame, etc. sont déjà exportées,
+    // elles ne devraient pas apparaître ici.
 };
+
 console.log("Script game.js chargé");
