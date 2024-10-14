@@ -643,7 +643,7 @@ function displayChatMessage(message) {
     }
 }
 
-export function challengePlayer() {
+function challengePlayer() {
     if (currentRoom) {
         socket.emit('initiateChallenge', { roomId: currentRoom, challengerId: socket.id });
     }
