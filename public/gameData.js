@@ -331,4 +331,32 @@ export function createEnemyForMission(mission) {
         defense: Math.round(enemyBase.defense * (mission.enemyLevel / enemyBase.level))
     };
 }
+export function createEnemyForMission(mission) {
+    const enemyBase = enemies.find(e => e.name === mission.enemy);
+    if (!enemyBase) return null;
+
+    return {
+        name: enemyBase.name,
+        level: mission.enemyLevel,
+        hp: Math.round(enemyBase.hp * (mission.enemyLevel / enemyBase.level)),
+        attack: Math.round(enemyBase.attack * (mission.enemyLevel / enemyBase.level)),
+        defense: Math.round(enemyBase.defense * (mission.enemyLevel / enemyBase.level))
+    };
+}
+
+// Nouvelle fonction ajoutée pour générer un ennemi unique
+export function generateUniqueEnemy(floor) {
+    const baseEnemy = getRandomEnemy();
+    const uniqueName = `${baseEnemy.name} ${getRandomElement(['Féroce', 'Redoutable', 'Terrifiant', 'Mystérieux', 'Légendaire'])}`;
+    
+    const levelMultiplier = 1 + (floor * 0.1);
+    return {
+        name: uniqueName,
+        level: Math.round(baseEnemy.level * levelMultiplier),
+        hp: Math.round(baseEnemy.hp * levelMultiplier),
+        attack: Math.round(baseEnemy.attack * levelMultiplier),
+        defense: Math.round(baseEnemy.defense * levelMultiplier)
+    };
+}
+
 console.log("Module gameData chargé");
