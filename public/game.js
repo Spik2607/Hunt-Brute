@@ -902,5 +902,30 @@ window.startMultiplayerMode = startMultiplayerMode;
 // Initialisation du jeu
 document.addEventListener('DOMContentLoaded', initGame);
 
+export {
+    player,
+    companion,
+    currentMission,
+    currentExpedition,
+    updatePlayerInfo,
+    showGameArea,
+    skills,
+    initGame,
+    chooseMission,
+    startExpedition,
+    cancelExpedition,
+    startDonjon,
+    nextDonjonEvent,
+    exitDonjon,
+    openCompanionsMenu,
+    startMultiplayerMode,
+    joinRoom,
+    challengePlayer,
+    requestTrade,
+    showGameMessage,
+    openInventory,
+    buyItem,
+    sellItem,
+};
 
 console.log("Script game.js chargé");
