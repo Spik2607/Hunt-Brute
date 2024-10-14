@@ -516,7 +516,7 @@ export function openShop() {
     }
 }
 
-export function buyItem(itemId) {
+ function buyItem(itemId) {
     const item = items.find(i => i.id === itemId);
     if (player && item && player.gold >= item.cost) {
         player.gold -= item.cost;
@@ -528,7 +528,7 @@ export function buyItem(itemId) {
     }
 }
 
-export function sellItem(index) {
+function sellItem(index) {
     if (player && player.inventory[index]) {
         const item = player.inventory[index];
         const sellPrice = Math.floor(item.cost * 0.5);
