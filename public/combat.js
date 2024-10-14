@@ -1,18 +1,26 @@
 // combat.js
+import { createEnemyForMission, generateUniqueEnemy } from './gameData.js';
 
 let player, companion, enemy, currentMission;
 let currentCombat = false;
 
-export function initializeCombat(playerCharacter, companionCharacter, chosenEnemy) {
+export function initializeCombat(playerCharacter, companionCharacter, enemyData, currentMission) {
     player = playerCharacter;
     companion = companionCharacter;
-    enemy = { ...chosenEnemy };
+    
+    if (currentMission) {
+        // Mode mission : utiliser l'ennemi de niveau fixe de la mission
+        enemy = createEnemyForMission(currentMission);
+    } else {
+        // Mode donjon : utiliser l'ennemi généré aléatoirement
+        enemy = generateUniqueEnemy(enemyData.level);
+    }
+    
     currentCombat = true;
     
     updateBattleInfo();
     console.log("Combat initialisé:", { player, companion, enemy });
 }
-
 export function updateBattleInfo() {
     const playerStats = document.getElementById('player-combat-info');
     const companionStats = document.getElementById('companion-combat-info');
