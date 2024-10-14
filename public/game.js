@@ -49,20 +49,40 @@ const skills = {
     }
 };
 
-function initGame() {
-    console.log("Initialisation du jeu...");
-
-    // Cacher toutes les zones de jeu et afficher le menu principal
+function resetGame() {
+    console.log("Réinitialisation du jeu...");
+    // Effacer les données sauvegardées
+    localStorage.removeItem('huntBruteGameState');
+    
+    // Réinitialiser les variables globales
+    player = null;
+    companion = null;
+    currentMission = null;
+    currentExpedition = null;
+    currentDonjon = null;
+    
+    // Arrêter tous les intervalles
+    if (window.gameIntervals) {
+        window.gameIntervals.forEach(clearInterval);
+        window.gameIntervals = [];
+    }
+    
+    // Réinitialiser l'affichage
+    updatePlayerInfo();
     hideAllGameAreas();
     showGameArea('main-menu');
+    showCreateHunterButton();
+    
+    console.log("Jeu réinitialisé. Prêt pour une nouvelle partie.");
+}
 
-    // Initialiser la connexion socket pour le multijoueur
+function initGame() {
+    console.log("Initialisation du jeu...");
+    hideAllGameAreas();
+    showGameArea('main-menu');
     initializeSocket();
-
-    // Configurer les écouteurs d'événements pour les boutons et autres interactions
     setupEventListeners();
-
-    // Tenter de charger une partie sauvegardée
+    
     const savedState = localStorage.getItem('huntBruteGameState');
     if (savedState) {
         try {
@@ -84,15 +104,9 @@ function initGame() {
         showCreateHunterButton();
     }
 
-    // Mettre en place les intervalles de mise à jour
     setUpdateIntervals();
-
-    // Ajouter l'écouteur d'événement pour la fin de combat
     window.addEventListener('combatEnd', handleCombatEnd);
-
-    // Initialiser les composants supplémentaires du jeu
     initializeAdditionalComponents();
-
     console.log("Initialisation du jeu terminée");
 }
 
@@ -802,6 +816,10 @@ function setupEventListeners() {
     document.getElementById('trade-request').addEventListener('click', requestTrade);
     document.getElementById('save-game').addEventListener('click', saveGame);
     document.getElementById('load-game').addEventListener('click', loadGame);
+    document.getElementById('reset-game').addEventListener('click', () => {
+        if (confirm("Êtes-vous sûr de vouloir effacer votre personnage et redémarrer le jeu ?")) {
+            resetGame();
+        }
 }
 
 function showGameMessage(message) {
