@@ -81,26 +81,22 @@ export function initGame() {
     }, 1000);
 
     window.addEventListener('combatEnd', handleCombatEnd);
+    additionalInit();
+    console.log("Initialisation du jeu terminée");
 }
 
 function hideAllGameAreas() {
     const gameAreas = document.querySelectorAll('.game-area');
-    gameAreas.forEach(area => {
-        area.style.display = 'none';
-    });
+    gameAreas.forEach(area => area.style.display = 'none');
 }
 
 export function showGameArea(areaId) {
     console.log(`Tentative d'affichage de la zone: ${areaId}`);
     const areas = document.querySelectorAll('.game-area');
     areas.forEach(area => {
-        if (area.id === areaId) {
-            area.style.display = 'block';
-            console.log(`Zone ${areaId} affichée`);
-        } else {
-            area.style.display = 'none';
-        }
+        area.style.display = area.id === areaId ? 'block' : 'none';
     });
+    console.log(`Zone ${areaId} affichée`);
 }
 
 function showCreateHunterButton() {
@@ -385,7 +381,6 @@ function generateDonjonFloor() {
         });
     }
 }
-
 
 function updateDonjonInfo() {
     const donjonInfo = document.getElementById('donjon-info');
@@ -681,7 +676,7 @@ function handleOpponentAction(action) {
 
 export function requestTrade() {
     if (currentRoom) {
-        const otherPlayerId = getOtherPlayerId(); // Implémenter cette fonction
+        const otherPlayerId = getOtherPlayerId();
         socket.emit('initiateTradeRequest', { roomId: currentRoom, fromId: socket.id, toId: otherPlayerId });
     }
 }
@@ -789,31 +784,6 @@ function saveGame() {
     }
 }
 
-// Initialisation du jeu
-document.addEventListener('DOMContentLoaded', initGame);
-
-// Rendre les fonctions accessibles globalement
-window.createCharacter = createCharacter;
-window.startMission = startMission;
-window.startExpedition = startExpedition;
-window.cancelExpedition = cancelExpedition;
-window.nextDonjonEvent = nextDonjonEvent;
-window.exitDonjon = exitDonjon;
-window.openInventory = openInventory;
-window.distributeSkillPoint = distributeSkillPoint;
-window.confirmLevelUp = confirmLevelUp;
-window.joinRoom = joinRoom;
-window.sendChatMessage = sendChatMessage;
-window.challengePlayer = challengePlayer;
-window.requestTrade = requestTrade;
-window.offerTradeItem = offerTradeItem;
-window.buyItem = buyItem;
-window.sellItem = sellItem;
-
-console.log("Script game.js chargé");
-
-// Fonctions supplémentaires
-
 export function openCompanionsMenu() {
     if (!player) {
         console.error("Aucun joueur n'est initialisé");
@@ -887,19 +857,16 @@ function getOtherPlayerId() {
     return "player2";
 }
 
-// Fonction pour gérer les erreurs de manière globale
 function handleError(error) {
     console.error("Une erreur s'est produite :", error);
     showGameMessage("Une erreur s'est produite. Veuillez réessayer.");
 }
 
-// Ajout d'un gestionnaire d'erreurs global
 window.onerror = function(message, source, lineno, colno, error) {
     handleError(error || message);
     return true;
 };
 
-// Initialisation supplémentaire
 function additionalInit() {
     // Initialisation du son (à implémenter)
     // initializeSound();
@@ -911,47 +878,23 @@ function additionalInit() {
     // checkForUpdates();
 }
 
-// Fonction principale d'initialisation
-export function initGame() {
-    console.log("Initialisation du jeu...");
-    hideAllGameAreas();
-    showGameArea('main-menu');
-    initializeSocket();
-    setupEventListeners();
-    
-    const savedState = localStorage.getItem('huntBruteGameState');
-    if (savedState) {
-        try {
-            const gameState = JSON.parse(savedState);
-            loadGame(gameState);
-            console.log("Partie chargée avec succès");
-        } catch (error) {
-            console.error("Erreur lors du chargement de la sauvegarde:", error);
-            showCreateHunterButton();
-        }
-    } else {
-        showCreateHunterButton();
-    }
-
-    setInterval(() => {
-        if (player && !isCombatActive()) {
-            player.regenerateHP();
-            player.regenerateEnergy();
-            updatePlayerInfo();
-        }
-        if (currentExpedition) {
-            updateExpedition();
-        }
-    }, 1000);
-
-    window.addEventListener('combatEnd', handleCombatEnd);
-
-    additionalInit();
-
-    console.log("Initialisation du jeu terminée");
-}
-
-// Rendre les fonctions supplémentaires accessibles globalement
+// Rendre les fonctions accessibles globalement
+window.createCharacter = createCharacter;
+window.startMission = startMission;
+window.startExpedition = startExpedition;
+window.cancelExpedition = cancelExpedition;
+window.nextDonjonEvent = nextDonjonEvent;
+window.exitDonjon = exitDonjon;
+window.openInventory = openInventory;
+window.distributeSkillPoint = distributeSkillPoint;
+window.confirmLevelUp = confirmLevelUp;
+window.joinRoom = joinRoom;
+window.sendChatMessage = sendChatMessage;
+window.challengePlayer = challengePlayer;
+window.requestTrade = requestTrade;
+window.offerTradeItem = offerTradeItem;
+window.buyItem = buyItem;
+window.sellItem = sellItem;
 window.openCompanionsMenu = openCompanionsMenu;
 window.selectCompanion = selectCompanion;
 window.startMultiplayerMode = startMultiplayerMode;
@@ -984,3 +927,5 @@ export {
     buyItem,
     sellItem,
 };
+
+console.log("Script game.js chargé");
