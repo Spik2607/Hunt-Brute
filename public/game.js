@@ -674,7 +674,7 @@ function handleOpponentAction(action) {
     console.log("Action de l'adversaire:", action);
 }
 
-export function requestTrade() {
+function requestTrade() {
     if (currentRoom) {
         const otherPlayerId = getOtherPlayerId();
         socket.emit('initiateTradeRequest', { roomId: currentRoom, fromId: socket.id, toId: otherPlayerId });
