@@ -600,7 +600,7 @@ function initializeSocket() {
     });
 }
 
-export function joinRoom(roomId) {
+function joinRoom(roomId) {
     if (!player) {
         alert("Veuillez d'abord créer un personnage.");
         return;
