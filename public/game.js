@@ -905,7 +905,6 @@ document.addEventListener('DOMContentLoaded', initGame);
 export {
     player,
     companion,
-    currentMission,
     updatePlayerInfo,
     showGameArea,
     skills,
