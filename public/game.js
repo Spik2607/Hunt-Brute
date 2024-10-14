@@ -660,6 +660,48 @@ function createItemHTML(item, index, isEquipped) {
     `;
 }
 
+function equipItem(index) {
+    if (!player || !player.inventory[index]) return;
+    const item = player.inventory[index];
+    if (item.type === 'weapon' || item.type === 'armor' || item.type === 'accessory') {
+        if (player.equippedItems[item.type]) {
+            player.unequipItem(player.equippedItems[item.type]);
+        }
+        player.equipItem(item);
+        player.inventory.splice(index, 1);
+        updatePlayerInfo();
+        openInventory();
+        console.log("Objet équipé:", item);
+    }
+}
+
+function unequipItem(type) {
+    const item = player.equippedItems[type];
+    if (item) {
+        player.unequipItem(item);
+        updatePlayerInfo();
+        openInventory();
+    }
+}
+
+function useItem(index) {
+    if (!player || !player.inventory[index]) return;
+    const item = player.inventory[index];
+    if (item.type === 'consumable') {
+        if (item.effect === 'heal') {
+            const healAmount = item.value;
+            player.hp = Math.min(player.hp + healAmount, player.maxHp);
+            updateBattleLog(`Vous utilisez ${item.name} et récupérez ${healAmount} PV.`);
+        } else if (item.effect === 'energy') {
+            player.energy = Math.min(player.energy + item.value, player.maxEnergy);
+            updateBattleLog(`Vous utilisez ${item.name} et récupérez ${item.value} points d'énergie.`);
+        }
+        player.inventory.splice(index, 1);
+        updatePlayerInfo();
+        openInventory();
+    }
+}
+
 function openShop() {
     console.log("Ouverture de la boutique");
     const shopItems = document.getElementById('shop-items');
@@ -725,46 +767,6 @@ function sellUniqueItem(index) {
         updatePlayerInfo();
         openShop(); // Rafraîchir la boutique
         alert(`Vous avez vendu ${item.name} pour ${item.value} or.`);
-    }
-}
-
-function equipItem(index) {
-    if (!player || !player.inventory[index]) return;
-    const item = player.inventory[index];
-    if (item.type === 'weapon' || item.type === 'armor' || item.type === 'accessory') {
-        player.equipItem(item);
-        player.inventory.splice(index, 1);
-        updatePlayerInfo();
-        openInventory();
-        console.log("Objet équipé:", item);
-    }
-}
-
-function unequipItem(type) {
-    const item = player.equippedItems[type];
-    if (item) {
-        player.unequipItem(item);
-        player.inventory.push(item);
-        updatePlayerInfo();
-        openInventory();
-    }
-}
-
-function useItem(index) {
-    if (!player || !player.inventory[index]) return;
-    const item = player.inventory[index];
-    if (item.type === 'consumable') {
-        if (item.effect === 'heal') {
-            const healAmount = item.value;
-            player.hp = Math.min(player.hp + healAmount, player.maxHp);
-            updateBattleLog(`Vous utilisez ${item.name} et récupérez ${healAmount} PV.`);
-        } else if (item.effect === 'energy') {
-            player.energy = Math.min(player.energy + item.value, player.maxEnergy);
-            updateBattleLog(`Vous utilisez ${item.name} et récupérez ${item.value} points d'énergie.`);
-        }
-        player.inventory.splice(index, 1);
-        updatePlayerInfo();
-        openInventory();
     }
 }
 
