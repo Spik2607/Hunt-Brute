@@ -885,6 +885,7 @@ export {
     sellItem,
 };
 
+
 // Rendre les fonctions accessibles globalement
 window.player = player;
 window.distributeSkillPoint = distributeSkillPoint;
