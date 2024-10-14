@@ -26,6 +26,8 @@
             <button id="load-game">Charger</button>
         </nav>
 
+        <div id="game-messages"></div>
+
         <main id="game-content">
             <section id="character-creation" class="game-area">
                 <h2>Création du Personnage</h2>
@@ -123,6 +125,12 @@
                 <button id="trade-request">Demander un échange</button>
             </section>
 
+            <section id="expedition-area" class="game-area">
+                <h2>Expédition</h2>
+                <div id="expedition-info"></div>
+                <div id="expedition-log"></div>
+                <button id="cancel-expedition">Annuler l'expédition</button>
+            </section>
         </main>
 
         <div id="level-up-modal" class="modal">
@@ -134,17 +142,17 @@
                     <div>
                         <label for="strength-skill">Force :</label>
                         <span id="strength-skill"></span>
-                        <button onclick="distributeSkillPoint('strength')">+</button>
+                        <button onclick="inventoryModule.distributeSkillPoint('strength')">+</button>
                     </div>
                     <div>
                         <label for="agility-skill">Agilité :</label>
                         <span id="agility-skill"></span>
-                        <button onclick="distributeSkillPoint('agility')">+</button>
+                        <button onclick="inventoryModule.distributeSkillPoint('agility')">+</button>
                     </div>
                     <div>
                         <label for="intelligence-skill">Intelligence :</label>
                         <span id="intelligence-skill"></span>
-                        <button onclick="distributeSkillPoint('intelligence')">+</button>
+                        <button onclick="inventoryModule.distributeSkillPoint('intelligence')">+</button>
                     </div>
                 </div>
                 <button id="confirm-level-up">Confirmer</button>
@@ -157,6 +165,7 @@
     <script src="expedition.js" type="module"></script>
     <script src="combat.js" type="module"></script>
     <script src="donjon.js" type="module"></script>
+    <script src="inventory.js" type="module"></script>
     <script src="game.js" type="module"></script>
 </body>
 </html>
