@@ -925,6 +925,6 @@ export {
     showGameMessage,
     openInventory,
     buyItem,
-    };
-
+    sellItem // Ajouté ici s'il n'était pas présent auparavant
+};
 console.log("Script game.js chargé");
