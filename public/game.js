@@ -200,6 +200,16 @@ function createCharacter() {
     console.log("Personnage créé:", player);
 }
 
+function openShop() {
+    console.log("Tentative d'ouverture de la boutique");
+    if (player) {
+        inventoryModule.openShop(player);
+    } else {
+        console.error("Aucun joueur n'est initialisé");
+        showGameMessage("Veuillez d'abord créer un personnage.");
+    }
+}
+
 function setupEventListeners() {
     const listeners = [
         { id: 'start-adventure', event: 'click', handler: () => showGameArea('adventure-menu') },
