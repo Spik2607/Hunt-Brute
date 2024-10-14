@@ -231,7 +231,7 @@ function performAttack(attacker, defender) {
     updateBattleLog(`${attacker.name} inflige ${damageResult.damage} dégâts à ${defender.name}${damageResult.isCritical ? " (Coup critique!)" : ""}.`);
 }
 
-export function startExpedition() {
+function startExpedition() {
     if (!player) {
         console.error("Aucun joueur n'est initialisé");
         return;
