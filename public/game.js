@@ -447,7 +447,7 @@ export function exitDonjon() {
     console.log("Sortie du donjon");
 }
 
-export function openInventory() {
+function openInventory() {
     console.log("Tentative d'ouverture de l'inventaire");
     if (player) {
         updateInventoryDisplay(player);
