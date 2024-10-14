@@ -226,6 +226,7 @@ function openInventory() {
     console.log("Tentative d'ouverture de l'inventaire");
     if (player) {
         inventoryModule.updateInventoryDisplay(player);
+        inventoryModule.updateEquippedItemsDisplay(player);
         showGameArea('inventory-area');
     } else {
         console.error("Aucun joueur n'est initialisé");
