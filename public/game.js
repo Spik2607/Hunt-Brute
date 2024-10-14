@@ -882,7 +882,7 @@ export {
     unequipItem,
     useItem,
     buyItem,
-    sellItem
+    sellItem,
 };
 
 // Rendre les fonctions accessibles globalement
