@@ -1,5 +1,5 @@
 // game.js
-import { Character, items, missions, dropRates, getRandomCompanion, getRandomItem, enemies, getItemStats } from './gameData.js';
+import { Character, items, missions, dropRates, getRandomCompanion, getRandomItem, enemies, getItemStats, getRandomEnemy, getRandomMission, createEnemy, generateRandomLoot, calculateDamage, levelUpCharacter } from './gameData.js';
 import { expeditionEvents, getRandomExpeditionEvent } from './expedition.js';
 import { initializeCombat, playerAttack, playerDefend, playerUseSpecial, updateBattleInfo, updateBattleLog, isCombatActive } from './combat.js';
 import { generateUniqueEnemy, generateDonjonReward, generateDonjonEvent, generateDonjonBoss, generateBossReward } from './donjon.js';
@@ -213,11 +213,26 @@ function selectEnemyForMission(mission) {
 function handleCombatEnd(event) {
     const { victory } = event.detail;
     if (victory) {
+        const loot = generateRandomLoot(enemy.level);
+        if (loot) {
+            addItemToInventory(player, loot);
+        }
+        player.gainExperience(enemy.level * 10);
+        if (player.experience >= player.level * 100) {
+            levelUpCharacter(player);
+            showLevelUpModal();
+        }
         showGameArea('adventure-menu');
     } else {
         showGameArea('main-menu');
     }
     updatePlayerInfo();
+}
+
+function performAttack(attacker, defender) {
+    const damageResult = calculateDamage(attacker, defender);
+    defender.hp -= damageResult.damage;
+    updateBattleLog(`${attacker.name} inflige ${damageResult.damage} dégâts à ${defender.name}${damageResult.isCritical ? " (Coup critique!)" : ""}.`);
 }
 
 export function startExpedition() {
@@ -363,9 +378,14 @@ export function startDonjon() {
 function generateDonjonFloor() {
     currentDonjon.events = [];
     for (let i = 0; i < 5; i++) {
-        currentDonjon.events.push(generateDonjonEvent(currentDonjon.floor));
+        const enemy = createEnemy(getRandomEnemy().name, currentDonjon.floor);
+        currentDonjon.events.push({
+            type: 'combat',
+            enemy: enemy
+        });
     }
 }
+
 
 function updateDonjonInfo() {
     const donjonInfo = document.getElementById('donjon-info');
