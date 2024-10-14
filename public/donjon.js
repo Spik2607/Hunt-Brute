@@ -1,5 +1,5 @@
 // donjon.js
-
+import { generateUniqueEnemy } from './gameData.js';
 // Fonction utilitaire pour obtenir un élément aléatoire d'un tableau
 function getRandomElement(array) {
     return array[Math.floor(Math.random() * array.length)];
