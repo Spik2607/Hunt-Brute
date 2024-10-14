@@ -3,20 +3,32 @@
 import { missions } from './gameData.js';
 
 let player, enemy, currentMission;
+let currentCombat = false;
 
-export function initializeCombat(playerCharacter, missionIndex, chosenEnemy) {
+export function initializeCombat(playerCharacter, missionOrEnemy, isDonjon = false) {
     player = playerCharacter;
-    enemy = { ...chosenEnemy }; // Créer une copie de l'ennemi pour éviter de modifier l'original
-    currentMission = missions[missionIndex];
-    
-    // Ajuster les statistiques de l'ennemi en fonction du niveau de la mission
-    enemy.maxHp = Math.round(enemy.hp * currentMission.enemyLevel);
-    enemy.hp = enemy.maxHp;
-    enemy.attack = Math.round(enemy.attack * currentMission.enemyLevel);
-    enemy.defense = Math.round(enemy.defense * currentMission.enemyLevel);
+    currentCombat = true;
+
+    if (isDonjon) {
+        enemy = { ...missionOrEnemy };
+    } else {
+        currentMission = missions[missionOrEnemy];
+        enemy = createEnemyForMission(currentMission);
+    }
     
     updateBattleInfo();
     console.log("Combat initialisé:", { player, enemy, currentMission });
+}
+
+function createEnemyForMission(mission) {
+    return {
+        name: mission.enemy,
+        level: mission.enemyLevel,
+        maxHp: mission.enemyLevel * 20,
+        hp: mission.enemyLevel * 20,
+        attack: mission.enemyLevel * 5,
+        defense: mission.enemyLevel * 2
+    };
 }
 
 export function updateBattleInfo() {
@@ -41,7 +53,7 @@ export function updateBattleInfo() {
 }
 
 export function playerAttack() {
-    if (!player || !enemy) {
+    if (!currentCombat || !player || !enemy) {
         console.error("Combat non initialisé correctement");
         return;
     }
@@ -58,13 +70,14 @@ export function playerAttack() {
 }
 
 export function playerDefend() {
+    if (!currentCombat) return;
     player.defending = true;
     updateBattleLog(`${player.name} se met en position défensive.`);
     setTimeout(enemyTurn, 1000);
 }
 
 export function playerUseSpecial() {
-    if (!player || !enemy) return;
+    if (!currentCombat || !player || !enemy) return;
     const energyCost = 20;
     if (player.energy < energyCost) {
         updateBattleLog("Pas assez d'énergie pour utiliser une attaque spéciale.");
@@ -84,7 +97,7 @@ export function playerUseSpecial() {
 }
 
 function enemyTurn() {
-    if (!player || !enemy) return;
+    if (!currentCombat || !player || !enemy) return;
     let damage = Math.max(enemy.attack - player.defense, 1);
     if (player.defending) {
         damage = Math.floor(damage / 2);
@@ -107,9 +120,17 @@ function checkBattleEnd() {
 }
 
 function endCombat(victory) {
+    currentCombat = false;
     if (victory) {
-        const expGain = currentMission.expReward;
-        const goldGain = currentMission.goldReward;
+        let expGain, goldGain;
+        if (currentMission) {
+            expGain = currentMission.expReward;
+            goldGain = currentMission.goldReward;
+        } else {
+            // Récompenses pour le donjon
+            expGain = enemy.level * 10;
+            goldGain = enemy.level * 5;
+        }
         player.gainExperience(expGain);
         player.gold += goldGain;
         updateBattleLog(`Victoire ! Vous gagnez ${expGain} XP et ${goldGain} or.`);
@@ -132,6 +153,10 @@ export function updateBattleLog(message) {
     } else {
         console.error("Élément 'battle-log' non trouvé");
     }
+}
+
+export function isCombatActive() {
+    return currentCombat;
 }
 
 console.log("Module de combat chargé");
