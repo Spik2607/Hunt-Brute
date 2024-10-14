@@ -903,8 +903,6 @@ window.startMultiplayerMode = startMultiplayerMode;
 document.addEventListener('DOMContentLoaded', initGame);
 
 export {
-    player,
-    companion,
     updatePlayerInfo,
     showGameArea,
     skills,
