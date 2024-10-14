@@ -5,11 +5,11 @@ import { initializeCombat, playerAttack, playerDefend, playerUseSpecial, updateB
 import { generateUniqueEnemy, generateDonjonReward, generateDonjonEvent, generateDonjonBoss, generateBossReward } from './donjon.js';
 import { addItemToInventory, updateInventoryDisplay, updateEquippedItemsDisplay, openShop, buyItem, sellItem, equipItem, unequipItem, useItem } from './inventory.js';
 
-export let player = null;
-export let companion = null;
-export let currentMission = null;
-export let currentExpedition = null;
-export let currentDonjon = null;
+ let player = null;
+ let companion = null;
+ let currentMission = null;
+ let currentExpedition = null;
+ let currentDonjon = null;
 let socket;
 let currentRoom = null;
 
