@@ -85,7 +85,66 @@ function initGame() {
 }
 
 function initializeSocket() {
-    // Code pour initialiser le socket (inchangé)
+    function initializeSocket() {
+    socket = io();
+
+    socket.on('connect', () => {
+        console.log('Connecté au serveur');
+    });
+
+    socket.on('roomJoined', ({ roomId, players, messages }) => {
+        currentRoom = roomId;
+        updateWaitingAreaDisplay(players);
+        messages.forEach(displayChatMessage);
+    });
+
+    socket.on('playerJoined', (players) => {
+        updateWaitingAreaDisplay(players);
+    });
+
+    socket.on('gameReady', (players) => {
+        console.log('La partie peut commencer', players);
+    });
+
+    socket.on('roomError', (message) => {
+        alert(message);
+    });
+
+    socket.on('newMessage', (message) => {
+        displayChatMessage(message);
+    });
+
+    socket.on('challengeReceived', handleChallengeReceived);
+
+    socket.on('battleStart', startMultiplayerBattle);
+
+    socket.on('opponentAction', handleOpponentAction);
+
+    socket.on('tradeRequestReceived', handleTradeRequest);
+
+    socket.on('tradeStart', startTradeSession);
+
+    socket.on('itemOffered', ({ fromId, itemId }) => {
+        console.log(`Joueur ${fromId} offre l'objet ${itemId}`);
+    });
+
+    socket.on('tradeConfirmed', ({ playerId }) => {
+        console.log(`Échange confirmé par le joueur ${playerId}`);
+    });
+
+    socket.on('tradeCancelled', ({ playerId }) => {
+        console.log(`Échange annulé par le joueur ${playerId}`);
+        closeTradeInterface();
+    });
+
+    socket.on('playerLeft', (playerId) => {
+        console.log(`Le joueur ${playerId} a quitté la salle`);
+    });
+
+    socket.on('disconnect', () => {
+        console.log('Déconnecté du serveur');
+    });
+}
 }
 
 function hideAllGameAreas() {
@@ -148,14 +207,8 @@ function setupEventListeners() {
         { id: 'start-mission', event: 'click', handler: chooseMission },
         { id: 'start-expedition', event: 'click', handler: startExpedition },
         { id: 'cancel-expedition', event: 'click', handler: cancelExpedition },
-        { id: 'open-shop', event: 'click', handler: () => {
-            console.log("Bouton boutique cliqué");
-            openShop();
-        }},
-        { id: 'open-inventory', event: 'click', handler: () => {
-            console.log("Bouton inventaire cliqué");
-            openInventory();
-        }},
+        { id: 'open-shop', event: 'click', handler: () => inventoryModule.openShop(player) },
+        { id: 'open-inventory', event: 'click', handler: openInventory },
         { id: 'manage-companions', event: 'click', handler: openCompanionsMenu },
         { id: 'join-fixed-room', event: 'click', handler: () => joinRoom(FIXED_ROOM) },
         { id: 'save-game', event: 'click', handler: saveGame },
@@ -206,20 +259,8 @@ function updatePlayerInfo() {
         Attaque: ${player.attack} | Défense: ${player.defense}<br>
         Ressources: Bois ${player.resources.wood}, Pierre ${player.resources.stone}, Fer ${player.resources.iron}
     `;
-    
-    // Mise à jour de l'affichage de l'inventaire et des objets équipés
     inventoryModule.updateInventoryDisplay(player);
     inventoryModule.updateEquippedItemsDisplay(player);
-}
-
-function openShop() {
-    console.log("Tentative d'ouverture de la boutique");
-    if (player) {
-        inventoryModule.openShop(player);
-    } else {
-        console.error("Aucun joueur n'est initialisé");
-        showGameMessage("Veuillez d'abord créer un personnage.");
-    }
 }
 
 function openInventory() {
@@ -263,7 +304,7 @@ function chooseMission() {
 function startMission(index) {
     currentMission = missions[index];
     const chosenEnemy = selectEnemyForMission(currentMission);
-    initializeCombat(player, index, chosenEnemy);
+    initializeCombat(player, companion, chosenEnemy);
     showGameArea('battle-area');
     console.log("Mission commencée:", currentMission);
 }
@@ -275,9 +316,11 @@ function selectEnemyForMission(mission) {
     );
     
     if (suitableEnemies.length > 0) {
-        return { ...suitableEnemies[Math.floor(Math.random() * suitableEnemies.length)] };
+        const selectedEnemy = { ...suitableEnemies[Math.floor(Math.random() * suitableEnemies.length)] };
+        selectedEnemy.name = mission.enemy;
+        return selectedEnemy;
     } else {
-        return { ...enemies[0] };
+        return { ...enemies[0], name: mission.enemy };
     }
 }
 
@@ -389,7 +432,7 @@ function updateExpeditionDisplay() {
             Expédition: ${currentExpedition.name}<br>
             Temps restant: ${minutes}:${seconds.toString().padStart(2, '0')}
         `;
-    }
+        }
 }
 
 function updateExpeditionLog(message) {
@@ -468,7 +511,7 @@ function handleDonjonEvent(event) {
     switch (event.type) {
         case 'combat':
             eventArea.innerHTML = `<p>Vous rencontrez un ${event.enemy.name} !</p>`;
-            initializeCombat(player, -1, event.enemy);
+            initializeCombat(player, companion, event.enemy);
             showGameArea('battle-area');
             break;
         case 'treasure':
@@ -514,21 +557,25 @@ function openCompanionsMenu() {
         return;
     }
     companionsList.innerHTML = '';
-    player.companions.forEach((comp, index) => {
-        const compElement = document.createElement('div');
-        compElement.textContent = `${comp.name} (${comp.type})`;
-        const selectButton = document.createElement('button');
-        selectButton.textContent = 'Sélectionner';
-        selectButton.onclick = () => selectCompanion(index);
-        compElement.appendChild(selectButton);
-        companionsList.appendChild(compElement);
-    });
+    if (player.companions && player.companions.length > 0) {
+        player.companions.forEach((comp, index) => {
+            const compElement = document.createElement('div');
+            compElement.textContent = `${comp.name} (${comp.type})`;
+            const selectButton = document.createElement('button');
+            selectButton.textContent = 'Sélectionner';
+            selectButton.onclick = () => selectCompanion(index);
+            compElement.appendChild(selectButton);
+            companionsList.appendChild(compElement);
+        });
+    } else {
+        companionsList.innerHTML = '<p>Vous n\'avez pas encore de compagnons.</p>';
+    }
     showGameArea('companions-area');
     console.log("Menu des compagnons ouvert");
 }
 
 function selectCompanion(index) {
-    if (!player || !player.companions[index]) {
+    if (!player || !player.companions || index >= player.companions.length) {
         console.error("Joueur non initialisé ou compagnon non trouvé");
         return;
     }
@@ -540,17 +587,19 @@ function selectCompanion(index) {
 
 function updateCompanionInfo() {
     const activeCompanionDiv = document.getElementById('active-companion');
-    if (activeCompanionDiv && companion) {
-        activeCompanionDiv.innerHTML = `
-            <h3>Compagnon actif</h3>
-            <p>Nom: ${companion.name}</p>
-            <p>Type: ${companion.type}</p>
-            <p>PV: ${companion.hp}/${companion.maxHp}</p>
-            <p>Attaque: ${companion.attack}</p>
-            <p>Défense: ${companion.defense}</p>
-        `;
-    } else if (activeCompanionDiv) {
-        activeCompanionDiv.innerHTML = '<p>Aucun compagnon actif</p>';
+    if (activeCompanionDiv) {
+        if (companion) {
+            activeCompanionDiv.innerHTML = `
+                <h3>Compagnon actif</h3>
+                <p>Nom: ${companion.name}</p>
+                <p>Type: ${companion.type}</p>
+                <p>PV: ${companion.hp}/${companion.maxHp}</p>
+                <p>Attaque: ${companion.attack}</p>
+                <p>Défense: ${companion.defense}</p>
+            `;
+        } else {
+            activeCompanionDiv.innerHTML = '<p>Aucun compagnon actif</p>';
+        }
     }
 }
 
@@ -620,7 +669,7 @@ function handleChallengeReceived({ challengerId }) {
 function startMultiplayerBattle({ challengerId, accepterId }) {
     const opponent = getOpponentInfo(challengerId === socket.id ? accepterId : challengerId);
     if (opponent) {
-        initializeCombat(player, -1, opponent); // -1 indique un combat multijoueur
+        initializeCombat(player, companion, opponent);
         showGameArea('battle-area');
         console.log("Combat multijoueur commencé entre", challengerId, "et", accepterId);
     } else {
@@ -638,13 +687,6 @@ function getOpponentInfo(opponentId) {
         attack: 10,
         defense: 5
     };
-}
-
-function handleOpponentAction(action) {
-    // Cette fonction devrait être implémentée dans combat.js
-    // et appelée ici pour gérer les actions de l'adversaire en multijoueur
-    console.log("Action de l'adversaire:", action);
-    // Exemple : updateBattleInfo();
 }
 
 function requestTrade() {
@@ -814,7 +856,6 @@ function showLevelUpModal() {
     }
 }
 
-// Fonction pour afficher les messages du jeu
 function showGameMessage(message) {
     const messageElement = document.getElementById('game-messages');
     if (messageElement) {
@@ -841,6 +882,7 @@ window.player = player;
 window.updatePlayerInfo = updatePlayerInfo;
 window.showGameMessage = showGameMessage;
 window.showGameArea = showGameArea;
+window.openInventory = openInventory;
 
 // Intégration du module d'inventaire
 window.inventoryModule = inventoryModule;
@@ -866,65 +908,8 @@ export {
     joinRoom,
     challengePlayer,
     requestTrade,
-    showGameMessage
+    showGameMessage,
+    openInventory
 };
-
-// Fonction pour mettre à jour l'interface utilisateur
-function updateUI() {
-    updatePlayerInfo();
-    inventoryModule.updateInventoryDisplay(player);
-    inventoryModule.updateEquippedItemsDisplay(player);
-    updateCompanionInfo();
-    if (currentExpedition) {
-        updateExpeditionDisplay();
-    }
-    if (currentDonjon) {
-        updateDonjonInfo();
-    }
-}
-
-// Fonction pour gérer les récompenses (utilisée après les combats, les événements du donjon, etc.)
-function handleRewards(rewards) {
-    if (rewards.gold) {
-        player.gold += rewards.gold;
-        showGameMessage(`Vous avez gagné ${rewards.gold} pièces d'or.`);
-    }
-    if (rewards.exp) {
-        player.gainExperience(rewards.exp);
-        showGameMessage(`Vous avez gagné ${rewards.exp} points d'expérience.`);
-    }
-    if (rewards.item) {
-        inventoryModule.addItemToInventory(player, rewards.item);
-        showGameMessage(`Vous avez obtenu : ${rewards.item.name}`);
-    }
-    updateUI();
-}
-
-// Fonction pour gérer la fin d'un combat
-function endCombat(victory) {
-    if (victory) {
-        showGameMessage("Vous avez remporté le combat !");
-        if (currentMission) {
-            handleRewards({
-                gold: currentMission.goldReward,
-                exp: currentMission.expReward,
-                item: getRandomItem() // Fonction à implémenter dans gameData.js
-            });
-            currentMission = null;
-        } else if (currentDonjon) {
-            handleRewards(generateDonjonReward(currentDonjon.floor));
-            nextDonjonEvent();
-        }
-    } else {
-        showGameMessage("Vous avez perdu le combat...");
-        if (currentDonjon) {
-            exitDonjon();
-        }
-    }
-    showGameArea('adventure-menu');
-}
-
-// Écouteur d'événements pour la fin du combat
-window.addEventListener('combatEnd', (event) => endCombat(event.detail.victory));
 
 console.log("Script game.js chargé");
