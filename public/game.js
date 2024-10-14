@@ -48,7 +48,7 @@ const skills = {
     }
 };
 
-export function initGame() {
+ function initGame() {
     console.log("Initialisation du jeu...");
     hideAllGameAreas();
     showGameArea('main-menu');
@@ -90,7 +90,7 @@ function hideAllGameAreas() {
     gameAreas.forEach(area => area.style.display = 'none');
 }
 
-export function showGameArea(areaId) {
+ function showGameArea(areaId) {
     console.log(`Tentative d'affichage de la zone: ${areaId}`);
     const areas = document.querySelectorAll('.game-area');
     areas.forEach(area => {
@@ -134,7 +134,7 @@ export function createCharacter() {
     showGameArea('adventure-menu');
 }
 
-export function updatePlayerInfo() {
+ function updatePlayerInfo() {
     if (!player) {
         console.error("Aucun joueur n'est initialisé");
         return;
@@ -157,7 +157,7 @@ export function updatePlayerInfo() {
     updateEquippedItemsDisplay(player);
 }
 
-export function chooseMission() {
+function chooseMission() {
     if (!player) {
         console.error("Aucun joueur n'est initialisé");
         return;
