@@ -1,26 +1,28 @@
 // combat.js
-import { createEnemyForMission, generateUniqueEnemy } from './gameData.js';
+import { createEnemyForMission, generateUniqueEnemy, calculateDamage } from './gameData.js';
 
 let player, companion, enemy, currentMission;
 let currentCombat = false;
 
-export function initializeCombat(playerCharacter, companionCharacter, enemyData, currentMission) {
+export function initializeCombat(playerCharacter, companionCharacter, enemyData, mission) {
     player = playerCharacter;
     companion = companionCharacter;
     
-    if (currentMission) {
+    if (mission) {
         // Mode mission : utiliser l'ennemi de niveau fixe de la mission
-        enemy = createEnemyForMission(currentMission);
+        enemy = createEnemyForMission(mission);
     } else {
         // Mode donjon : utiliser l'ennemi généré aléatoirement
         enemy = generateUniqueEnemy(enemyData.level);
     }
     
+    currentMission = mission;
     currentCombat = true;
     
     updateBattleInfo();
     console.log("Combat initialisé:", { player, companion, enemy });
 }
+
 export function updateBattleInfo() {
     const playerStats = document.getElementById('player-combat-info');
     const companionStats = document.getElementById('companion-combat-info');
@@ -57,9 +59,9 @@ export function playerAttack() {
         console.error("Combat non initialisé correctement");
         return;
     }
-    const damage = Math.max(player.attack - enemy.defense, 1);
-    enemy.hp = Math.max(enemy.hp - damage, 0);
-    updateBattleLog(`${player.name} inflige ${damage} dégâts à ${enemy.name}.`);
+    const damageResult = calculateDamage(player, enemy);
+    enemy.hp = Math.max(enemy.hp - damageResult.damage, 0);
+    updateBattleLog(`${player.name} inflige ${damageResult.damage} dégâts à ${enemy.name}${damageResult.isCritical ? " (Coup critique!)" : ""}.`);
     updateBattleInfo();
     
     if (enemy.hp > 0) {
@@ -98,13 +100,14 @@ export function playerUseSpecial() {
 
 function enemyTurn() {
     if (!currentCombat || !player || !enemy) return;
-    let damage = Math.max(enemy.attack - player.defense, 1);
+    const damageResult = calculateDamage(enemy, player);
+    let damage = damageResult.damage;
     if (player.defending) {
         damage = Math.floor(damage / 2);
         player.defending = false;
     }
     player.hp = Math.max(player.hp - damage, 0);
-    updateBattleLog(`${enemy.name} inflige ${damage} dégâts à ${player.name}.`);
+    updateBattleLog(`${enemy.name} inflige ${damage} dégâts à ${player.name}${damageResult.isCritical ? " (Coup critique!)" : ""}.`);
     updateBattleInfo();
     checkBattleEnd();
 }
