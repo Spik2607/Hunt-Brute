@@ -858,12 +858,14 @@ export {
     currentMission,
     currentExpedition,
     currentDonjon,
-    initGame,
-    updatePlayerInfo,  // Assurez-vous que cette ligne n'apparaît qu'une seule fois
-    showGameArea,
-    showGameMessage,
-    handleCombatEnd,
-    handleLevelUp
+    createCharacter,
+    startMission,
+    distributeSkillPoint,
+    confirmLevelUp,
+    showLevelUpModal,
+    sendChatMessage,
+    offerTradeItem,
+    // ... ajouter ici toutes les autres fonctions et variables à exporter
 };
 
 // Initialisation du jeu
