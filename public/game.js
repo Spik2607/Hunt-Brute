@@ -122,6 +122,13 @@ function setUpdateIntervals() {
     window.gameIntervals.push(expeditionUpdateInterval);
 }
 
+function initializeAdditionalComponents() {
+    // Initialiser d'autres composants du jeu si nécessaire
+    // Par exemple : système de quêtes, événements aléatoires, etc.
+    console.log("Initialisation des composants supplémentaires");
+    // Implémentez ici l'initialisation d'autres systèmes de jeu
+}
+
 function hideAllGameAreas() {
     const gameAreas = document.querySelectorAll('.game-area');
     gameAreas.forEach(area => area.style.display = 'none');
