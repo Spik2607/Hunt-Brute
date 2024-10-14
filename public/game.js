@@ -59,21 +59,23 @@ function initGame() {
     if (savedState) {
         try {
             const gameState = JSON.parse(savedState);
-            (gameState);
-            console.log("Partie chargée avec succès");
+            if (loadGame(gameState)) {
+                console.log("Partie chargée avec succès", player);
+                updatePlayerInfo();
+                showGameArea('adventure-menu');
+            } else {
+                console.error("Échec du chargement de la partie");
+                showCreateHunterButton();
+            }
         } catch (error) {
             console.error("Erreur lors du chargement de la sauvegarde:", error);
             showCreateHunterButton();
         }
     } else {
+        console.log("Aucune sauvegarde trouvée, affichage du bouton de création de personnage");
         showCreateHunterButton();
     }
-  if (player) {
-        console.log("Joueur initialisé:", player);
-        updatePlayerInfo();
-    } else {
-        console.log("Aucun joueur initialisé");
-    }
+
     setInterval(() => {
         if (player && !isCombatActive()) {
             player.regenerateHP();
@@ -89,6 +91,7 @@ function initGame() {
     additionalInit();
     console.log("Initialisation du jeu terminée");
 }
+
 
 function hideAllGameAreas() {
     const gameAreas = document.querySelectorAll('.game-area');
@@ -159,6 +162,8 @@ function showCharacterCreationArea() {
         Attaque: ${player.attack} | Défense: ${player.defense}<br>
         Ressources: Bois ${player.resources.wood}, Pierre ${player.resources.stone}, Fer ${player.resources.iron}
     `;
+    updateInventoryDisplay(player);
+    updateEquippedItemsDisplay(player);
     console.log("Informations du joueur mises à jour");
 }
 
@@ -774,12 +779,43 @@ function showGameMessage(message) {
 
 function loadGame(gameState) {
     console.log("Tentative de chargement du jeu avec:", gameState);
-    player = new Character(gameState.name, gameState.maxHp, gameState.attack, gameState.defense);
-    Object.assign(player, gameState);
-    console.log("Joueur chargé:", player);
-    updatePlayerInfo();
-    showGameArea('adventure-menu');
+    if (!gameState || typeof gameState !== 'object') {
+        console.error("État de jeu invalide");
+        return false;
+    }
+
+    try {
+        player = new Character(
+            gameState.name,
+            gameState.maxHp,
+            gameState.attack,
+            gameState.defense
+        );
+
+        // Copie des propriétés supplémentaires
+        Object.assign(player, {
+            level: gameState.level || 1,
+            experience: gameState.experience || 0,
+            gold: gameState.gold || 0,
+            energy: gameState.energy,
+            maxEnergy: gameState.maxEnergy,
+            inventory: gameState.inventory || [],
+            equippedItems: gameState.equippedItems || { weapon: null, armor: null, accessory: null },
+            resources: gameState.resources || { wood: 0, stone: 0, iron: 0 },
+            skills: gameState.skills || { strength: 0, agility: 0, intelligence: 0 }
+        });
+
+        // Préservation des méthodes de Character
+        Object.setPrototypeOf(player, Character.prototype);
+
+        console.log("Joueur chargé:", player);
+        return true;
+    } catch (error) {
+        console.error("Erreur lors de la création du personnage:", error);
+        return false;
+    }
 }
+
 function saveGame() {
     if (player) {
         const gameState = JSON.stringify(player);
