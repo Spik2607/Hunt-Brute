@@ -5,11 +5,12 @@ import { initializeCombat, playerAttack, playerDefend, playerUseSpecial, updateB
 import { generateUniqueEnemy, generateDonjonReward, generateDonjonEvent, generateDonjonBoss, generateBossReward } from './donjon.js';
 import { addItemToInventory, updateInventoryDisplay, updateEquippedItemsDisplay, openShop, buyItem, sellItem, equipItem, unequipItem, useItem } from './inventory.js';
 
- let player = null;
- let companion = null;
- let currentMission = null;
- let currentExpedition = null;
- let currentDonjon = null;
+// Variables globales
+let player = null;
+let companion = null;
+let currentMission = null;
+let currentExpedition = null;
+let currentDonjon = null;
 let socket;
 let currentRoom = null;
 
@@ -142,7 +143,7 @@ function showCharacterCreationArea() {
     showGameArea('adventure-menu');
 }
 
- function updatePlayerInfo() {
+function updatePlayerInfo() {
     console.log("Mise à jour des informations du joueur");
     if (!player) {
         console.error("Aucun joueur n'est initialisé");
@@ -154,13 +155,13 @@ function showCharacterCreationArea() {
         return;
     }
     playerInfo.innerHTML = `
-        ${player.name} - Niveau ${player.level}<br>
-        PV: ${player.hp}/${player.maxHp}<br>
-        XP: ${player.experience}/${player.level * 100}<br>
-        Or: ${player.gold}<br>
-        Énergie: ${player.energy}/${player.maxEnergy}<br>
-        Attaque: ${player.attack} | Défense: ${player.defense}<br>
-        Ressources: Bois ${player.resources.wood}, Pierre ${player.resources.stone}, Fer ${player.resources.iron}
+        ${player.name || 'Inconnu'} - Niveau ${player.level || 1}<br>
+        PV: ${player.hp || 0}/${player.maxHp || 100}<br>
+        XP: ${player.experience || 0}/${(player.level || 1) * 100}<br>
+        Or: ${player.gold || 0}<br>
+        Énergie: ${player.energy || 0}/${player.maxEnergy || 100}<br>
+        Attaque: ${player.attack || 0} | Défense: ${player.defense || 0}<br>
+        Ressources: Bois ${player.resources?.wood || 0}, Pierre ${player.resources?.stone || 0}, Fer ${player.resources?.iron || 0}
     `;
     updateInventoryDisplay(player);
     updateEquippedItemsDisplay(player);
@@ -786,10 +787,10 @@ function loadGame(gameState) {
 
     try {
         player = new Character(
-            gameState.name,
-            gameState.maxHp,
-            gameState.attack,
-            gameState.defense
+            gameState.name || "Héros",
+            gameState.maxHp || 100,
+            gameState.attack || 10,
+            gameState.defense || 5
         );
 
         // Copie des propriétés supplémentaires
@@ -797,18 +798,16 @@ function loadGame(gameState) {
             level: gameState.level || 1,
             experience: gameState.experience || 0,
             gold: gameState.gold || 0,
-            energy: gameState.energy,
-            maxEnergy: gameState.maxEnergy,
+            energy: gameState.energy || 100,
+            maxEnergy: gameState.maxEnergy || 100,
             inventory: gameState.inventory || [],
             equippedItems: gameState.equippedItems || { weapon: null, armor: null, accessory: null },
             resources: gameState.resources || { wood: 0, stone: 0, iron: 0 },
             skills: gameState.skills || { strength: 0, agility: 0, intelligence: 0 }
         });
 
-        // Préservation des méthodes de Character
-        Object.setPrototypeOf(player, Character.prototype);
-
         console.log("Joueur chargé:", player);
+        updatePlayerInfo();
         return true;
     } catch (error) {
         console.error("Erreur lors de la création du personnage:", error);
