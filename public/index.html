@@ -15,6 +15,8 @@
             <div id="player-info"></div>
         </header>
         
+        <div id="game-messages"></div>
+
         <nav id="main-menu">
             <button id="start-adventure">Mode Aventure</button>
             <button id="start-donjon">Donjon</button>
@@ -25,8 +27,6 @@
             <button id="save-game">Sauvegarder</button>
             <button id="load-game">Charger</button>
         </nav>
-
-        <div id="game-messages"></div>
 
         <main id="game-content">
             <section id="character-creation" class="game-area">
@@ -96,14 +96,22 @@
 
             <section id="inventory-area" class="game-area">
                 <h2>Inventaire</h2>
-                <div id="equipped-items"></div>
-                <div id="inventory-items"></div>
+                <div id="equipped-items">
+                    <h3>Objets équipés</h3>
+                    <!-- Les objets équipés seront affichés ici -->
+                </div>
+                <div id="inventory-items">
+                    <h3>Objets dans l'inventaire</h3>
+                    <!-- Les objets de l'inventaire seront affichés ici -->
+                </div>
                 <button id="close-inventory">Fermer l'inventaire</button>
             </section>
 
             <section id="shop-area" class="game-area">
                 <h2>Boutique</h2>
-                <div id="shop-items"></div>
+                <div id="shop-items">
+                    <!-- Les objets de la boutique seront affichés ici -->
+                </div>
                 <button id="leave-shop">Quitter la boutique</button>
             </section>
 
@@ -142,17 +150,17 @@
                     <div>
                         <label for="strength-skill">Force :</label>
                         <span id="strength-skill"></span>
-                        <button onclick="inventoryModule.distributeSkillPoint('strength')">+</button>
+                        <button onclick="distributeSkillPoint('strength')">+</button>
                     </div>
                     <div>
                         <label for="agility-skill">Agilité :</label>
                         <span id="agility-skill"></span>
-                        <button onclick="inventoryModule.distributeSkillPoint('agility')">+</button>
+                        <button onclick="distributeSkillPoint('agility')">+</button>
                     </div>
                     <div>
                         <label for="intelligence-skill">Intelligence :</label>
                         <span id="intelligence-skill"></span>
-                        <button onclick="inventoryModule.distributeSkillPoint('intelligence')">+</button>
+                        <button onclick="distributeSkillPoint('intelligence')">+</button>
                     </div>
                 </div>
                 <button id="confirm-level-up">Confirmer</button>
