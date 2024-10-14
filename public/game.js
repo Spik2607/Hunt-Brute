@@ -906,7 +906,6 @@ export {
     player,
     companion,
     currentMission,
-    currentExpedition,
     updatePlayerInfo,
     showGameArea,
     skills,
