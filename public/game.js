@@ -1,9 +1,9 @@
 // game.js
-import { Character, items, missions, dropRates, getRandomCompanion, getRandomItem, enemies, getItemStats, getRandomEnemy, getRandomMission, createEnemy, generateRandomLoot, calculateDamage, levelUpCharacter } from './gameData.js';
+import { Character, items, missions, dropRates, getRandomCompanion, getRandomItem, enemies, getItemStats, getRandomEnemy, getRandomMission, levelUpCharacter, generateRandomLoot } from './gameData.js';
 import { expeditionEvents, getRandomExpeditionEvent } from './expedition.js';
 import { initializeCombat, playerAttack, playerDefend, playerUseSpecial, updateBattleInfo, updateBattleLog, isCombatActive } from './combat.js';
 import { generateUniqueEnemy, generateDonjonReward, generateDonjonEvent, generateDonjonBoss, generateBossReward } from './donjon.js';
-import { addItemToInventory, updateInventoryDisplay, updateEquippedItemsDisplay } from './inventory.js';
+import { addItemToInventory, updateInventoryDisplay, updateEquippedItemsDisplay, openShop, buyItem, sellItem, equipItem, unequipItem, useItem } from './inventory.js';
 
 export let player = null;
 export let companion = null;
@@ -48,7 +48,7 @@ const skills = {
     }
 };
 
- function initGame() {
+function initGame() {
     console.log("Initialisation du jeu...");
     hideAllGameAreas();
     showGameArea('main-menu');
@@ -90,7 +90,7 @@ function hideAllGameAreas() {
     gameAreas.forEach(area => area.style.display = 'none');
 }
 
- function showGameArea(areaId) {
+function showGameArea(areaId) {
     console.log(`Tentative d'affichage de la zone: ${areaId}`);
     const areas = document.querySelectorAll('.game-area');
     areas.forEach(area => {
@@ -134,7 +134,7 @@ export function createCharacter() {
     showGameArea('adventure-menu');
 }
 
- function updatePlayerInfo() {
+export function updatePlayerInfo() {
     if (!player) {
         console.error("Aucun joueur n'est initialisé");
         return;
@@ -215,20 +215,13 @@ function handleCombatEnd(event) {
         }
         player.gainExperience(enemy.level * 10);
         if (player.experience >= player.level * 100) {
-            levelUpCharacter(player);
-            showLevelUpModal();
+            handleLevelUp();
         }
         showGameArea('adventure-menu');
     } else {
         showGameArea('main-menu');
     }
     updatePlayerInfo();
-}
-
-function performAttack(attacker, defender) {
-    const damageResult = calculateDamage(attacker, defender);
-    defender.hp -= damageResult.damage;
-    updateBattleLog(`${attacker.name} inflige ${damageResult.damage} dégâts à ${defender.name}${damageResult.isCritical ? " (Coup critique!)" : ""}.`);
 }
 
 function startExpedition() {
@@ -374,11 +367,8 @@ function startDonjon() {
 function generateDonjonFloor() {
     currentDonjon.events = [];
     for (let i = 0; i < 5; i++) {
-        const enemy = createEnemy(getRandomEnemy().name, currentDonjon.floor);
-        currentDonjon.events.push({
-            type: 'combat',
-            enemy: enemy
-        });
+        const event = generateDonjonEvent(currentDonjon.floor);
+        currentDonjon.events.push(event);
     }
 }
 
@@ -392,7 +382,7 @@ function updateDonjonInfo() {
     }
 }
 
- function nextDonjonEvent() {
+function nextDonjonEvent() {
     if (!currentDonjon || currentDonjon.events.length === 0) {
         console.log("Fin de l'étage du donjon");
         currentDonjon.floor++;
@@ -491,51 +481,61 @@ export function showLevelUpModal() {
     }
 }
 
-export function openShop() {
-    console.log("Tentative d'ouverture de la boutique");
-    if (player) {
-        const shopElement = document.getElementById('shop-items');
-        if (!shopElement) return;
-
-        shopElement.innerHTML = '';
-        items.forEach(item => {
-            const itemElement = document.createElement('div');
-            itemElement.className = 'shop-item';
-            itemElement.innerHTML = `
-                <span>${item.name} - ${item.cost} or</span>
-                <button onclick="buyItem('${item.id}')">Acheter</button>
-            `;
-            itemElement.title = getItemStats(item);
-            shopElement.appendChild(itemElement);
-        });
-
-        showGameArea('shop-area');
-    } else {
+function openCompanionsMenu() {
+    if (!player) {
         console.error("Aucun joueur n'est initialisé");
-        showGameMessage("Veuillez d'abord créer un personnage.");
+        return;
+    }
+    const companionsList = document.getElementById('companions-list');
+    if (!companionsList) {
+        console.error("L'élément 'companions-list' n'a pas été trouvé");
+        return;
+    }
+    companionsList.innerHTML = '';
+    const availableCompanions = getAvailableCompanions();
+    availableCompanions.forEach((companion, index) => {
+        const companionElement = document.createElement('div');
+        companionElement.className = 'companion-item';
+        companionElement.innerHTML = `
+            <h3>${companion.name}</h3>
+            <p>Niveau : ${companion.level}</p>
+            <p>Attaque : ${companion.attack}</p>
+            <p>Défense : ${companion.defense}</p>
+            <button onclick="selectCompanion(${index})">Sélectionner</button>
+        `;
+        companionsList.appendChild(companionElement);
+    });
+    showGameArea('companions-area');
+}
+
+function getAvailableCompanions() {
+    // Cette fonction devrait retourner la liste des compagnons disponibles
+    // Pour l'instant, nous allons simplement retourner quelques compagnons factices
+    return [
+        { name: "Guerrier", level: 1, attack: 5, defense: 5 },
+        { name: "Archer", level: 1, attack: 7, defense: 3 },
+        { name: "Mage", level: 1, attack: 8, defense: 2 }
+    ];
+}
+
+export function selectCompanion(index) {
+    const availableCompanions = getAvailableCompanions();
+    if (index >= 0 && index < availableCompanions.length) {
+        companion = availableCompanions[index];
+        updateActiveCompanionDisplay();
+        showGameMessage(`${companion.name} a rejoint votre équipe !`);
     }
 }
 
- function buyItem(itemId) {
-    const item = items.find(i => i.id === itemId);
-    if (player && item && player.gold >= item.cost) {
-        player.gold -= item.cost;
-        addItemToInventory(player, item);
-        updatePlayerInfo();
-        showGameMessage(`${player.name} a acheté ${item.name}`);
-    } else {
-        showGameMessage("Vous n'avez pas assez d'or !");
-    }
-}
-
-function sellItem(index) {
-    if (player && player.inventory[index]) {
-        const item = player.inventory[index];
-        const sellPrice = Math.floor(item.cost * 0.5);
-        player.gold += sellPrice;
-        player.inventory.splice(index, 1);
-        updatePlayerInfo();
-        showGameMessage(`${player.name} a vendu ${item.name} pour ${sellPrice} or`);
+function updateActiveCompanionDisplay() {
+    const activeCompanionDiv = document.getElementById('active-companion');
+    if (activeCompanionDiv && companion) {
+        activeCompanionDiv.innerHTML = `
+            <h3>Compagnon actif : ${companion.name}</h3>
+            <p>Niveau : ${companion.level}</p>
+            <p>Attaque : ${companion.attack}</p>
+            <p>Défense : ${companion.defense}</p>
+        `;
     }
 }
 
@@ -670,8 +670,8 @@ function startMultiplayerBattle({ challengerId, accepterId }) {
 }
 
 function handleOpponentAction(action) {
-    // Implémenter la logique pour gérer l'action de l'adversaire
     console.log("Action de l'adversaire:", action);
+    // Implémenter la logique pour gérer l'action de l'adversaire
 }
 
 function requestTrade() {
@@ -784,62 +784,10 @@ function saveGame() {
     }
 }
 
-function openCompanionsMenu() {
-    if (!player) {
-        console.error("Aucun joueur n'est initialisé");
-        return;
-    }
-    const companionsList = document.getElementById('companions-list');
-    if (!companionsList) {
-        console.error("L'élément 'companions-list' n'a pas été trouvé");
-        return;
-    }
-    companionsList.innerHTML = '';
-    const availableCompanions = getAvailableCompanions();
-    availableCompanions.forEach((companion, index) => {
-        const companionElement = document.createElement('div');
-        companionElement.className = 'companion-item';
-        companionElement.innerHTML = `
-            <h3>${companion.name}</h3>
-            <p>Niveau : ${companion.level}</p>
-            <p>Attaque : ${companion.attack}</p>
-            <p>Défense : ${companion.defense}</p>
-            <button onclick="selectCompanion(${index})">Sélectionner</button>
-        `;
-        companionsList.appendChild(companionElement);
-    });
-    showGameArea('companions-area');
-}
-
-function getAvailableCompanions() {
-    // Cette fonction devrait retourner la liste des compagnons disponibles
-    // Pour l'instant, nous allons simplement retourner quelques compagnons factices
-    return [
-        { name: "Guerrier", level: 1, attack: 5, defense: 5 },
-        { name: "Archer", level: 1, attack: 7, defense: 3 },
-        { name: "Mage", level: 1, attack: 8, defense: 2 }
-    ];
-}
-
-export function selectCompanion(index) {
-    const availableCompanions = getAvailableCompanions();
-    if (index >= 0 && index < availableCompanions.length) {
-        companion = availableCompanions[index];
-        updateActiveCompanionDisplay();
-        showGameMessage(`${companion.name} a rejoint votre équipe !`);
-    }
-}
-
-function updateActiveCompanionDisplay() {
-    const activeCompanionDiv = document.getElementById('active-companion');
-    if (activeCompanionDiv && companion) {
-        activeCompanionDiv.innerHTML = `
-            <h3>Compagnon actif : ${companion.name}</h3>
-            <p>Niveau : ${companion.level}</p>
-            <p>Attaque : ${companion.attack}</p>
-            <p>Défense : ${companion.defense}</p>
-        `;
-    }
+function handleLevelUp() {
+    levelUpCharacter(player);
+    showLevelUpModal();
+    updatePlayerInfo();
 }
 
 function startMultiplayerMode() {
@@ -895,13 +843,30 @@ window.requestTrade = requestTrade;
 window.offerTradeItem = offerTradeItem;
 window.buyItem = buyItem;
 window.sellItem = sellItem;
+window.equipItem = equipItem;
+window.unequipItem = unequipItem;
+window.useItem = useItem;
 window.openCompanionsMenu = openCompanionsMenu;
 window.selectCompanion = selectCompanion;
 window.startMultiplayerMode = startMultiplayerMode;
+window.saveGame = saveGame;
+
+// Exportations pour l'utilisation dans d'autres modules
+export {
+    player,
+    companion,
+    currentMission,
+    currentExpedition,
+    currentDonjon,
+    initGame,
+    updatePlayerInfo,
+    showGameArea,
+    showGameMessage,
+    handleCombatEnd,
+    handleLevelUp
+};
 
 // Initialisation du jeu
 document.addEventListener('DOMContentLoaded', initGame);
 
-
-
-console.log("Script game.js chargé");
+console.log("Script game.js chargé et complété");
