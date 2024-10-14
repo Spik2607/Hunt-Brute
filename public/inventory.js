@@ -192,6 +192,7 @@ export function buyItem(player, itemId) {
         showGameMessage("Vous n'avez pas assez d'or !");
     }
 }
+
 export function sellItem(player, index) {
     if (!player || !Array.isArray(player.inventory) || index < 0 || index >= player.inventory.length) {
         console.error("Vente impossible : joueur ou index invalide");
