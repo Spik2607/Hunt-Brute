@@ -392,7 +392,7 @@ function updateDonjonInfo() {
     }
 }
 
-export function nextDonjonEvent() {
+ function nextDonjonEvent() {
     if (!currentDonjon || currentDonjon.events.length === 0) {
         console.log("Fin de l'étage du donjon");
         currentDonjon.floor++;
