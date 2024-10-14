@@ -1,4 +1,5 @@
 // expedition.js
+import { getRandomElement } from './gameData.js';
 
 export const expeditionEvents = [
     {
