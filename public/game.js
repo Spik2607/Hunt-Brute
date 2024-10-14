@@ -784,7 +784,7 @@ function saveGame() {
     }
 }
 
-export function openCompanionsMenu() {
+function openCompanionsMenu() {
     if (!player) {
         console.error("Aucun joueur n'est initialisé");
         return;
