@@ -832,6 +832,10 @@ window.confirmLevelUp = confirmLevelUp;
 window.saveGame = saveGame;
 window.loadGame = loadGame;
 window.offerTradeItem = offerTradeItem;
+window.player = player;
+window.updatePlayerInfo = updatePlayerInfo;
+window.showGameMessage = showGameMessage;
+window.showGameArea = showGameArea;
 
 // Intégration du module d'inventaire
 window.inventoryModule = inventoryModule;
