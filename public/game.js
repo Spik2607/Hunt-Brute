@@ -1,7 +1,7 @@
 // game.js
 import { Character, items, missions, dropRates, getRandomCompanion, getRandomItem, enemies, getItemStats } from './gameData.js';
 import { expeditionEvents, getRandomExpeditionEvent } from './expedition.js';
-import { initializeCombat, playerAttack, playerDefend, playerUseSpecial, updateBattleInfo, updateBattleLog } from './combat.js';
+import { initializeCombat, playerAttack, playerDefend, playerUseSpecial, updateBattleInfo, updateBattleLog, isCombatActive } from './combat.js';
 import { generateUniqueEnemy, generateDonjonReward, generateDonjonEvent, generateDonjonBoss, generateBossReward } from './donjon.js';
 import * as inventoryModule from './inventory.js';
 
@@ -70,7 +70,7 @@ function initGame() {
     }
 
     setInterval(() => {
-        if (player) {
+        if (player && !isCombatActive()) {
             player.regenerateHP();
             player.regenerateEnergy();
             updatePlayerInfo();
@@ -148,8 +148,14 @@ function setupEventListeners() {
         { id: 'start-mission', event: 'click', handler: chooseMission },
         { id: 'start-expedition', event: 'click', handler: startExpedition },
         { id: 'cancel-expedition', event: 'click', handler: cancelExpedition },
-        { id: 'open-shop', event: 'click', handler: () => inventoryModule.openShop(player) },
-        { id: 'open-inventory', event: 'click', handler: () => inventoryModule.updateInventoryDisplay(player) },
+        { id: 'open-shop', event: 'click', handler: () => {
+            console.log("Bouton boutique cliqué");
+            openShop();
+        }},
+        { id: 'open-inventory', event: 'click', handler: () => {
+            console.log("Bouton inventaire cliqué");
+            openInventory();
+        }},
         { id: 'manage-companions', event: 'click', handler: openCompanionsMenu },
         { id: 'join-fixed-room', event: 'click', handler: () => joinRoom(FIXED_ROOM) },
         { id: 'save-game', event: 'click', handler: saveGame },
@@ -200,6 +206,27 @@ function updatePlayerInfo() {
         Attaque: ${player.attack} | Défense: ${player.defense}<br>
         Ressources: Bois ${player.resources.wood}, Pierre ${player.resources.stone}, Fer ${player.resources.iron}
     `;
+}
+
+function openShop() {
+    console.log("Tentative d'ouverture de la boutique");
+    if (player) {
+        inventoryModule.openShop(player);
+    } else {
+        console.error("Aucun joueur n'est initialisé");
+        showGameMessage("Veuillez d'abord créer un personnage.");
+    }
+}
+
+function openInventory() {
+    console.log("Tentative d'ouverture de l'inventaire");
+    if (player) {
+        inventoryModule.updateInventoryDisplay(player);
+        showGameArea('inventory-area');
+    } else {
+        console.error("Aucun joueur n'est initialisé");
+        showGameMessage("Veuillez d'abord créer un personnage.");
+    }
 }
 
 function chooseMission() {
