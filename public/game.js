@@ -51,21 +51,28 @@ const skills = {
 
 function initGame() {
     console.log("Initialisation du jeu...");
+
+    // Cacher toutes les zones de jeu et afficher le menu principal
     hideAllGameAreas();
     showGameArea('main-menu');
+
+    // Initialiser la connexion socket pour le multijoueur
     initializeSocket();
+
+    // Configurer les écouteurs d'événements pour les boutons et autres interactions
     setupEventListeners();
-    
+
+    // Tenter de charger une partie sauvegardée
     const savedState = localStorage.getItem('huntBruteGameState');
     if (savedState) {
         try {
             const gameState = JSON.parse(savedState);
             if (loadGame(gameState)) {
-                console.log("Partie chargée avec succès", player);
+                console.log("Partie chargée avec succès:", player);
                 updatePlayerInfo();
                 showGameArea('adventure-menu');
             } else {
-                console.error("Échec du chargement de la partie");
+                console.error("Échec du chargement de la partie sauvegardée");
                 showCreateHunterButton();
             }
         } catch (error) {
@@ -77,22 +84,43 @@ function initGame() {
         showCreateHunterButton();
     }
 
-    setInterval(() => {
+    // Mettre en place les intervalles de mise à jour
+    setUpdateIntervals();
+
+    // Ajouter l'écouteur d'événement pour la fin de combat
+    window.addEventListener('combatEnd', handleCombatEnd);
+
+    // Initialiser les composants supplémentaires du jeu
+    initializeAdditionalComponents();
+
+    console.log("Initialisation du jeu terminée");
+}
+
+function setUpdateIntervals() {
+    // Arrêter les intervalles existants s'il y en a
+    if (window.gameIntervals) {
+        window.gameIntervals.forEach(clearInterval);
+    }
+    window.gameIntervals = [];
+
+    // Intervalle pour la régénération et la mise à jour des informations du joueur
+    const playerUpdateInterval = setInterval(() => {
         if (player && !isCombatActive()) {
             player.regenerateHP();
             player.regenerateEnergy();
             updatePlayerInfo();
         }
+    }, 1000);
+    window.gameIntervals.push(playerUpdateInterval);
+
+    // Intervalle pour la mise à jour de l'expédition si elle est en cours
+    const expeditionUpdateInterval = setInterval(() => {
         if (currentExpedition) {
             updateExpedition();
         }
     }, 1000);
-
-    window.addEventListener('combatEnd', handleCombatEnd);
-    additionalInit();
-    console.log("Initialisation du jeu terminée");
+    window.gameIntervals.push(expeditionUpdateInterval);
 }
-
 
 function hideAllGameAreas() {
     const gameAreas = document.querySelectorAll('.game-area');
@@ -124,7 +152,7 @@ function showCharacterCreationArea() {
     showGameArea('character-creation');
 }
 
- function createCharacter() {
+function createCharacter() {
     const nameInput = document.getElementById('hero-name');
     if (!nameInput) {
         console.error("L'élément 'hero-name' n'a pas été trouvé");
@@ -137,9 +165,8 @@ function showCharacterCreationArea() {
     }
     player = new Character(name, 100, 10, 5);
     console.log("Nouveau personnage créé:", player);
+    saveGame(); // Sauvegarder immédiatement le nouveau personnage
     updatePlayerInfo();
-    updateInventoryDisplay(player);
-    updateEquippedItemsDisplay(player);
     showGameArea('adventure-menu');
 }
 
@@ -766,6 +793,8 @@ function setupEventListeners() {
     document.getElementById('send-message').addEventListener('click', sendChatMessage);
     document.getElementById('challenge-player').addEventListener('click', challengePlayer);
     document.getElementById('trade-request').addEventListener('click', requestTrade);
+    document.getElementById('save-game').addEventListener('click', saveGame);
+    document.getElementById('load-game').addEventListener('click', loadGame);
 }
 
 function showGameMessage(message) {
@@ -787,19 +816,19 @@ function loadGame(gameState) {
 
     try {
         player = new Character(
-            gameState.name || "Héros",
-            gameState.maxHp || 100,
-            gameState.attack || 10,
-            gameState.defense || 5
+            gameState.name,
+            gameState.maxHp,
+            gameState.attack,
+            gameState.defense
         );
-
+        
         // Copie des propriétés supplémentaires
         Object.assign(player, {
             level: gameState.level || 1,
             experience: gameState.experience || 0,
             gold: gameState.gold || 0,
-            energy: gameState.energy || 100,
-            maxEnergy: gameState.maxEnergy || 100,
+            energy: gameState.energy,
+            maxEnergy: gameState.maxEnergy,
             inventory: gameState.inventory || [],
             equippedItems: gameState.equippedItems || { weapon: null, armor: null, accessory: null },
             resources: gameState.resources || { wood: 0, stone: 0, iron: 0 },
@@ -819,9 +848,11 @@ function saveGame() {
     if (player) {
         const gameState = JSON.stringify(player);
         localStorage.setItem('huntBruteGameState', gameState);
+        console.log("Partie sauvegardée");
         showGameMessage("Partie sauvegardée avec succès !");
     } else {
-        showGameMessage("Aucune partie à sauvegarder.");
+        console.error("Aucun joueur à sauvegarder");
+        showGameMessage("Erreur : Aucune partie à sauvegarder.");
     }
 }
 
