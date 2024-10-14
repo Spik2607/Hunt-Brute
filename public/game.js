@@ -857,7 +857,8 @@ export {
     player,
     distributeSkillPoint,
     confirmLevelUp,
-    showLevelUpModal
+    showLevelUpModal,
+    companion,
     currentMission,
     currentExpedition,
     updatePlayerInfo,
