@@ -902,15 +902,5 @@ window.startMultiplayerMode = startMultiplayerMode;
 // Initialisation du jeu
 document.addEventListener('DOMContentLoaded', initGame);
 
-export {
-    player,
-    companion,
-    currentMission,
-    currentExpedition,
-    skills,
-    // Supprimez d'ici toutes les fonctions qui sont déjà exportées individuellement plus haut dans le fichier.
-    // Par exemple, si updatePlayerInfo, showGameArea, initGame, etc. sont déjà exportées,
-    // elles ne devraient pas apparaître ici.
-};
 
 console.log("Script game.js chargé");
