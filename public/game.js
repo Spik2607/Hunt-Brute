@@ -202,6 +202,7 @@ function createCharacter() {
 
 function openShop() {
     console.log("Tentative d'ouverture de la boutique");
+    console.log("État actuel du joueur:", player);
     if (player) {
         inventoryModule.openShop(player);
     } else {
