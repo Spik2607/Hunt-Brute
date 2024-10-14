@@ -158,13 +158,24 @@ export function openShop(player) {
 }
 
 export function buyItem(player, itemId) {
+    console.log("Tentative d'achat d'item:", itemId);
+    console.log("État du joueur:", player);
+    
     if (!player) {
         console.error("Achat impossible : joueur invalide");
         return;
     }
+    if (typeof player !== 'object') {
+        console.error("Achat impossible : le joueur n'est pas un objet valide");
+        return;
+    }
     const item = items.find(i => i.id === itemId);
     if (!item) {
-        console.error("Item not found");
+        console.error("Item non trouvé:", itemId);
+        return;
+    }
+    if (typeof player.gold !== 'number') {
+        console.error("Le joueur n'a pas de propriété 'gold' valide");
         return;
     }
     if (player.gold >= item.cost) {
@@ -181,7 +192,6 @@ export function buyItem(player, itemId) {
         showGameMessage("Vous n'avez pas assez d'or !");
     }
 }
-
 export function sellItem(player, index) {
     if (!player || !Array.isArray(player.inventory) || index < 0 || index >= player.inventory.length) {
         console.error("Vente impossible : joueur ou index invalide");
