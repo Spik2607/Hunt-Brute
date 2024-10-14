@@ -59,7 +59,7 @@ function initGame() {
     if (savedState) {
         try {
             const gameState = JSON.parse(savedState);
-            loadGame(gameState);
+            (gameState);
             console.log("Partie chargée avec succès");
         } catch (error) {
             console.error("Erreur lors du chargement de la sauvegarde:", error);
@@ -68,7 +68,12 @@ function initGame() {
     } else {
         showCreateHunterButton();
     }
-
+  if (player) {
+        console.log("Joueur initialisé:", player);
+        updatePlayerInfo();
+    } else {
+        console.log("Aucun joueur initialisé");
+    }
     setInterval(() => {
         if (player && !isCombatActive()) {
             player.regenerateHP();
@@ -135,6 +140,7 @@ function showCharacterCreationArea() {
 }
 
  function updatePlayerInfo() {
+    console.log("Mise à jour des informations du joueur");
     if (!player) {
         console.error("Aucun joueur n'est initialisé");
         return;
@@ -153,8 +159,7 @@ function showCharacterCreationArea() {
         Attaque: ${player.attack} | Défense: ${player.defense}<br>
         Ressources: Bois ${player.resources.wood}, Pierre ${player.resources.stone}, Fer ${player.resources.iron}
     `;
-    updateInventoryDisplay(player);
-    updateEquippedItemsDisplay(player);
+    console.log("Informations du joueur mises à jour");
 }
 
 function chooseMission() {
@@ -768,12 +773,13 @@ function showGameMessage(message) {
 }
 
 function loadGame(gameState) {
+    console.log("Tentative de chargement du jeu avec:", gameState);
     player = new Character(gameState.name, gameState.maxHp, gameState.attack, gameState.defense);
     Object.assign(player, gameState);
+    console.log("Joueur chargé:", player);
     updatePlayerInfo();
     showGameArea('adventure-menu');
 }
-
 function saveGame() {
     if (player) {
         const gameState = JSON.stringify(player);
