@@ -331,18 +331,6 @@ export function createEnemyForMission(mission) {
         defense: Math.round(enemyBase.defense * (mission.enemyLevel / enemyBase.level))
     };
 }
-export function createEnemyForMission(mission) {
-    const enemyBase = enemies.find(e => e.name === mission.enemy);
-    if (!enemyBase) return null;
-
-    return {
-        name: enemyBase.name,
-        level: mission.enemyLevel,
-        hp: Math.round(enemyBase.hp * (mission.enemyLevel / enemyBase.level)),
-        attack: Math.round(enemyBase.attack * (mission.enemyLevel / enemyBase.level)),
-        defense: Math.round(enemyBase.defense * (mission.enemyLevel / enemyBase.level))
-    };
-}
 
 // Nouvelle fonction ajoutée pour générer un ennemi unique
 export function generateUniqueEnemy(floor) {
