@@ -441,7 +441,7 @@ function handleDonjonEvent(event) {
     }
 }
 
-export function exitDonjon() {
+function exitDonjon() {
     currentDonjon = null;
     showGameArea('adventure-menu');
     console.log("Sortie du donjon");
