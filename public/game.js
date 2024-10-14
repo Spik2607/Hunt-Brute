@@ -206,6 +206,10 @@ function updatePlayerInfo() {
         Attaque: ${player.attack} | Défense: ${player.defense}<br>
         Ressources: Bois ${player.resources.wood}, Pierre ${player.resources.stone}, Fer ${player.resources.iron}
     `;
+    
+    // Mise à jour de l'affichage de l'inventaire et des objets équipés
+    inventoryModule.updateInventoryDisplay(player);
+    inventoryModule.updateEquippedItemsDisplay(player);
 }
 
 function openShop() {
