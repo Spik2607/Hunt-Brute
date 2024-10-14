@@ -256,7 +256,7 @@ export function startExpedition() {
     console.log("Expédition commencée:", currentExpedition);
 }
 
-export function cancelExpedition() {
+function cancelExpedition() {
     if (!currentExpedition) {
         alert("Il n'y a pas d'expédition en cours à annuler.");
         return;
