@@ -803,24 +803,37 @@ function closeTradeInterface() {
 }
 
 function setupEventListeners() {
-    document.getElementById('create-character').addEventListener('click', createCharacter);
-    document.getElementById('start-mission').addEventListener('click', chooseMission);
-    document.getElementById('start-expedition').addEventListener('click', startExpedition);
-    document.getElementById('cancel-expedition').addEventListener('click', cancelExpedition);
-    document.getElementById('next-donjon-event').addEventListener('click', nextDonjonEvent);
-    document.getElementById('exit-donjon').addEventListener('click', exitDonjon);
-    document.getElementById('open-inventory').addEventListener('click', openInventory);
-    document.getElementById('confirm-level-up').addEventListener('click', confirmLevelUp);
-    document.getElementById('send-message').addEventListener('click', sendChatMessage);
-    document.getElementById('challenge-player').addEventListener('click', challengePlayer);
-    document.getElementById('trade-request').addEventListener('click', requestTrade);
-    document.getElementById('save-game').addEventListener('click', saveGame);
-    document.getElementById('load-game').addEventListener('click', loadGame);
-    document.getElementById('reset-game').addEventListener('click', () => {
-        if (confirm("Êtes-vous sûr de vouloir effacer votre personnage et redémarrer le jeu ?")) {
-            resetGame();
-        })
-}
+    const listeners = [
+        { id: 'create-character', event: 'click', handler: createCharacter },
+        { id: 'start-mission', event: 'click', handler: chooseMission },
+        { id: 'start-expedition', event: 'click', handler: startExpedition },
+        { id: 'cancel-expedition', event: 'click', handler: cancelExpedition },
+        { id: 'next-donjon-event', event: 'click', handler: nextDonjonEvent },
+        { id: 'exit-donjon', event: 'click', handler: exitDonjon },
+        { id: 'open-inventory', event: 'click', handler: openInventory },
+        { id: 'confirm-level-up', event: 'click', handler: confirmLevelUp },
+        { id: 'send-message', event: 'click', handler: sendChatMessage },
+        { id: 'challenge-player', event: 'click', handler: challengePlayer },
+        { id: 'trade-request', event: 'click', handler: requestTrade },
+        { id: 'save-game', event: 'click', handler: saveGame },
+        { id: 'load-game', event: 'click', handler: loadGame },
+        { id: 'reset-game', event: 'click', handler: () => {
+            if (confirm("Êtes-vous sûr de vouloir effacer votre personnage et redémarrer le jeu ?")) {
+                resetGame();
+            }
+        }}
+    ];
+
+    listeners.forEach(({ id, event, handler }) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener(event, handler);
+        } else {
+            console.warn(`Élément avec l'ID '${id}' non trouvé pour l'événement ${event}`);
+        }
+    });
+
+    console.log("Écouteurs d'événements configurés avec succès");
 
 function showGameMessage(message) {
     const gameMessages = document.getElementById('game-messages');
