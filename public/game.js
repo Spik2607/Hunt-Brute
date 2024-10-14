@@ -819,7 +819,7 @@ function setupEventListeners() {
     document.getElementById('reset-game').addEventListener('click', () => {
         if (confirm("Êtes-vous sûr de vouloir effacer votre personnage et redémarrer le jeu ?")) {
             resetGame();
-        }
+        })
 }
 
 function showGameMessage(message) {
