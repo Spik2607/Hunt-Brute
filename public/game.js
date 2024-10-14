@@ -842,7 +842,7 @@ function updateActiveCompanionDisplay() {
     }
 }
 
-export function startMultiplayerMode() {
+function startMultiplayerMode() {
     if (!player) {
         showGameMessage("Veuillez d'abord créer un personnage.");
         return;
