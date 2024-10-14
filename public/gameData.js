@@ -319,6 +319,7 @@ export function levelUpCharacter(character) {
     console.log(`${character.name} a atteint le niveau ${character.level}!`);
     console.log(`PV max: +10, Attaque: +2, Défense: +1, Points de compétence: +3`);
 }
+
 export function createEnemyForMission(mission) {
     const enemyBase = enemies.find(e => e.name === mission.enemy);
     if (!enemyBase) return null;
@@ -332,7 +333,6 @@ export function createEnemyForMission(mission) {
     };
 }
 
-// Nouvelle fonction ajoutée pour générer un ennemi unique
 export function generateUniqueEnemy(floor) {
     const baseEnemy = getRandomEnemy();
     const uniqueName = `${baseEnemy.name} ${getRandomElement(['Féroce', 'Redoutable', 'Terrifiant', 'Mystérieux', 'Légendaire'])}`;
