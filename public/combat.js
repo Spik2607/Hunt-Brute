@@ -1,52 +1,44 @@
 // combat.js
 
-import { missions } from './gameData.js';
-
-let player, enemy, currentMission;
+let player, companion, enemy, currentMission;
 let currentCombat = false;
 
-export function initializeCombat(playerCharacter, missionOrEnemy, isDonjon = false) {
+export function initializeCombat(playerCharacter, companionCharacter, chosenEnemy) {
     player = playerCharacter;
+    companion = companionCharacter;
+    enemy = { ...chosenEnemy };
     currentCombat = true;
-
-    if (isDonjon) {
-        enemy = { ...missionOrEnemy };
-    } else {
-        currentMission = missions[missionOrEnemy];
-        enemy = createEnemyForMission(currentMission);
-    }
     
     updateBattleInfo();
-    console.log("Combat initialisé:", { player, enemy, currentMission });
-}
-
-function createEnemyForMission(mission) {
-    return {
-        name: mission.enemy,
-        level: mission.enemyLevel,
-        maxHp: mission.enemyLevel * 20,
-        hp: mission.enemyLevel * 20,
-        attack: mission.enemyLevel * 5,
-        defense: mission.enemyLevel * 2
-    };
+    console.log("Combat initialisé:", { player, companion, enemy });
 }
 
 export function updateBattleInfo() {
     const playerStats = document.getElementById('player-combat-info');
+    const companionStats = document.getElementById('companion-combat-info');
     const enemyStats = document.getElementById('enemy-combat-info');
 
     if (playerStats && player) {
         playerStats.querySelector('h3').textContent = player.name;
-        playerStats.querySelector('h3').style.color = 'blue';
         playerStats.querySelector('.health-text').textContent = `${player.hp}/${player.maxHp} PV`;
         playerStats.querySelector('.health-bar-fill').style.width = `${(player.hp / player.maxHp) * 100}%`;
         playerStats.querySelector('.energy-text').textContent = `${player.energy}/${player.maxEnergy} Énergie`;
         playerStats.querySelector('.energy-bar-fill').style.width = `${(player.energy / player.maxEnergy) * 100}%`;
     }
     
+    if (companionStats) {
+        if (companion) {
+            companionStats.style.display = 'block';
+            companionStats.querySelector('h3').textContent = companion.name;
+            companionStats.querySelector('.health-text').textContent = `${companion.hp}/${companion.maxHp} PV`;
+            companionStats.querySelector('.health-bar-fill').style.width = `${(companion.hp / companion.maxHp) * 100}%`;
+        } else {
+            companionStats.style.display = 'none';
+        }
+    }
+    
     if (enemyStats && enemy) {
         enemyStats.querySelector('h3').textContent = enemy.name;
-        enemyStats.querySelector('h3').style.color = 'red';
         enemyStats.querySelector('.health-text').textContent = `${enemy.hp}/${enemy.maxHp} PV`;
         enemyStats.querySelector('.health-bar-fill').style.width = `${(enemy.hp / enemy.maxHp) * 100}%`;
     }
@@ -122,24 +114,16 @@ function checkBattleEnd() {
 function endCombat(victory) {
     currentCombat = false;
     if (victory) {
-        let expGain, goldGain;
-        if (currentMission) {
-            expGain = currentMission.expReward;
-            goldGain = currentMission.goldReward;
-        } else {
-            // Récompenses pour le donjon
-            expGain = enemy.level * 10;
-            goldGain = enemy.level * 5;
-        }
+        const expGain = currentMission ? currentMission.expReward : enemy.level * 10;
+        const goldGain = currentMission ? currentMission.goldReward : enemy.level * 5;
         player.gainExperience(expGain);
         player.gold += goldGain;
         updateBattleLog(`Victoire ! Vous gagnez ${expGain} XP et ${goldGain} or.`);
     } else {
         updateBattleLog("Défaite ! Vous avez perdu le combat.");
-        player.hp = Math.max(player.hp, Math.floor(player.maxHp * 0.1)); // Évite la mort totale
+        player.hp = Math.max(player.hp, Math.floor(player.maxHp * 0.1));
     }
     
-    // Déclencher un événement personnalisé pour signaler la fin du combat
     window.dispatchEvent(new CustomEvent('combatEnd', { detail: { victory } }));
 }
 
