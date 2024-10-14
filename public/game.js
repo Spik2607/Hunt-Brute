@@ -356,7 +356,7 @@ function updateAdventureMenu() {
     }
 }
 
-export function startDonjon() {
+function startDonjon() {
     if (!player) {
         console.error("Aucun joueur n'est initialisé");
         return;
