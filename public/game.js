@@ -664,10 +664,7 @@ function equipItem(index) {
     if (!player || !player.inventory[index]) return;
     const item = player.inventory[index];
     if (item.type === 'weapon' || item.type === 'armor' || item.type === 'accessory') {
-        if (player.equippedItems[item.type]) {
-            player.unequipItem(player.equippedItems[item.type]);
-        }
-        player.equipItem(item);
+        player.equip(item);  // Utilisez 'equip' au lieu de 'equipItem'
         player.inventory.splice(index, 1);
         updatePlayerInfo();
         openInventory();
