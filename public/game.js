@@ -50,7 +50,6 @@ import {
     unequipItem,
     useItem
 } from './inventory.js';
-
 // Variables globales
 let player = null;
 let companion = null;
