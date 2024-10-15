@@ -1,3 +1,4 @@
+/* Base styles */
 * {
     margin: 0;
     padding: 0;
@@ -21,6 +22,7 @@ body {
     border-radius: 8px;
 }
 
+/* Header and navigation styles */
 header {
     text-align: center;
     margin-bottom: 30px;
@@ -37,6 +39,7 @@ h1 {
 h2, h3 {
     color: #6b3e26;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    margin-bottom: 15px;
 }
 
 nav {
@@ -66,6 +69,7 @@ nav button:hover {
     transform: translateY(-2px);
 }
 
+/* General game area styles */
 .game-area {
     background-color: rgba(255, 253, 240, 0.9);
     border: 2px solid #8B4513;
@@ -99,12 +103,83 @@ input[type="text"], select {
     font-size: 1em;
 }
 
+/* Player info styles */
 #player-info {
     background-color: rgba(255, 255, 255, 0.7);
     padding: 10px;
     border-radius: 5px;
     margin-bottom: 15px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Multiplayer area styles */
+#multiplayer-area {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+#players-list, #chat-area {
+    background-color: #f0e6d2;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+#chat-messages {
+    height: 200px;
+    overflow-y: auto;
+    border: 1px solid #8B4513;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+/* Leaderboard styles */
+#leaderboard {
+    background-color: #f0e6d2;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+#leaderboard h3 {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+/* Guild area styles */
+#guild-area {
+    background-color: #f0e6d2;
+    border-radius: 5px;
+    padding: 20px;
+}
+
+#create-guild, #guilds-list, #player-guild-info {
+    margin-bottom: 20px;
+}
+
+/* Crafting area styles */
+#crafting-area {
+    background-color: #f0e6d2;
+    border-radius: 5px;
+    padding: 20px;
+}
+
+#crafting-recipes {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+/* World events styles */
+#world-events {
+    background-color: #f0e6d2;
+    border-radius: 5px;
+    padding: 20px;
+}
+
+#current-world-event {
+    border: 1px solid #8B4513;
+    padding: 10px;
+    border-radius: 5px;
 }
 
 /* Combat styles */
@@ -172,63 +247,9 @@ input[type="text"], select {
     line-height: 1.4;
 }
 
-#action-buttons {
+#combat-actions {
     display: flex;
     justify-content: space-between;
-}
-
-.action-button {
-    background-color: #8B4513;
-    color: #FFF8DC;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 1em;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.action-button:hover {
-    background-color: #A0522D;
-    transform: translateY(-2px);
-}
-
-/* Mission choice styles */
-#mission-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
-}
-
-.mission-item {
-    background-color: #f0e6d2;
-    border: 1px solid #8B4513;
-    border-radius: 5px;
-    padding: 15px;
-    transition: all 0.3s ease;
-}
-
-.mission-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-.mission-item h3 {
-    margin-bottom: 10px;
-    color: #6b3e26;
-}
-
-.mission-item p {
-    margin-bottom: 5px;
-    font-size: 0.9em;
-}
-
-.mission-item button {
-    margin-top: 10px;
-    width: 100%;
 }
 
 /* Inventory and Shop styles */
@@ -237,17 +258,6 @@ input[type="text"], select {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-#inventory-filters {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
-}
-
-#inventory-search {
-    flex-grow: 1;
-    margin-right: 10px;
 }
 
 .inventory-grid, #inventory-items, #shop-items {
@@ -274,50 +284,17 @@ input[type="text"], select {
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
-.inventory-item-name, .shop-item-name {
-    font-weight: bold;
-    font-size: 1.1em;
-    margin-bottom: 5px;
+/* Trade area styles */
+#trade-area {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
 }
 
-.inventory-item-stats, .shop-item-stats {
-    font-size: 0.9em;
-    color: #666;
-    margin-bottom: 10px;
-}
-
-.inventory-item-buttons, .shop-item-buttons {
-    display: flex;
-    justify-content: space-between;
-}
-
-/* Rarity colors */
-.item-common { border-color: #ffffff; }
-.item-uncommon { border-color: #1eff00; }
-.item-rare { border-color: #0070dd; }
-.item-epic { border-color: #a335ee; }
-.item-legendary { border-color: #ff8000; }
-
-/* Expedition styles */
-#expedition-area {
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    padding: 20px;
-    margin-top: 20px;
-}
-
-#expedition-info {
-    font-size: 1.1em;
-    margin-bottom: 15px;
-}
-
-#expedition-log {
-    max-height: 200px;
-    overflow-y: auto;
-    border: 1px solid #ddd;
+#player-trade-items, #other-player-trade-items {
+    background-color: #f0e6d2;
+    border-radius: 5px;
     padding: 10px;
-    margin-top: 10px;
-    background-color: #fff;
 }
 
 /* Modal styles */
@@ -342,20 +319,6 @@ input[type="text"], select {
     max-width: 500px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.modal-content h2 {
-    border-bottom: 1px solid #8B4513;
-    padding-bottom: 10px;
-    margin-bottom: 15px;
-}
-
-#skill-distribution {
-    margin-top: 20px;
-}
-
-#skill-distribution div {
-    margin-bottom: 10px;
 }
 
 /* Animations */
@@ -387,11 +350,15 @@ input[type="text"], select {
         flex-direction: column;
     }
     
-    #mission-list, #inventory-items, #shop-items {
+    #multiplayer-area, #trade-area {
         grid-template-columns: 1fr;
     }
     
-    #inventory-filters, #action-buttons {
+    #mission-list, #inventory-items, #shop-items, #crafting-recipes {
+        grid-template-columns: 1fr;
+    }
+    
+    #inventory-filters, #combat-actions {
         flex-direction: column;
     }
     
