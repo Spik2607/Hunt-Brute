@@ -28,6 +28,7 @@ function initializeSocket() {
 
         socket.on('connect', () => {
             console.log('Connected to server');
+            initializeAdditionalFeatures();
         });
 
         socket.on('roomJoined', ({ roomId, players, messages }) => {
@@ -114,7 +115,6 @@ function initializeSocket() {
             showGameMessage("Vous avez été déconnecté du serveur.");
         });
 
-        // Nouvelles fonctionnalités
         socket.on('groupQuestReady', ({ questId, players }) => {
             showGameMessage(`La quête de groupe ${questId} est prête à commencer avec ${players.length} joueurs !`);
             // Logique pour démarrer la quête de groupe
@@ -411,6 +411,173 @@ function updatePlayerInfo() {
     }
 }
 
+function updateLeaderboard() {
+    const leaderboardData = [
+        { name: "Joueur1", level: 10, score: 1000 },
+        { name: "Joueur2", level: 9, score: 950 },
+        { name: "Joueur3", level: 8, score: 900 },
+    ];
+
+    const leaderboardElement = document.getElementById('leaderboard');
+    if (leaderboardElement) {
+        leaderboardElement.innerHTML = '<h3>Classement</h3>';
+        leaderboardData.forEach((player, index) => {
+            const playerElement = document.createElement('div');
+            playerElement.textContent = `${index + 1}. ${player.name} (Niveau ${player.level}) - Score: ${player.score}`;
+            leaderboardElement.appendChild(playerElement);
+        });
+    } else {
+        console.error("L'élément 'leaderboard' n'a pas été trouvé.");
+    }
+}
+
+function initializeGroupQuests() {
+    const groupQuestsElement = document.getElementById('group-quests');
+    if (groupQuestsElement) {
+        const quests = [
+            { id: 1, name: "Vaincre le dragon ancien", minPlayers: 3, reward: "1000 or et une arme légendaire" },
+            { id: 2, name: "Explorer le donjon maudit", minPlayers: 2, reward: "500 or et un grimoire rare" },
+            { id: 3, name: "Défendre le village contre une horde de gobelins", minPlayers: 4, reward: "750 or et une armure d'élite" }
+        ];
+
+        quests.forEach(quest => {
+            const questElement = document.createElement('div');
+            questElement.innerHTML = `
+                <h4>${quest.name}</h4>
+                <p>Joueurs requis: ${quest.minPlayers}</p>
+                <p>Récompense: ${quest.reward}</p>
+                <button onclick="joinGroupQuest(${quest.id})">Rejoindre</button>
+            `;
+            groupQuestsElement.appendChild(questElement);
+        });
+    } else {
+        console.error("L'élément 'group-quests' n'a pas été trouvé.");
+    }
+}
+
+function joinGroupQuest(questId) {
+    if (socket && currentRoom && player) {
+        socket.emit('joinGroupQuest', { roomId: currentRoom, questId, playerId: player.id });
+        showGameMessage(`Vous avez rejoint la quête de groupe ${questId}. En attente d'autres joueurs...`);
+    } else {
+        showGameMessage("Impossible de rejoindre la quête pour le moment.");
+    }
+}
+
+function createGuild() {
+    const guildNameInput = document.getElementById('guild-name-input');
+    if (guildNameInput && socket && player) {
+        const guildName = guildNameInput.value.trim();
+        if (guildName) {
+            socket.emit('createGuild', { name: guildName, founderId: player.id });
+            showGameMessage(`Vous avez créé la guilde "${guildName}".`);
+        } else {
+            showGameMessage("Veuillez entrer un nom de guilde valide.");
+        }
+    } else {
+        console.error("Éléments nécessaires pour créer une guilde non trouvés.");
+    }
+}
+
+function joinGuild(guildId) {
+    if (socket && player) {
+        socket.emit('joinGuild', { guildId, playerId: player.id });
+        showGameMessage(`Demande d'adhésion à la guilde envoyée.`);
+    } else {
+        showGameMessage("Impossible de rejoindre la guilde pour le moment.");
+    }
+}
+
+function updateGuildsList() {
+    const guilds = [
+        { id: 1, name: "Les Chevaliers de l'Aube", members: 10 },
+        { id: 2, name: "La Confrérie des Ombres", members: 8 },
+        { id: 3, name: "Les Gardiens de la Nature", members: 12 }
+    ];
+
+    const guildsListElement = document.getElementById('guilds-list');
+    if (guildsListElement) {
+        guildsListElement.innerHTML = '<h3>Guildes</h3>';
+        guilds.forEach(guild => {
+            const guildElement = document.createElement('div');
+            guildElement.innerHTML = `
+                <h4>${guild.name}</h4>
+                <p>Membres: ${guild.members}</p>
+                <button onclick="joinGuild(${guild.id})">Rejoindre</button>
+            `;
+            guildsListElement.appendChild(guildElement);
+        });
+    } else {
+        console.error("L'élément 'guilds-list' n'a pas été trouvé.");
+    }
+}
+
+function updatePlayerGuildInfo() {
+    if (player && player.guild) {
+        const guildInfoElement = document.getElementById('player-guild-info');
+        if (guildInfoElement) {
+            guildInfoElement.innerHTML = `
+                <h3>Votre Guilde</h3>
+                <p>Nom: ${player.guild.name}</p>
+                <p>Rang: ${player.guild.rank}</p>
+            `;
+        } else {
+            console.error("L'élément 'player-guild-info' n'a pas été trouvé.");
+        }
+    }
+}
+
+function initializeCraftingSystem() {
+    const craftingRecipes = [
+        { id: 1, name: "Épée en acier", materials: { iron: 5, wood: 2 }, result: "sword" },
+        { id: 2, name: "Potion de soin", materials: { herb: 3, water: 1 }, result: "healingPotion" },
+        { id: 3, name: "Arc elfique", materials: { wood: 4, magicEssence: 2 }, result: "elfBow" }
+    ];
+
+    const craftingElement = document.getElementById('crafting-recipes');
+    if (craftingElement) {
+        craftingRecipes.forEach(recipe => {
+            const recipeElement = document.createElement('div');
+            recipeElement.innerHTML = `
+                <h4>${recipe.name}</h4>
+                <p>Matériaux requis: ${Object.entries(recipe.materials).map(([item, count]) => `${count} ${item}`).join(', ')}</p>
+                <button onclick="craftItem(${recipe.id})">Fabriquer</button>
+            `;
+            craftingElement.appendChild(recipeElement);
+        });
+    } else {
+        console.error("L'élément 'crafting-recipes' n'a pas été trouvé.");
+    }
+}
+
+function craftItem(recipeId) {
+    showGameMessage(`Tentative de fabrication de l'objet avec la recette ${recipeId}.`);
+    // Logique de fabrication à implémenter
+}
+
+function startWorldEvent() {
+    const worldEvents = [
+        { id: 1, name: "Invasion de démons", duration: 3600, reward: "Équipement démoniaque" },
+        { id: 2, name: "Festival de la moisson", duration: 7200, reward: "Potions de buff rares" },
+        { id: 3, name: "Chasse au trésor royale", duration: 5400, reward: "Or et objets précieux" }
+    ];
+
+    const event = worldEvents[Math.floor(Math.random() * worldEvents.length)];
+    if (socket) {
+        socket.emit('startWorldEvent', event);
+    } else {
+        console.error("Socket non initialisé lors du démarrage de l'événement mondial.");
+    }
+}
+
+function initializeAdditionalFeatures() {
+    updateLeaderboard();
+    initializeGroupQuests();
+    updateGuildsList();
+    initializeCraftingSystem();
+    setTimeout(startWorldEvent, 3600000); // Premier événement après 1 heure
+}
+
 // Exposer les fonctions nécessaires globalement
 window.player = player;
 window.equipItem = equipItem;
@@ -428,179 +595,9 @@ window.playerUseSpecial = playerUseSpecial;
 window.updatePlayerInfo = updatePlayerInfo;
 window.showGameMessage = showGameMessage;
 window.showGameArea = showGameArea;
-
-console.log("Module de jeu multijoueur chargé");
-
-// Fonctions pour le système de classement
-function updateLeaderboard() {
-    // Simuler une requête au serveur pour obtenir le classement
-    const leaderboardData = [
-        { name: "Joueur1", level: 10, score: 1000 },
-        { name: "Joueur2", level: 9, score: 950 },
-        { name: "Joueur3", level: 8, score: 900 },
-    ];
-
-    const leaderboardElement = document.getElementById('leaderboard');
-    leaderboardElement.innerHTML = '<h3>Classement</h3>';
-    leaderboardData.forEach((player, index) => {
-        const playerElement = document.createElement('div');
-        playerElement.textContent = `${index + 1}. ${player.name} (Niveau ${player.level}) - Score: ${player.score}`;
-        leaderboardElement.appendChild(playerElement);
-    });
-}
-
-// Fonctions pour les quêtes de groupe
-function initializeGroupQuests() {
-    const groupQuestsElement = document.getElementById('group-quests');
-    const quests = [
-        { id: 1, name: "Vaincre le dragon ancien", minPlayers: 3, reward: "1000 or et une arme légendaire" },
-        { id: 2, name: "Explorer le donjon maudit", minPlayers: 2, reward: "500 or et un grimoire rare" },
-        { id: 3, name: "Défendre le village contre une horde de gobelins", minPlayers: 4, reward: "750 or et une armure d'élite" }
-    ];
-
-    quests.forEach(quest => {
-        const questElement = document.createElement('div');
-        questElement.innerHTML = `
-            <h4>${quest.name}</h4>
-            <p>Joueurs requis: ${quest.minPlayers}</p>
-            <p>Récompense: ${quest.reward}</p>
-            <button onclick="joinGroupQuest(${quest.id})">Rejoindre</button>
-        `;
-        groupQuestsElement.appendChild(questElement);
-    });
-}
-
-function joinGroupQuest(questId) {
-    socket.emit('joinGroupQuest', { roomId: currentRoom, questId, playerId: player.id });
-    showGameMessage(`Vous avez rejoint la quête de groupe ${questId}. En attente d'autres joueurs...`);
-}
-
-// Gestion des événements de quête de groupe
-socket.on('groupQuestReady', ({ questId, players }) => {
-    showGameMessage(`La quête de groupe ${questId} est prête à commencer avec ${players.length} joueurs !`);
-    // Ici, vous pouvez ajouter la logique pour démarrer la quête de groupe
-});
-
-// Fonctions pour le système de guildes
-function createGuild() {
-    const guildName = document.getElementById('guild-name-input').value;
-    if (guildName) {
-        socket.emit('createGuild', { name: guildName, founderId: player.id });
-        showGameMessage(`Vous avez créé la guilde "${guildName}".`);
-    } else {
-        showGameMessage("Veuillez entrer un nom de guilde valide.");
-    }
-}
-
-function joinGuild(guildId) {
-    socket.emit('joinGuild', { guildId, playerId: player.id });
-    showGameMessage(`Demande d'adhésion à la guilde envoyée.`);
-}
-
-// Gestion des événements de guilde
-socket.on('guildCreated', ({ guildId, name }) => {
-    showGameMessage(`La guilde "${name}" a été créée avec succès.`);
-    updateGuildsList();
-});
-
-socket.on('guildJoined', ({ guildId, name }) => {
-    showGameMessage(`Vous avez rejoint la guilde "${name}".`);
-    updatePlayerGuildInfo();
-});
-
-function updateGuildsList() {
-    // Simuler une requête au serveur pour obtenir la liste des guildes
-    const guilds = [
-        { id: 1, name: "Les Chevaliers de l'Aube", members: 10 },
-        { id: 2, name: "La Confrérie des Ombres", members: 8 },
-        { id: 3, name: "Les Gardiens de la Nature", members: 12 }
-    ];
-
-    const guildsListElement = document.getElementById('guilds-list');
-    guildsListElement.innerHTML = '<h3>Guildes</h3>';
-    guilds.forEach(guild => {
-        const guildElement = document.createElement('div');
-        guildElement.innerHTML = `
-            <h4>${guild.name}</h4>
-            <p>Membres: ${guild.members}</p>
-            <button onclick="joinGuild(${guild.id})">Rejoindre</button>
-        `;
-        guildsListElement.appendChild(guildElement);
-    });
-}
-
-function updatePlayerGuildInfo() {
-    // Mettre à jour les informations de guilde du joueur
-    if (player.guild) {
-        const guildInfoElement = document.getElementById('player-guild-info');
-        guildInfoElement.innerHTML = `
-            <h3>Votre Guilde</h3>
-            <p>Nom: ${player.guild.name}</p>
-            <p>Rang: ${player.guild.rank}</p>
-        `;
-    }
-}
-
-// Fonctions pour le système de craft
-function initializeCraftingSystem() {
-    const craftingRecipes = [
-        { id: 1, name: "Épée en acier", materials: { iron: 5, wood: 2 }, result: "sword" },
-        { id: 2, name: "Potion de soin", materials: { herb: 3, water: 1 }, result: "healingPotion" },
-        { id: 3, name: "Arc elfique", materials: { wood: 4, magicEssence: 2 }, result: "elfBow" }
-    ];
-
-    const craftingElement = document.getElementById('crafting-recipes');
-    craftingRecipes.forEach(recipe => {
-        const recipeElement = document.createElement('div');
-        recipeElement.innerHTML = `
-            <h4>${recipe.name}</h4>
-            <p>Matériaux requis: ${Object.entries(recipe.materials).map(([item, count]) => `${count} ${item}`).join(', ')}</p>
-            <button onclick="craftItem(${recipe.id})">Fabriquer</button>
-        `;
-        craftingElement.appendChild(recipeElement);
-    });
-}
-
-function craftItem(recipeId) {
-    // Vérifier si le joueur a les matériaux nécessaires
-    // Si oui, créer l'objet et l'ajouter à l'inventaire
-    // Sinon, afficher un message d'erreur
-    showGameMessage(`Tentative de fabrication de l'objet avec la recette ${recipeId}.`);
-    // Exemple: addItemToInventory(player, { id: 'craftedSword', name: 'Épée fabriquée', type: 'weapon', attack: 15 });
-}
-
-// Fonctions pour les événements mondiaux
-function startWorldEvent() {
-    const worldEvents = [
-        { id: 1, name: "Invasion de démons", duration: 3600, reward: "Équipement démoniaque" },
-        { id: 2, name: "Festival de la moisson", duration: 7200, reward: "Potions de buff rares" },
-        { id: 3, name: "Chasse au trésor royale", duration: 5400, reward: "Or et objets précieux" }
-    ];
-
-    const event = worldEvents[Math.floor(Math.random() * worldEvents.length)];
-    socket.emit('startWorldEvent', event);
-}
-
-socket.on('worldEventStarted', (event) => {
-    showGameMessage(`Un événement mondial a commencé: ${event.name}. Durée: ${event.duration / 60} minutes. Récompense: ${event.reward}`);
-    // Ajouter la logique pour afficher un compte à rebours et les détails de l'événement
-});
-
-// Initialisation des nouvelles fonctionnalités
-function initializeAdditionalFeatures() {
-    updateLeaderboard();
-    initializeGroupQuests();
-    updateGuildsList();
-    initializeCraftingSystem();
-    // Mettre en place un intervalle pour vérifier et démarrer des événements mondiaux
-    setInterval(startWorldEvent, 3600000); // Vérifier toutes les heures
-}
-
-// Appeler cette fonction après la connexion du joueur
-initializeAdditionalFeatures();
-
-// Exposer les nouvelles fonctions globalement si nécessaire
 window.joinGroupQuest = joinGroupQuest;
 window.createGuild = createGuild;
 window.joinGuild = joinGuild;
 window.craftItem = craftItem;
+
+console.log("Module de jeu multijoueur chargé");
