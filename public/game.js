@@ -173,7 +173,7 @@ function showCharacterCreationArea() {
     showGameArea('character-creation');
 }
 
-function createCharacter() {
+export function createCharacter() {
     const nameInput = document.getElementById('hero-name');
     if (!nameInput) {
         console.error("L'élément 'hero-name' n'a pas été trouvé");
@@ -242,7 +242,7 @@ function chooseMission() {
     showGameArea('mission-choice');
 }
 
- function startMission(index) {
+export  function startMission(index) {
     currentMission = missions[index];
     const chosenEnemy = selectEnemyForMission(currentMission);
     initializeCombat(player, companion, chosenEnemy, currentMission);
@@ -508,7 +508,7 @@ function openInventory() {
     }
 }
 
- function distributeSkillPoint(skill) {
+ export function distributeSkillPoint(skill) {
     if (player.skillPoints > 0) {
         player.skills[skill]++;
         player.skillPoints--;
@@ -520,13 +520,13 @@ function openInventory() {
     }
 }
 
- function confirmLevelUp() {
+export  function confirmLevelUp() {
     player.applySkills();
     document.getElementById('level-up-modal').style.display = 'none';
     updatePlayerInfo();
 }
 
- function showLevelUpModal() {
+export  function showLevelUpModal() {
     const modal = document.getElementById('level-up-modal');
     const newLevelSpan = document.getElementById('new-level');
     const skillPointsSpan = document.getElementById('skill-points');
@@ -685,7 +685,7 @@ function updateWaitingAreaDisplay(players) {
     }
 }
 
- function sendChatMessage() {
+export  function sendChatMessage() {
     const chatInput = document.getElementById('chat-input');
     const message = chatInput.value.trim();
     if (message && currentRoom) {
@@ -936,49 +936,43 @@ function additionalInit() {
     // checkForUpdates();
 }
 
-// Rendre les fonctions accessibles globalement
-window.createCharacter = createCharacter;
-window.startMission = startMission;
-window.startExpedition = startExpedition;
-window.cancelExpedition = cancelExpedition;
-window.nextDonjonEvent = nextDonjonEvent;
-window.exitDonjon = exitDonjon;
-window.openInventory = openInventory;
-window.distributeSkillPoint = distributeSkillPoint;
-window.confirmLevelUp = confirmLevelUp;
-window.joinRoom = joinRoom;
-window.sendChatMessage = sendChatMessage;
-window.challengePlayer = challengePlayer;
-window.requestTrade = requestTrade;
-window.offerTradeItem = offerTradeItem;
-window.buyItem = buyItem;
-window.sellItem = sellItem;
-window.equipItem = equipItem;
-window.unequipItem = unequipItem;
-window.useItem = useItem;
-window.openCompanionsMenu = openCompanionsMenu;
-window.selectCompanion = selectCompanion;
-window.startMultiplayerMode = startMultiplayerMode;
-window.saveGame = saveGame;
 
-// Exportations pour l'utilisation dans d'autres modules
-export {
-    player,
-    companion,
-    currentMission,
-    currentExpedition,
-    currentDonjon,
-    createCharacter,
-    startMission,
-    distributeSkillPoint,
-    confirmLevelUp,
-    showLevelUpModal,
-    sendChatMessage,
-    offerTradeItem,
-    // ... ajouter ici toutes les autres fonctions et variables à exporter
+function setupGlobalFunctions() {
+    window.createCharacter = createCharacter;
+    window.startMission = startMission;
+    window.startExpedition = startExpedition;
+    window.cancelExpedition = cancelExpedition;
+    window.nextDonjonEvent = nextDonjonEvent;
+    window.exitDonjon = exitDonjon;
+    window.openInventory = openInventory;
+    window.distributeSkillPoint = distributeSkillPoint;
+    window.confirmLevelUp = confirmLevelUp;
+    window.joinRoom = joinRoom;
+    window.sendChatMessage = sendChatMessage;
+    window.challengePlayer = challengePlayer;
+    window.requestTrade = requestTrade;
+    window.offerTradeItem = offerTradeItem;
+    window.buyItem = buyItem;
+    window.sellItem = sellItem;
+    window.equipItem = equipItem;
+    window.unequipItem = unequipItem;
+    window.useItem = useItem;
+    window.openCompanionsMenu = openCompanionsMenu;
+    window.selectCompanion = selectCompanion;
+    window.startMultiplayerMode = startMultiplayerMode;
+    window.saveGame = saveGame;
+}
+    
+// Configuration de l'erreur globale
+window.onerror = function(message, source, lineno, colno, error) {
+    handleError(error || message);
+    return true;
 };
 
-// Initialisation du jeu
-document.addEventListener('DOMContentLoaded', initGame);
+// Initialisation
+document.addEventListener('DOMContentLoaded', () => {
+    setupGlobalFunctions();
+    initGame();
+});
 
 console.log("Script game.js chargé et complété");
