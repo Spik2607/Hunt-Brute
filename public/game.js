@@ -8,12 +8,21 @@ let player;
 let currentRoom;
 let socket;
 
-document.addEventListener('DOMContentLoaded', () => {
-    initializeGame();
-});
+document.addEventListener('DOMContentLoaded', initializeGame);
 
 function initializeGame() {
+    console.log("Initializing game...");
+    initializeSocket();
+    initializeEventListeners();
+    loadCharacter();
+}
+
+function initializeSocket() {
     socket = io();
+
+    socket.on('connect', () => {
+        console.log('Connected to server');
+    });
 
     socket.on('roomJoined', ({ roomId, players, messages }) => {
         currentRoom = roomId;
@@ -37,12 +46,15 @@ function initializeGame() {
     socket.on('challengeReceived', ({ challengerId }) => {
         if (challengerId !== player.id) {
             showGameMessage(`${challengerId} vous défie en duel !`);
-            document.getElementById('accept-challenge').style.display = 'block';
+            const acceptChallengeButton = document.getElementById('accept-challenge');
+            if (acceptChallengeButton) {
+                acceptChallengeButton.style.display = 'block';
+            }
         }
     });
 
     socket.on('battleStart', ({ challengerId, accepterId }) => {
-        if (player.id === challengerId || player.id === accepterId) {
+        if (player && (player.id === challengerId || player.id === accepterId)) {
             startMultiplayerBattle(challengerId, accepterId);
         }
     });
@@ -52,26 +64,29 @@ function initializeGame() {
     });
 
     socket.on('tradeRequestReceived', ({ fromId, toId }) => {
-        if (player.id === toId) {
+        if (player && player.id === toId) {
             showGameMessage(`${fromId} vous propose un échange !`);
-            document.getElementById('accept-trade').style.display = 'block';
+            const acceptTradeButton = document.getElementById('accept-trade');
+            if (acceptTradeButton) {
+                acceptTradeButton.style.display = 'block';
+            }
         }
     });
 
     socket.on('tradeStart', ({ fromId, toId }) => {
-        if (player.id === fromId || player.id === toId) {
+        if (player && (player.id === fromId || player.id === toId)) {
             startTrade(fromId, toId);
         }
     });
 
     socket.on('itemOffered', ({ fromId, itemId }) => {
-        if (fromId !== player.id) {
+        if (player && fromId !== player.id) {
             showOfferedItem(itemId);
         }
     });
 
     socket.on('tradeConfirmed', ({ playerId }) => {
-        if (playerId !== player.id) {
+        if (player && playerId !== player.id) {
             showGameMessage("L'autre joueur a confirmé l'échange.");
         }
     });
@@ -83,120 +98,229 @@ function initializeGame() {
 
     socket.on('playerLeft', (playerId) => {
         showGameMessage(`Le joueur ${playerId} a quitté la partie.`);
-        updatePlayersList(players.filter(p => p.id !== playerId));
+        if (currentRoom) {
+            socket.emit('getRoomPlayers', currentRoom);
+        }
     });
 
-    document.getElementById('create-character').addEventListener('click', createCharacter);
-    document.getElementById('join-room').addEventListener('click', joinRoom);
-    document.getElementById('send-message').addEventListener('click', sendChatMessage);
-    document.getElementById('challenge-player').addEventListener('click', initiateChallenge);
-    document.getElementById('accept-challenge').addEventListener('click', acceptChallenge);
-    document.getElementById('trade-request').addEventListener('click', initiateTradeRequest);
-    document.getElementById('accept-trade').addEventListener('click', acceptTradeRequest);
-    document.getElementById('confirm-trade').addEventListener('click', confirmTrade);
-    document.getElementById('cancel-trade').addEventListener('click', cancelTrade);
+    socket.on('disconnect', () => {
+        console.log('Disconnected from server');
+        showGameMessage("Vous avez été déconnecté du serveur.");
+    });
+}
+
+function initializeEventListeners() {
+    const createCharacterButton = document.getElementById('create-character');
+    if (createCharacterButton) {
+        createCharacterButton.addEventListener('click', createCharacter);
+    }
+
+    const joinRoomButton = document.getElementById('join-room');
+    if (joinRoomButton) {
+        joinRoomButton.addEventListener('click', joinRoom);
+    }
+
+    const sendMessageButton = document.getElementById('send-message');
+    if (sendMessageButton) {
+        sendMessageButton.addEventListener('click', sendChatMessage);
+    }
+
+    const challengePlayerButton = document.getElementById('challenge-player');
+    if (challengePlayerButton) {
+        challengePlayerButton.addEventListener('click', initiateChallenge);
+    }
+
+    const acceptChallengeButton = document.getElementById('accept-challenge');
+    if (acceptChallengeButton) {
+        acceptChallengeButton.addEventListener('click', acceptChallenge);
+    }
+
+    const tradeRequestButton = document.getElementById('trade-request');
+    if (tradeRequestButton) {
+        tradeRequestButton.addEventListener('click', initiateTradeRequest);
+    }
+
+    const acceptTradeButton = document.getElementById('accept-trade');
+    if (acceptTradeButton) {
+        acceptTradeButton.addEventListener('click', acceptTradeRequest);
+    }
+
+    const confirmTradeButton = document.getElementById('confirm-trade');
+    if (confirmTradeButton) {
+        confirmTradeButton.addEventListener('click', confirmTrade);
+    }
+
+    const cancelTradeButton = document.getElementById('cancel-trade');
+    if (cancelTradeButton) {
+        cancelTradeButton.addEventListener('click', cancelTrade);
+    }
+}
+
+function loadCharacter() {
+    const savedCharacter = localStorage.getItem('playerCharacter');
+    if (savedCharacter) {
+        player = JSON.parse(savedCharacter);
+        updatePlayerInfo();
+        showGameArea('multiplayer-area');
+    } else {
+        showGameArea('character-creation');
+    }
 }
 
 function createCharacter() {
-    const name = document.getElementById('hero-name').value;
-    player = new Character(name, 100, 10, 5);
-    showGameArea('multiplayer-area');
+    const nameInput = document.getElementById('hero-name');
+    if (nameInput) {
+        const name = nameInput.value.trim();
+        if (name) {
+            player = new Character(name, 100, 10, 5);
+            localStorage.setItem('playerCharacter', JSON.stringify(player));
+            updatePlayerInfo();
+            showGameArea('multiplayer-area');
+        } else {
+            showGameMessage("Veuillez entrer un nom pour votre personnage.");
+        }
+    } else {
+        console.error("L'élément 'hero-name' n'a pas été trouvé.");
+    }
 }
 
 function joinRoom() {
-    const roomId = document.getElementById('room-id').value || 'fixed-room';
-    socket.emit('joinRoom', { roomId, playerInfo: { name: player.name, level: player.level } });
+    const roomIdInput = document.getElementById('room-id');
+    if (roomIdInput) {
+        const roomId = roomIdInput.value || 'fixed-room';
+        if (player) {
+            socket.emit('joinRoom', { roomId, playerInfo: { name: player.name, level: player.level } });
+        } else {
+            showGameMessage("Veuillez d'abord créer un personnage.");
+        }
+    } else {
+        console.error("L'élément 'room-id' n'a pas été trouvé.");
+    }
 }
 
 function updatePlayersList(players) {
     const playersList = document.getElementById('players-list');
-    playersList.innerHTML = '';
-    players.forEach(p => {
-        const playerElement = document.createElement('div');
-        playerElement.textContent = `${p.name} (Niveau ${p.level})`;
-        playersList.appendChild(playerElement);
-    });
+    if (playersList) {
+        playersList.innerHTML = '';
+        players.forEach(p => {
+            const playerElement = document.createElement('div');
+            playerElement.textContent = `${p.name} (Niveau ${p.level})`;
+            playersList.appendChild(playerElement);
+        });
+    } else {
+        console.error("L'élément 'players-list' n'a pas été trouvé.");
+    }
 }
 
 function sendChatMessage() {
     const messageInput = document.getElementById('chat-input');
-    const message = messageInput.value;
-    if (message) {
-        socket.emit('chatMessage', { roomId: currentRoom, message: { sender: player.name, content: message } });
-        messageInput.value = '';
+    if (messageInput) {
+        const message = messageInput.value.trim();
+        if (message && currentRoom) {
+            socket.emit('chatMessage', { roomId: currentRoom, message: { sender: player.name, content: message } });
+            messageInput.value = '';
+        }
+    } else {
+        console.error("L'élément 'chat-input' n'a pas été trouvé.");
     }
 }
 
 function addChatMessage(message) {
     const chatMessages = document.getElementById('chat-messages');
-    const messageElement = document.createElement('div');
-    messageElement.textContent = `${message.sender}: ${message.content}`;
-    chatMessages.appendChild(messageElement);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    if (chatMessages) {
+        const messageElement = document.createElement('div');
+        messageElement.textContent = `${message.sender}: ${message.content}`;
+        chatMessages.appendChild(messageElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    } else {
+        console.error("L'élément 'chat-messages' n'a pas été trouvé.");
+    }
 }
 
 function initiateChallenge() {
-    socket.emit('initiateChallenge', { roomId: currentRoom, challengerId: player.id });
+    if (currentRoom && player) {
+        socket.emit('initiateChallenge', { roomId: currentRoom, challengerId: player.id });
+    } else {
+        showGameMessage("Vous devez être dans une salle pour défier un joueur.");
+    }
 }
 
 function acceptChallenge() {
-    socket.emit('acceptChallenge', { roomId: currentRoom, challengerId: player.id, accepterId: player.id });
+    if (currentRoom && player) {
+        socket.emit('acceptChallenge', { roomId: currentRoom, challengerId: player.id, accepterId: player.id });
+    } else {
+        showGameMessage("Vous ne pouvez pas accepter le défi en ce moment.");
+    }
 }
 
 function startMultiplayerBattle(challengerId, accepterId) {
-    // Initialiser le combat multijoueur
     showGameArea('battle-area');
     initializeCombat(player, null, { name: "Adversaire", hp: 100, attack: 10, defense: 5 }, null);
     updateBattleInfo();
 }
 
 function handleOpponentAction(action) {
-    // Gérer l'action de l'adversaire dans le combat
-    if (action.type === 'attack') {
+    if (action.type === 'attack' && player) {
         const damage = calculateDamage(action.attacker, player);
         player.hp -= damage;
         showGameMessage(`L'adversaire vous inflige ${damage} dégâts.`);
+        updateBattleInfo();
     }
-    updateBattleInfo();
 }
 
 function initiateTradeRequest() {
     const otherPlayerId = getOtherPlayerId();
-    socket.emit('initiateTradeRequest', { roomId: currentRoom, fromId: player.id, toId: otherPlayerId });
+    if (currentRoom && player && otherPlayerId) {
+        socket.emit('initiateTradeRequest', { roomId: currentRoom, fromId: player.id, toId: otherPlayerId });
+    } else {
+        showGameMessage("Impossible d'initier l'échange en ce moment.");
+    }
 }
 
 function acceptTradeRequest() {
     const otherPlayerId = getOtherPlayerId();
-    socket.emit('acceptTradeRequest', { roomId: currentRoom, fromId: otherPlayerId, toId: player.id });
+    if (currentRoom && player && otherPlayerId) {
+        socket.emit('acceptTradeRequest', { roomId: currentRoom, fromId: otherPlayerId, toId: player.id });
+    } else {
+        showGameMessage("Impossible d'accepter l'échange en ce moment.");
+    }
 }
 
 function startTrade(fromId, toId) {
     showGameArea('trade-area');
-    // Afficher les inventaires pour l'échange
     displayTradeInventory();
 }
 
 function offerTradeItem(itemId) {
-    socket.emit('offerTradeItem', { roomId: currentRoom, itemId });
+    if (currentRoom) {
+        socket.emit('offerTradeItem', { roomId: currentRoom, itemId });
+    }
 }
 
 function showOfferedItem(itemId) {
-    // Afficher l'objet offert par l'autre joueur
     const item = items.find(i => i.id === itemId);
     if (item) {
         const offeredItemsElement = document.getElementById('offered-items');
-        const itemElement = document.createElement('div');
-        itemElement.textContent = item.name;
-        offeredItemsElement.appendChild(itemElement);
+        if (offeredItemsElement) {
+            const itemElement = document.createElement('div');
+            itemElement.textContent = item.name;
+            offeredItemsElement.appendChild(itemElement);
+        } else {
+            console.error("L'élément 'offered-items' n'a pas été trouvé.");
+        }
     }
 }
 
 function confirmTrade() {
-    socket.emit('confirmTrade', { roomId: currentRoom });
+    if (currentRoom) {
+        socket.emit('confirmTrade', { roomId: currentRoom });
+    }
 }
 
 function cancelTrade() {
-    socket.emit('cancelTrade', { roomId: currentRoom });
+    if (currentRoom) {
+        socket.emit('cancelTrade', { roomId: currentRoom });
+    }
 }
 
 function closeTrade() {
@@ -204,12 +328,14 @@ function closeTrade() {
 }
 
 function getOtherPlayerId() {
-    // Logique pour obtenir l'ID de l'autre joueur dans la salle
-    const players = document.getElementById('players-list').children;
-    for (let playerElement of players) {
-        const playerId = playerElement.dataset.playerId;
-        if (playerId !== player.id) {
-            return playerId;
+    const playersList = document.getElementById('players-list');
+    if (playersList && player) {
+        const playerElements = playersList.children;
+        for (let playerElement of playerElements) {
+            const playerId = playerElement.dataset.playerId;
+            if (playerId && playerId !== player.id) {
+                return playerId;
+            }
         }
     }
     return null;
@@ -217,28 +343,41 @@ function getOtherPlayerId() {
 
 function showGameArea(areaId) {
     const gameAreas = document.querySelectorAll('.game-area');
-    gameAreas.forEach(area => area.style.display = 'none');
-    document.getElementById(areaId).style.display = 'block';
+    gameAreas.forEach(area => {
+        if (area.id === areaId) {
+            area.style.display = 'block';
+        } else {
+            area.style.display = 'none';
+        }
+    });
 }
 
 function showGameMessage(message) {
     const gameMessages = document.getElementById('game-messages');
-    const messageElement = document.createElement('div');
-    messageElement.textContent = message;
-    gameMessages.appendChild(messageElement);
-    gameMessages.scrollTop = gameMessages.scrollHeight;
+    if (gameMessages) {
+        const messageElement = document.createElement('div');
+        messageElement.textContent = message;
+        gameMessages.appendChild(messageElement);
+        gameMessages.scrollTop = gameMessages.scrollHeight;
+    } else {
+        console.error("L'élément 'game-messages' n'a pas été trouvé.");
+    }
 }
 
 function updatePlayerInfo() {
     const playerInfoElement = document.getElementById('player-info');
-    playerInfoElement.innerHTML = `
-        <p>Nom: ${player.name}</p>
-        <p>Niveau: ${player.level}</p>
-        <p>PV: ${player.hp}/${player.maxHp}</p>
-        <p>Attaque: ${player.attack}</p>
-        <p>Défense: ${player.defense}</p>
-        <p>Or: ${player.gold}</p>
-    `;
+    if (playerInfoElement && player) {
+        playerInfoElement.innerHTML = `
+            <p>Nom: ${player.name}</p>
+            <p>Niveau: ${player.level}</p>
+            <p>PV: ${player.hp}/${player.maxHp}</p>
+            <p>Attaque: ${player.attack}</p>
+            <p>Défense: ${player.defense}</p>
+            <p>Or: ${player.gold}</p>
+        `;
+    } else {
+        console.error("L'élément 'player-info' n'a pas été trouvé ou le joueur n'est pas défini.");
+    }
 }
 
 // Exposer les fonctions nécessaires globalement
@@ -258,8 +397,6 @@ window.playerUseSpecial = playerUseSpecial;
 window.updatePlayerInfo = updatePlayerInfo;
 window.showGameMessage = showGameMessage;
 window.showGameArea = showGameArea;
-
-console.log("Module de jeu multijoueur chargé");
 
 console.log("Module de jeu multijoueur chargé");
 
