@@ -202,24 +202,7 @@ function initGame() {
     console.log("Initialisation du jeu terminée");
 }
 
-function setUpdateIntervals() {
-    // Arrêter les intervalles existants s'il y en a
-    if (window.gameIntervals) {
-        window.gameIntervals.forEach(clearInterval);
-    }
-    window.gameIntervals = [];
 
-    // Intervalle pour la régénération et la mise à jour des informations du joueur
-    const playerUpdateInterval = setInterval(() => {
-        if (player && !isCombatActive()) {
-            player.regenerateHP();
-            player.regenerateEnergy();
-            updatePlayerInfo();
-        }
-    }, 1000);
-    window.gameIntervals.push(playerUpdateInterval);
-
-    // Intervalle pour la mise à jour de l'expédition si elle est en cours
     const expeditionUpdateInterval = setInterval(() => {
         if (currentExpedition) {
             updateExpedition();
@@ -249,6 +232,28 @@ function showGameArea(areaId) {
     console.log(`Zone ${areaId} affichée`);
 }
 
+let isUpdating = false;
+
+function updateGameState() {
+    if (!isUpdating) return;
+    
+    updatePlayerInfo();
+    // Autres mises à jour visuelles si nécessaire
+    
+    requestAnimationFrame(updateGameState);
+}
+
+function startUpdating() {
+    if (!isUpdating) {
+        isUpdating = true;
+        requestAnimationFrame(updateGameState);
+    }
+}
+
+function stopUpdating() {
+    isUpdating = false;
+}
+
 function showCreateHunterButton() {
     const mainMenu = document.getElementById('main-menu');
     if (!mainMenu.querySelector('#create-hunter-button')) {
@@ -265,8 +270,15 @@ function showCharacterCreationArea() {
     showGameArea('character-creation');
 }
 
+let lastUpdateTime = 0;
+const UPDATE_INTERVAL = 1000; // Mise à jour toutes les 1000ms (1 seconde)
 
 function updatePlayerInfo() {
+    const currentTime = Date.now();
+    if (currentTime - lastUpdateTime < UPDATE_INTERVAL) {
+        return; // Sortir si le temps écoulé depuis la dernière mise à jour est trop court
+    }
+    
     console.log("Mise à jour des informations du joueur");
     if (!player) {
         console.error("Aucun joueur n'est initialisé");
@@ -278,17 +290,35 @@ function updatePlayerInfo() {
         return;
     }
     playerInfo.innerHTML = `
-        ${player.name || 'Inconnu'} - Niveau ${player.level || 1}<br>
-        PV: ${player.hp || 0}/${player.maxHp || 100}<br>
-        XP: ${player.experience || 0}/${(player.level || 1) * 100}<br>
-        Or: ${player.gold || 0}<br>
-        Énergie: ${player.energy || 0}/${player.maxEnergy || 100}<br>
-        Attaque: ${player.attack || 0} | Défense: ${player.defense || 0}<br>
-        Ressources: Bois ${player.resources?.wood || 0}, Pierre ${player.resources?.stone || 0}, Fer ${player.resources?.iron || 0}
+        ${player.name} - Niveau ${player.level}<br>
+        PV: ${player.hp}/${player.maxHp}<br>
+        XP: ${player.experience}/${player.level * 100}<br>
+        Or: ${player.gold}<br>
+        Énergie: ${player.energy}/${player.maxEnergy}<br>
+        Attaque: ${player.attack} | Défense: ${player.defense}<br>
+        Ressources: Bois ${player.resources.wood}, Pierre ${player.resources.stone}, Fer ${player.resources.iron}
     `;
-    updateInventoryDisplay(player);
-    updateEquippedItemsDisplay(player);
-    console.log("Informations du joueur mises à jour");
+    
+    lastUpdateTime = currentTime;
+}
+
+function setUpdateIntervals() {
+    if (window.gameIntervals) {
+        window.gameIntervals.forEach(clearInterval);
+    }
+    window.gameIntervals = [];
+
+    const gameUpdateInterval = setInterval(() => {
+        if (player && !isCombatActive()) {
+            player.regenerateHP();
+            player.regenerateEnergy();
+            updatePlayerInfo(); // Appel unique ici
+        }
+        if (currentExpedition) {
+            updateExpedition();
+        }
+    }, 1000);
+    window.gameIntervals.push(gameUpdateInterval);
 }
 
 function chooseMission() {
