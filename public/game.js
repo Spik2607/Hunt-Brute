@@ -168,42 +168,7 @@ function handleCreateCharacter() {
     showGameArea('adventure-menu');
 }
 
-function initGame() {
-    console.log("Initialisation du jeu...");
-    hideAllGameAreas();
-    showGameArea('main-menu');
-    initializeSocket();
-    setupEventListeners();
-    
-    const savedState = localStorage.getItem('huntBruteGameState');
-    if (savedState) {
-        try {
-            const gameState = JSON.parse(savedState);
-            if (loadGame(gameState)) {
-                console.log("Partie chargée avec succès:", player);
-                updatePlayerInfo();
-                showGameArea('adventure-menu');
-            } else {
-                console.error("Échec du chargement de la partie sauvegardée");
-                showCreateHunterButton();
-            }
-        } catch (error) {
-            console.error("Erreur lors du chargement de la sauvegarde:", error);
-            showCreateHunterButton();
-        }
-    } else {
-        console.log("Aucune sauvegarde trouvée, affichage du bouton de création de personnage");
-        showCreateHunterButton();
-    }
-
-    setUpdateIntervals();
-    window.addEventListener('combatEnd', handleCombatEnd);
-    initializeAdditionalComponents();
-    console.log("Initialisation du jeu terminée");
-}
-
-
-    const expeditionUpdateInterval = setInterval(() => {
+   const expeditionUpdateInterval = setInterval(() => {
         if (currentExpedition) {
             updateExpedition();
         }
