@@ -1,5 +1,3 @@
-// game.js
-
 // Imports de gameData.js
 import { 
     Character, 
@@ -9,11 +7,16 @@ import {
     getRandomEnemy, 
     getRandomMission, 
     levelUpCharacter, 
-    generateRandomLoot 
+    generateRandomLoot,
+    getRandomCompanion,
+    getItemStats
 } from './gameData.js';
 
 // Imports de expedition.js
-import { getRandomExpeditionEvent } from './expedition.js';
+import { 
+    expeditionEvents, 
+    getRandomExpeditionEvent 
+} from './expedition.js';
 
 // Imports de combat.js
 import { 
@@ -22,6 +25,7 @@ import {
     playerDefend, 
     playerUseSpecial, 
     updateBattleInfo, 
+    updateBattleLog,
     isCombatActive 
 } from './combat.js';
 
@@ -29,7 +33,9 @@ import {
 import { 
     generateUniqueEnemy, 
     generateDonjonReward, 
-    generateDonjonEvent 
+    generateDonjonEvent,
+    generateDonjonBoss, 
+    generateBossReward 
 } from './donjon.js';
 
 // Imports de inventory.js
@@ -39,7 +45,10 @@ import {
     updateEquippedItemsDisplay, 
     openShop, 
     buyItem, 
-    sellItem 
+    sellItem,
+    equipItem,
+    unequipItem,
+    useItem
 } from './inventory.js';
 
 // Variables globales
