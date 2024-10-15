@@ -1,6 +1,6 @@
 // game.js
 import { Character, createCharacter, items, missions, dropRates, getRandomCompanion, getRandomItem, enemies, getItemStats, getRandomEnemy, getRandomMission, levelUpCharacter, generateRandomLoot } from './gameData.js';
-import { expeditionEvents, getRandomExpeditionEvent } from './expedition.js';
+import { expeditionEvents, getRandomExpeditionEvent, getRandomExpedition, calculateExpeditionRewards } from './expedition.js';
 import { initializeCombat, playerAttack, playerDefend, playerUseSpecial, updateBattleInfo, updateBattleLog, isCombatActive } from './combat.js';
 import { generateUniqueEnemy, generateDonjonReward, generateDonjonEvent, generateDonjonBoss, generateBossReward } from './donjon.js';
 import { addItemToInventory, updateInventoryDisplay, updateEquippedItemsDisplay, openShop, buyItem, sellItem, equipItem, unequipItem, useItem } from './inventory.js';
