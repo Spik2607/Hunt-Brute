@@ -925,17 +925,6 @@ window.onerror = function(message, source, lineno, colno, error) {
     return true;
 };
 
-function additionalInit() {
-    // Initialisation du son (à implémenter)
-    // initializeSound();
-
-    // Chargement des ressources (à implémenter)
-    // loadResources();
-
-    // Vérification des mises à jour (à implémenter)
-    // checkForUpdates();
-}
-
 
 function setupGlobalFunctions() {
     window.createCharacter = createCharacter;
@@ -962,7 +951,17 @@ function setupGlobalFunctions() {
     window.startMultiplayerMode = startMultiplayerMode;
     window.saveGame = saveGame;
 }
-    
+function additionalInit() {
+    // Initialisation du son (à implémenter)
+    // initializeSound();
+
+    // Chargement des ressources (à implémenter)
+    // loadResources();
+
+    // Vérification des mises à jour (à implémenter)
+    // checkForUpdates();
+}
+
 // Configuration de l'erreur globale
 window.onerror = function(message, source, lineno, colno, error) {
     handleError(error || message);
