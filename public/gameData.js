@@ -346,5 +346,18 @@ export function generateUniqueEnemy(floor) {
         defense: Math.round(baseEnemy.defense * levelMultiplier)
     };
 }
+export function createCharacter(name, initialStats = {}) {
+    return new Character(
+        name,
+        100, // hp par défaut
+        10,  // attaque par défaut
+        5,   // défense par défaut
+        {
+            strength: initialStats.strength || 5,
+            agility: initialStats.agility || 5,
+            intelligence: initialStats.intelligence || 5
+        }
+    );
+}
 
 console.log("Module gameData chargé");
