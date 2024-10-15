@@ -51,7 +51,9 @@
                     <button id="send-message">Envoyer</button>
                 </div>
                 <button id="challenge-player">Défier un joueur</button>
+                <button id="accept-challenge">Accepter le défi</button>
                 <button id="trade-request">Demander un échange</button>
+                <button id="accept-trade">Accepter l'échange</button>
                 <div id="leaderboard"></div>
             </section>
 
@@ -64,7 +66,7 @@
                 <h2>Guildes</h2>
                 <div id="create-guild">
                     <input type="text" id="guild-name-input" placeholder="Nom de la guilde">
-                    <button onclick="createGuild()">Créer une guilde</button>
+                    <button id="create-guild-button">Créer une guilde</button>
                 </div>
                 <div id="guilds-list"></div>
                 <div id="player-guild-info"></div>
@@ -111,9 +113,9 @@
                 </div>
                 <div id="battle-log"></div>
                 <div id="combat-actions">
-                    <button id="attack-button" onclick="window.playerAttack()">Attaque normale</button>
-                    <button id="defend-button" onclick="window.playerDefend()">Se défendre</button>
-                    <button id="special-button" onclick="window.playerUseSpecial()">Attaque spéciale</button>
+                    <button id="attack-button">Attaque normale</button>
+                    <button id="defend-button">Se défendre</button>
+                    <button id="special-button">Attaque spéciale</button>
                     <button id="use-item-button">Utiliser un objet</button>
                 </div>
             </section>
@@ -164,17 +166,17 @@
                     <div>
                         <label for="strength-skill">Force :</label>
                         <span id="strength-skill"></span>
-                        <button onclick="distributeSkillPoint('strength')">+</button>
+                        <button id="increase-strength">+</button>
                     </div>
                     <div>
                         <label for="agility-skill">Agilité :</label>
                         <span id="agility-skill"></span>
-                        <button onclick="distributeSkillPoint('agility')">+</button>
+                        <button id="increase-agility">+</button>
                     </div>
                     <div>
                         <label for="intelligence-skill">Intelligence :</label>
                         <span id="intelligence-skill"></span>
-                        <button onclick="distributeSkillPoint('intelligence')">+</button>
+                        <button id="increase-intelligence">+</button>
                     </div>
                 </div>
                 <button id="confirm-level-up">Confirmer</button>
