@@ -1,5 +1,5 @@
 // game.js
-import { Character, createCharacter, items, missions, dropRates, getRandomCompanion, getRandomItem, enemies, getItemStats, getRandomEnemy, getRandomMission, levelUpCharacter, generateRandomLoot } from './gameData.js';
+import { Character,  items, missions, dropRates, getRandomCompanion, getRandomItem, enemies, getItemStats, getRandomEnemy, getRandomMission, levelUpCharacter, generateRandomLoot } from './gameData.js';
 import { expeditionEvents, getRandomExpeditionEvent, getRandomExpedition, calculateExpeditionRewards } from './expedition.js';
 import { initializeCombat, playerAttack, playerDefend, playerUseSpecial, updateBattleInfo, updateBattleLog, isCombatActive } from './combat.js';
 import { generateUniqueEnemy, generateDonjonReward, generateDonjonEvent, generateDonjonBoss, generateBossReward } from './donjon.js';
@@ -15,6 +15,32 @@ let socket;
 let currentRoom = null;
 
 const FIXED_ROOM = 'fixed-room';
+
+
+function createCharacter() {
+    const nameInput = document.getElementById('hero-name');
+    if (!nameInput) {
+        console.error("L'élément 'hero-name' n'a pas été trouvé");
+        return;
+    }
+    const name = nameInput.value.trim();
+    if (!name) {
+        alert("Veuillez entrer un nom pour votre personnage.");
+        return;
+    }
+    
+    console.log("Création du personnage :", name);
+    
+    player = new Character(name, 100, 10, 5);
+    
+    console.log("Nouveau personnage créé :", player);
+    
+    saveGame();
+    updatePlayerInfo();
+    showGameArea('adventure-menu');
+    
+    console.log("Personnage sauvegardé et interface mise à jour");
+}
 
 const skills = {
     fireballSpell: {
@@ -891,13 +917,10 @@ function saveGame() {
         const gameState = JSON.stringify(player);
         localStorage.setItem('huntBruteGameState', gameState);
         console.log("Partie sauvegardée");
-        showGameMessage("Partie sauvegardée avec succès !");
     } else {
-        console.error("Aucun joueur à sauvegarder");
-        showGameMessage("Erreur : Aucune partie à sauvegarder.");
+        console.error("Tentative de sauvegarde sans joueur initialisé");
     }
 }
-
 function handleLevelUp() {
     levelUpCharacter(player);
     showLevelUpModal();
