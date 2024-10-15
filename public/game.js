@@ -193,23 +193,6 @@ function showCharacterCreationArea() {
     showGameArea('character-creation');
 }
 
-export function createCharacter() {
-    const nameInput = document.getElementById('hero-name');
-    if (!nameInput) {
-        console.error("L'élément 'hero-name' n'a pas été trouvé");
-        return;
-    }
-    const name = nameInput.value.trim();
-    if (!name) {
-        alert("Veuillez entrer un nom pour votre personnage.");
-        return;
-    }
-    player = new Character(name, 100, 10, 5);
-    console.log("Nouveau personnage créé:", player);
-    saveGame(); // Sauvegarder immédiatement le nouveau personnage
-    updatePlayerInfo();
-    showGameArea('adventure-menu');
-}
 
 function updatePlayerInfo() {
     console.log("Mise à jour des informations du joueur");
