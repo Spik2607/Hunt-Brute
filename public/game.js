@@ -76,6 +76,26 @@ function resetGame() {
     console.log("Jeu réinitialisé. Prêt pour une nouvelle partie.");
 }
 
+function handleCreateCharacter() {
+    const name = document.getElementById('hero-name').value.trim();
+    if (!name) {
+        alert("Veuillez entrer un nom pour votre personnage.");
+        return;
+    }
+    
+    const initialStats = {
+        strength: 5, // Vous pouvez ajuster ces valeurs ou les rendre dynamiques
+        agility: 5,
+        intelligence: 5
+    };
+    
+    player = createCharacter(name, initialStats);
+    console.log("Nouveau personnage créé:", player);
+    saveGame();
+    updatePlayerInfo();
+    showGameArea('adventure-menu');
+}
+
 function initGame() {
     console.log("Initialisation du jeu...");
     hideAllGameAreas();
