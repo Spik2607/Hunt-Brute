@@ -41,12 +41,14 @@
             <section id="multiplayer-area" class="game-area">
                 <h2>Mode Multijoueur</h2>
                 <div id="room-join">
+                    <label for="room-id">ID de la salle:</label>
                     <input type="text" id="room-id" placeholder="ID de la salle">
                     <button id="join-room">Rejoindre une salle</button>
                 </div>
                 <div id="players-list"></div>
                 <div id="chat-area">
                     <div id="chat-messages"></div>
+                    <label for="chat-input">Message:</label>
                     <input type="text" id="chat-input" placeholder="Entrez votre message">
                     <button id="send-message">Envoyer</button>
                 </div>
@@ -65,6 +67,7 @@
             <section id="guild-area" class="game-area">
                 <h2>Guildes</h2>
                 <div id="create-guild">
+                    <label for="guild-name-input">Nom de la guilde:</label>
                     <input type="text" id="guild-name-input" placeholder="Nom de la guilde">
                     <button id="create-guild-button">Créer une guilde</button>
                 </div>
@@ -165,17 +168,17 @@
                 <div class="skill-distribution">
                     <div>
                         <label for="strength-skill">Force :</label>
-                        <span id="strength-skill"></span>
+                        <input type="text" id="strength-skill" readonly>
                         <button id="increase-strength">+</button>
                     </div>
                     <div>
                         <label for="agility-skill">Agilité :</label>
-                        <span id="agility-skill"></span>
+                        <input type="text" id="agility-skill" readonly>
                         <button id="increase-agility">+</button>
                     </div>
                     <div>
                         <label for="intelligence-skill">Intelligence :</label>
-                        <span id="intelligence-skill"></span>
+                        <input type="text" id="intelligence-skill" readonly>
                         <button id="increase-intelligence">+</button>
                     </div>
                 </div>
