@@ -174,21 +174,6 @@ function initializeSocket() {
     }
 }
 
-function initializeEventListeners() {
-    document.getElementById('create-character').addEventListener('click', createCharacter);
-    document.getElementById('join-room').addEventListener('click', joinRoom);
-    document.getElementById('send-message').addEventListener('click', sendChatMessage);
-    document.getElementById('challenge-player').addEventListener('click', initiateChallenge);
-    document.getElementById('accept-challenge').addEventListener('click', acceptChallenge);
-    document.getElementById('trade-request').addEventListener('click', initiateTradeRequest);
-    document.getElementById('accept-trade').addEventListener('click', acceptTradeRequest);
-    document.getElementById('confirm-trade').addEventListener('click', confirmTrade);
-    document.getElementById('cancel-trade').addEventListener('click', cancelTrade);
-    document.getElementById('attack-button').addEventListener('click', playerAttack);
-    document.getElementById('defend-button').addEventListener('click', playerDefend);
-    document.getElementById('special-button').addEventListener('click', playerUseSpecial);
-}
-
 function loadCharacter() {
     const savedCharacter = localStorage.getItem('playerCharacter');
     if (savedCharacter) {
