@@ -834,6 +834,7 @@ function setupEventListeners() {
     });
 
     console.log("Écouteurs d'événements configurés avec succès");
+    }
 
 function showGameMessage(message) {
     const gameMessages = document.getElementById('game-messages');
