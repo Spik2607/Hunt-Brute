@@ -17,14 +17,6 @@ function initializeGame() {
     loadCharacter();
 }
 
-
-function initializeGame() {
-    console.log("Initializing game...");
-    initializeSocket();
-    initializeEventListeners();
-    loadCharacter();
-}
-
 function initializeSocket() {
     try {
         socket = io();
