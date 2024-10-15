@@ -13,6 +13,46 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeEventListeners();
 });
 
+function initializeEventListeners() {
+    const elements = [
+        { id: 'create-character', event: 'click', handler: createCharacter },
+        { id: 'join-room', event: 'click', handler: joinRoom },
+        { id: 'send-message', event: 'click', handler: sendChatMessage },
+        { id: 'challenge-player', event: 'click', handler: initiateChallenge },
+        { id: 'accept-challenge', event: 'click', handler: acceptChallenge },
+        { id: 'trade-request', event: 'click', handler: initiateTradeRequest },
+        { id: 'accept-trade', event: 'click', handler: acceptTradeRequest },
+        { id: 'confirm-trade', event: 'click', handler: confirmTrade },
+        { id: 'cancel-trade', event: 'click', handler: cancelTrade },
+        { id: 'attack-button', event: 'click', handler: playerAttack },
+        { id: 'defend-button', event: 'click', handler: playerDefend },
+        { id: 'special-button', event: 'click', handler: playerUseSpecial }
+    ];
+
+    elements.forEach(({ id, event, handler }) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener(event, handler);
+        } else {
+            console.warn(`Element with id '${id}' not found`);
+        }
+    });
+}
+
+// Ajoutez cette fonction qui manquait
+function updateChatMessages(messages) {
+    const chatMessages = document.getElementById('chat-messages');
+    if (chatMessages) {
+        chatMessages.innerHTML = '';
+        messages.forEach(message => {
+            const messageElement = document.createElement('div');
+            messageElement.textContent = `${message.sender}: ${message.content}`;
+            chatMessages.appendChild(messageElement);
+        });
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+}
+
 function initializeGame() {
     console.log("Initializing game...");
     initializeSocket();
