@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hunt Brute - V2.5</title>
+    <title>Hunt Brute - Multijoueur V3.0</title>
     <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
@@ -11,7 +11,7 @@
 <body>
     <div id="game-container">
         <header>
-            <h1>Hunt Brute</h1>
+            <h1>Hunt Brute - Multijoueur</h1>
             <div id="player-info"></div>
         </header>
         
@@ -24,6 +24,8 @@
             <button id="open-shop">Boutique</button>
             <button id="open-inventory">Inventaire</button>
             <button id="manage-companions">Compagnons</button>
+            <button id="open-guilds">Guildes</button>
+            <button id="open-crafting">Artisanat</button>
             <button id="save-game">Sauvegarder</button>
             <button id="load-game">Charger</button>
         </nav>
@@ -36,24 +38,46 @@
                 <button id="create-character">Créer le personnage</button>
             </section>
 
-            <section id="adventure-menu" class="game-area">
-                <h2>Menu Aventure</h2>
-                <button id="start-mission">Commencer une mission</button>
-                <button id="start-expedition">Partir en expédition</button>
-                <div id="current-expedition"></div>
+            <section id="multiplayer-area" class="game-area">
+                <h2>Mode Multijoueur</h2>
+                <div id="room-join">
+                    <input type="text" id="room-id" placeholder="ID de la salle">
+                    <button id="join-room">Rejoindre une salle</button>
+                </div>
+                <div id="players-list"></div>
+                <div id="chat-area">
+                    <div id="chat-messages"></div>
+                    <input type="text" id="chat-input" placeholder="Entrez votre message">
+                    <button id="send-message">Envoyer</button>
+                </div>
+                <button id="challenge-player">Défier un joueur</button>
+                <button id="trade-request">Demander un échange</button>
+                <div id="leaderboard"></div>
             </section>
 
-            <section id="mission-choice" class="game-area">
-                <h2>Choisir une mission</h2>
-                <div id="mission-list"></div>
+            <section id="group-quests" class="game-area">
+                <h2>Quêtes de Groupe</h2>
+                <!-- Les quêtes de groupe seront ajoutées ici dynamiquement -->
             </section>
 
-            <section id="donjon-area" class="game-area">
-                <h2>Donjon</h2>
-                <div id="donjon-info"></div>
-                <div id="donjon-events"></div>
-                <button id="next-donjon-event">Événement suivant</button>
-                <button id="exit-donjon">Quitter le donjon</button>
+            <section id="guild-area" class="game-area">
+                <h2>Guildes</h2>
+                <div id="create-guild">
+                    <input type="text" id="guild-name-input" placeholder="Nom de la guilde">
+                    <button onclick="createGuild()">Créer une guilde</button>
+                </div>
+                <div id="guilds-list"></div>
+                <div id="player-guild-info"></div>
+            </section>
+
+            <section id="crafting-area" class="game-area">
+                <h2>Artisanat</h2>
+                <div id="crafting-recipes"></div>
+            </section>
+
+            <section id="world-events" class="game-area">
+                <h2>Événements Mondiaux</h2>
+                <div id="current-world-event"></div>
             </section>
 
             <section id="battle-area" class="game-area">
@@ -87,9 +111,9 @@
                 </div>
                 <div id="battle-log"></div>
                 <div id="combat-actions">
-                    <button id="attack-button">Attaque normale</button>
-                    <button id="defend-button">Se défendre</button>
-                    <button id="special-button">Attaque spéciale</button>
+                    <button id="attack-button" onclick="window.playerAttack()">Attaque normale</button>
+                    <button id="defend-button" onclick="window.playerDefend()">Se défendre</button>
+                    <button id="special-button" onclick="window.playerUseSpecial()">Attaque spéciale</button>
                     <button id="use-item-button">Utiliser un objet</button>
                 </div>
             </section>
@@ -121,23 +145,13 @@
                 <div id="active-companion"></div>
             </section>
 
-            <section id="multiplayer-area" class="game-area">
-                <h2>Mode Multijoueur</h2>
-                <div id="waiting-area"></div>
-                <div id="chat-area">
-                    <div id="chat-messages"></div>
-                    <input type="text" id="chat-input" placeholder="Entrez votre message">
-                    <button id="send-message">Envoyer</button>
-                </div>
-                <button id="challenge-player">Défier un joueur</button>
-                <button id="trade-request">Demander un échange</button>
-            </section>
-
-            <section id="expedition-area" class="game-area">
-                <h2>Expédition</h2>
-                <div id="expedition-info"></div>
-                <div id="expedition-log"></div>
-                <button id="cancel-expedition">Annuler l'expédition</button>
+            <section id="trade-area" class="game-area">
+                <h2>Échange</h2>
+                <div id="player-trade-items"></div>
+                <div id="other-player-trade-items"></div>
+                <div id="offered-items"></div>
+                <button id="confirm-trade">Confirmer l'échange</button>
+                <button id="cancel-trade">Annuler l'échange</button>
             </section>
         </main>
 
@@ -167,13 +181,14 @@
             </div>
         </div>
     </div>
-<button id="reset-game" style="position: fixed; bottom: 10px; right: 10px;">Effacer le personnage</button>
+
+    <button id="reset-game" style="position: fixed; bottom: 10px; right: 10px;">Effacer le personnage</button>
+
     <script src="/socket.io/socket.io.js"></script>
     <script src="gameData.js" type="module"></script>
-    <script src="expedition.js" type="module"></script>
+    <script src="inventory.js" type="module"></script>
     <script src="combat.js" type="module"></script>
     <script src="donjon.js" type="module"></script>
-    <script src="inventory.js" type="module"></script>
     <script src="game.js" type="module"></script>
 </body>
 </html>
