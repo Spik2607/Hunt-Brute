@@ -1,9 +1,46 @@
 // game.js
-import { Character,  items, missions, dropRates, getRandomCompanion, getRandomItem, enemies, getItemStats, getRandomEnemy, getRandomMission, levelUpCharacter, generateRandomLoot } from './gameData.js';
-import { expeditionEvents, getRandomExpeditionEvent, getRandomExpedition, calculateExpeditionRewards } from './expedition.js';
-import { initializeCombat, playerAttack, playerDefend, playerUseSpecial, updateBattleInfo, updateBattleLog, isCombatActive } from './combat.js';
-import { generateUniqueEnemy, generateDonjonReward, generateDonjonEvent, generateDonjonBoss, generateBossReward } from './donjon.js';
-import { addItemToInventory, updateInventoryDisplay, updateEquippedItemsDisplay, openShop, buyItem, sellItem, equipItem, unequipItem, useItem } from './inventory.js';
+
+// Imports de gameData.js
+import { 
+    Character, 
+    items, 
+    missions, 
+    enemies, 
+    getRandomEnemy, 
+    getRandomMission, 
+    levelUpCharacter, 
+    generateRandomLoot 
+} from './gameData.js';
+
+// Imports de expedition.js
+import { getRandomExpeditionEvent } from './expedition.js';
+
+// Imports de combat.js
+import { 
+    initializeCombat, 
+    playerAttack, 
+    playerDefend, 
+    playerUseSpecial, 
+    updateBattleInfo, 
+    isCombatActive 
+} from './combat.js';
+
+// Imports de donjon.js
+import { 
+    generateUniqueEnemy, 
+    generateDonjonReward, 
+    generateDonjonEvent 
+} from './donjon.js';
+
+// Imports de inventory.js
+import { 
+    addItemToInventory, 
+    updateInventoryDisplay, 
+    updateEquippedItemsDisplay, 
+    openShop, 
+    buyItem, 
+    sellItem 
+} from './inventory.js';
 
 // Variables globales
 let player = null;
