@@ -238,6 +238,31 @@ export const expeditionEvents = [
 ];
 
 export function getRandomExpeditionEvent(expedition) {
-    const randomIndex = Math.floor(Math.random() * expedition.events.length);
-    return expedition.events[randomIndex];
+    if (!expedition || !Array.isArray(expedition.events) || expedition.events.length === 0) {
+        console.error("Expédition invalide ou sans événements");
+        return null;
+    }
+    return getRandomElement(expedition.events);
 }
+
+export function getRandomExpedition() {
+    return getRandomElement(expeditionEvents);
+}
+
+// Ajout d'une fonction utilitaire pour calculer la récompense totale d'une expédition
+export function calculateExpeditionRewards(events) {
+    return events.reduce((total, event) => {
+        const dummyPlayer = { hp: 100, energy: 100, gold: 0, experience: 0, resources: { wood: 0, iron: 0 } };
+        const result = event.effect(dummyPlayer);
+        return {
+            gold: total.gold + (dummyPlayer.gold - 0),
+            experience: total.experience + (dummyPlayer.experience - 0),
+            resources: {
+                wood: total.resources.wood + (dummyPlayer.resources.wood - 0),
+                iron: total.resources.iron + (dummyPlayer.resources.iron - 0)
+            }
+        };
+    }, { gold: 0, experience: 0, resources: { wood: 0, iron: 0 } });
+}
+
+console.log("Module expedition.js chargé");
