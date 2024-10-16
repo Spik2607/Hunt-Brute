@@ -1,6 +1,5 @@
 // combat.js
 import { createEnemyForMission, generateUniqueEnemy, calculateDamage } from './gameData.js';
-import { calculateDamage } from './gameData.js';
 
 let player, companion, enemy, currentMission;
 let currentCombat = false;
