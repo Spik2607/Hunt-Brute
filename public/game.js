@@ -1,5 +1,5 @@
 // game.js
-import { Character, items, missions, getRandomMission, createEnemyForMission, calculateDamage, generateRandomLoot } from './gameData.js';
+import { Character, items, missions, getRandomMission, createEnemyForMission, calculateDamage, generateRandomLoot, getAvailableMissions  } from './gameData.js';
 import { equipItem, unequipItem, useItem, updateInventoryDisplay, updateEquippedItemsDisplay, openShop, buyItem, sellItem, addItemToInventory } from './inventory.js';
 import { initializeCombat, updateBattleInfo, playerAttack, playerDefend, playerUseSpecial, isCombatActive } from './combat.js';
 import { generateDonjonEvent, generateDonjonBoss, generateBossReward } from './donjon.js';
@@ -240,28 +240,42 @@ function startAdventure() {
     displayMissionMenu(availableMissions); // Nouvelle fonction à créer
 }
 
+function startAdventure() {
+    console.log("Démarrage du mode Aventure");
+    const availableMissions = getAvailableMissions(player.level);
+    displayMissionMenu(availableMissions);
+}
+
 function displayMissionMenu(missions) {
     const missionArea = document.getElementById('mission-area');
+    if (!missionArea) {
+        console.error("Élément 'mission-area' non trouvé");
+        return;
+    }
     missionArea.innerHTML = '<h2>Missions disponibles</h2>';
     missions.forEach(mission => {
         const missionElement = document.createElement('div');
         missionElement.innerHTML = `
             <h3>${mission.name}</h3>
             <p>Difficulté: ${mission.difficulty}</p>
-            <p>Récompense: ${mission.reward} or</p>
-            <button onclick="selectMission(${mission.id})">Commencer la mission</button>
+            <p>Récompense: ${mission.goldReward} or, ${mission.expReward} XP</p>
+            <button onclick="selectMission(${missions.indexOf(mission)})">Commencer la mission</button>
         `;
         missionArea.appendChild(missionElement);
     });
     showGameArea('mission-area');
 }
 
-function selectMission(missionId) {
-    const mission = getMissionById(missionId); // Fonction à créer dans gameData.js
-    const enemy = createEnemyForMission(mission);
-    initializeCombat(player, null, enemy, mission);
-    showGameArea('battle-area');
-}
+function selectMission(missionIndex) {
+    const availableMissions = getAvailableMissions(player.level);
+    const selectedMission = availableMissions[missionIndex];
+    if (selectedMission) {
+        const enemy = createEnemyForMission(selectedMission);
+        initializeCombat(player, null, enemy, selectedMission);
+        showGameArea('battle-area');
+    } else {
+        console.error("Mission non trouvée");
+    }
 
 function startDonjon() {
     console.log("Démarrage du mode Donjon");
