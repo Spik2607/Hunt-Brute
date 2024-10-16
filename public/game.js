@@ -602,7 +602,7 @@ function initializeCraftingSystem() {
     // Par exemple :
     const craftingArea = document.getElementById('crafting-area');
     if (craftingArea) {
-        craftingArea.innerHTML = '<h2>Système d'artisanat</h2>';
+        craftingArea.innerHTML = '<h2>Système d artisanat</h2>';
         // Ajouter ici la logique pour initialiser le système d'artisanat
     }
 }
