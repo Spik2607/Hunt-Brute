@@ -1,6 +1,4 @@
 // game.js
-console.log("Chargement du module de jeu multijoueur...");
-
 import { Character, items, missions, getRandomMission, createEnemyForMission, calculateDamage, generateRandomLoot } from './gameData.js';
 import { equipItem, unequipItem, useItem, updateInventoryDisplay, updateEquippedItemsDisplay, openShop, buyItem, sellItem, addItemToInventory } from './inventory.js';
 import { initializeCombat, updateBattleInfo, playerAttack, playerDefend, playerUseSpecial, isCombatActive } from './combat.js';
@@ -9,67 +7,20 @@ import { generateDonjonEvent, generateDonjonBoss, generateBossReward } from './d
 let player;
 let currentRoom;
 let socket;
+let currentMission;
+let currentDonjonLevel;
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log("DOM chargé, initialisation du jeu...");
     initializeGame();
     initializeEventListeners();
-    console.log("Initialisation terminée, tentative de lancement du jeu");
-    launchGame();  // Ajoutez cette fonction
 });
-
-function launchGame() {
-    console.log("Tentative de lancement du jeu");
-    // Ajoutez ici le code pour lancer effectivement votre jeu
-    showGameArea('character-creation');  // ou 'multiplayer-area' selon votre logique
-    console.log("Zone de jeu affichée");
-}
 
 function initializeGame() {
     console.log("Initialisation du jeu...");
     initializeSocket();
     loadCharacter();
     console.log("Initialisation du jeu terminée");
-}
-
-function initializeEventListeners() {
-    console.log("Début de l'initialisation des écouteurs d'événements...");
-
-    const eventListeners = [
-        { id: 'create-character', event: 'click', handler: createCharacter },
-        { id: 'join-room', event: 'click', handler: joinRoom },
-        { id: 'send-message', event: 'click', handler: sendChatMessage },
-        { id: 'challenge-player', event: 'click', handler: initiateChallenge },
-        { id: 'accept-challenge', event: 'click', handler: acceptChallenge },
-        { id: 'trade-request', event: 'click', handler: initiateTradeRequest },
-        { id: 'accept-trade', event: 'click', handler: acceptTradeRequest },
-        { id: 'confirm-trade', event: 'click', handler: confirmTrade },
-        { id: 'cancel-trade', event: 'click', handler: cancelTrade },
-        { id: 'attack-button', event: 'click', handler: playerAttack },
-        { id: 'defend-button', event: 'click', handler: playerDefend },
-        { id: 'special-button', event: 'click', handler: playerUseSpecial },
-        { id: 'test-button', event: 'click', handler: testButtonClick }
-    ];
-
-    eventListeners.forEach(({ id, event, handler }) => {
-        const element = document.getElementById(id);
-        if (element) {
-            element.addEventListener(event, (e) => {
-                console.log(`Événement '${event}' déclenché sur l'élément '${id}'`);
-                handler(e);
-            });
-            console.log(`Écouteur d'événement '${event}' ajouté à l'élément '${id}'`);
-        } else {
-            console.warn(`Élément avec l'id '${id}' non trouvé. L'écouteur n'a pas pu être ajouté.`);
-        }
-    });
-
-    // Ajout d'un écouteur global pour les clics
-    document.addEventListener('click', (e) => {
-        console.log(`Clic détecté sur l'élément:`, e.target);
-    });
-
-    console.log("Fin de l'initialisation des écouteurs d'événements.");
 }
 
 // Fonction de test pour le bouton de test
@@ -203,6 +154,52 @@ socket.on('connect', () => {
     }
 }
 
+function initializeEventListeners() {
+    console.log("Initialisation des écouteurs d'événements");
+    const buttons = [
+        { id: 'start-adventure', handler: startAdventure },
+        { id: 'start-donjon', handler: startDonjon },
+        { id: 'open-multiplayer', handler: openMultiplayer },
+        { id: 'open-shop', handler: openShop },
+        { id: 'open-inventory', handler: openInventory },
+        { id: 'manage-companions', handler: manageCompanions },
+        { id: 'open-guilds', handler: openGuilds },
+        { id: 'open-crafting', handler: openCrafting },
+        { id: 'save-game', handler: saveGame },
+        { id: 'load-game', handler: loadGame },
+        { id: 'join-room', handler: joinRoom },
+        { id: 'send-message', handler: sendChatMessage },
+        { id: 'challenge-player', handler: initiateChallenge },
+        { id: 'accept-challenge', handler: acceptChallenge },
+        { id: 'trade-request', handler: initiateTradeRequest },
+        { id: 'accept-trade', handler: acceptTradeRequest },
+        { id: 'confirm-trade', handler: confirmTrade },
+        { id: 'cancel-trade', handler: cancelTrade },
+        { id: 'attack-button', handler: playerAttack },
+        { id: 'defend-button', handler: playerDefend },
+        { id: 'special-button', handler: playerUseSpecial },
+        { id: 'create-character', handler: createCharacter }
+    ];
+
+    buttons.forEach(({ id, handler }) => {
+        const button = document.getElementById(id);
+        if (button) {
+            button.addEventListener('click', () => {
+                console.log(`Bouton ${id} cliqué`);
+                handler();
+            });
+            console.log(`Écouteur ajouté pour ${id}`);
+        } else {
+            console.warn(`Bouton ${id} non trouvé`);
+        }
+    });
+
+    // Ajout d'un écouteur global pour les clics
+    document.addEventListener('click', (e) => {
+        console.log(`Clic détecté sur l'élément:`, e.target);
+    });
+}
+
 function loadCharacter() {
     console.log("Chargement du personnage...");
     const savedCharacter = localStorage.getItem('playerCharacter');
@@ -237,6 +234,80 @@ function createCharacter() {
     }
 }
 
+function startAdventure() {
+    console.log("Démarrage du mode Aventure");
+    const mission = getRandomMission();
+    if (mission) {
+        currentMission = mission;
+        const enemy = createEnemyForMission(mission);
+        initializeCombat(player, null, enemy, mission);
+        showGameArea('battle-area');
+    } else {
+        showGameMessage("Aucune mission disponible pour le moment.");
+    }
+}
+
+function startDonjon() {
+    console.log("Démarrage du mode Donjon");
+    currentDonjonLevel = 1;
+    showGameMessage("Vous entrez dans le donjon. Préparez-vous à affronter des défis !");
+    nextDonjonEvent();
+    showGameArea('donjon-area');
+}
+
+function openMultiplayer() {
+    console.log("Ouverture du mode Multijoueur");
+    showGameArea('multiplayer-area');
+}
+
+function openShop() {
+    console.log("Ouverture de la boutique");
+    updateShopInventory();
+    showGameArea('shop-area');
+}
+
+function openInventory() {
+    console.log("Ouverture de l'inventaire");
+    updateInventoryDisplay(player);
+    showGameArea('inventory-area');
+}
+
+function manageCompanions() {
+    console.log("Gestion des compagnons");
+    updateCompanionsList();
+    showGameArea('companions-area');
+}
+
+function openGuilds() {
+    console.log("Ouverture des guildes");
+    updateGuildsList();
+    showGameArea('guild-area');
+}
+
+function openCrafting() {
+    console.log("Ouverture de l'artisanat");
+    updateCraftingRecipes();
+    showGameArea('crafting-area');
+}
+
+function saveGame() {
+    console.log("Sauvegarde du jeu");
+    localStorage.setItem('playerCharacter', JSON.stringify(player));
+    showGameMessage("Jeu sauvegardé avec succès !");
+}
+
+function loadGame() {
+    console.log("Chargement du jeu");
+    const savedCharacter = localStorage.getItem('playerCharacter');
+    if (savedCharacter) {
+        player = JSON.parse(savedCharacter);
+        updatePlayerInfo();
+        showGameMessage("Jeu chargé avec succès !");
+    } else {
+        showGameMessage("Aucune sauvegarde trouvée.");
+    }
+}
+
 function joinRoom() {
     console.log("Tentative de rejoindre une salle");
     const roomIdInput = document.getElementById('room-id');
@@ -250,19 +321,6 @@ function joinRoom() {
     }
 }
 
-function updatePlayersList(players) {
-    console.log("Mise à jour de la liste des joueurs");
-    const playersList = document.getElementById('players-list');
-    if (playersList) {
-        playersList.innerHTML = '';
-        players.forEach(p => {
-            const playerElement = document.createElement('div');
-            playerElement.textContent = `${p.name} (Niveau ${p.level})`;
-            playersList.appendChild(playerElement);
-        });
-    }
-}
-
 function sendChatMessage() {
     console.log("Envoi d'un message");
     const messageInput = document.getElementById('chat-input');
@@ -272,17 +330,6 @@ function sendChatMessage() {
             socket.emit('chatMessage', { roomId: currentRoom, message: { sender: player.name, content: message } });
             messageInput.value = '';
         }
-    }
-}
-
-function addChatMessage(message) {
-    console.log("Ajout d'un message au chat");
-    const chatMessages = document.getElementById('chat-messages');
-    if (chatMessages) {
-        const messageElement = document.createElement('div');
-        messageElement.textContent = `${message.sender}: ${message.content}`;
-        chatMessages.appendChild(messageElement);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 }
 
@@ -301,23 +348,6 @@ function acceptChallenge() {
         socket.emit('acceptChallenge', { roomId: currentRoom, challengerId: player.id, accepterId: player.id });
     } else {
         showGameMessage("Vous ne pouvez pas accepter le défi en ce moment.");
-    }
-}
-
-function startMultiplayerBattle(challengerId, accepterId) {
-    console.log("Début d'un combat multijoueur");
-    showGameArea('battle-area');
-    initializeCombat(player, null, { name: "Adversaire", hp: 100, attack: 10, defense: 5 }, null);
-    updateBattleInfo();
-}
-
-function handleOpponentAction(action) {
-    console.log("Gestion de l'action de l'adversaire");
-    if (action.type === 'attack' && player) {
-        const damage = calculateDamage(action.attacker, player);
-        player.hp -= damage;
-        showGameMessage(`L'adversaire vous inflige ${damage} dégâts.`);
-        updateBattleInfo();
     }
 }
 
@@ -341,30 +371,6 @@ function acceptTradeRequest() {
     }
 }
 
-function startTrade(fromId, toId) {
-    console.log("Début d'un échange");
-    showGameArea('trade-area');
-    displayTradeInventory();
-}
-
-function displayTradeInventory() {
-    console.log("Affichage de l'inventaire d'échange");
-    // Implémentation de l'affichage de l'inventaire pour l'échange
-}
-
-function showOfferedItem(itemId) {
-    console.log("Affichage d'un objet offert");
-    const item = items.find(i => i.id === itemId);
-    if (item) {
-        const offeredItemsElement = document.getElementById('offered-items');
-        if (offeredItemsElement) {
-            const itemElement = document.createElement('div');
-            itemElement.textContent = item.name;
-            offeredItemsElement.appendChild(itemElement);
-        }
-    }
-}
-
 function confirmTrade() {
     console.log("Confirmation de l'échange");
     if (currentRoom) {
@@ -379,28 +385,29 @@ function cancelTrade() {
     }
 }
 
-function closeTrade() {
-    console.log("Fermeture de l'échange");
-    showGameArea('multiplayer-area');
+function updateShopInventory() {
+    console.log("Mise à jour de l'inventaire de la boutique");
+    // Implémentez cette fonction pour mettre à jour l'inventaire de la boutique
 }
 
-function getOtherPlayerId() {
-    console.log("Récupération de l'ID de l'autre joueur");
-    const playersList = document.getElementById('players-list');
-    if (playersList && player) {
-        const playerElements = playersList.children;
-        for (let playerElement of playerElements) {
-            const playerId = playerElement.dataset.playerId;
-            if (playerId && playerId !== player.id) {
-                return playerId;
-            }
-        }
-    }
-    return null;
+function updateCompanionsList() {
+    console.log("Mise à jour de la liste des compagnons");
+    // Implémentez cette fonction pour mettre à jour la liste des compagnons
+}
+
+function updateCraftingRecipes() {
+    console.log("Mise à jour des recettes d'artisanat");
+    // Implémentez cette fonction pour mettre à jour les recettes d'artisanat
+}
+
+function nextDonjonEvent() {
+    const event = generateDonjonEvent(currentDonjonLevel);
+    console.log("Nouvel événement de donjon :", event);
+    // Implémentez la logique pour gérer l'événement du donjon
 }
 
 function showGameArea(areaId) {
-    console.log(`Tentative d'affichage de la zone : ${areaId}`);
+    console.log(`Affichage de la zone de jeu : ${areaId}`);
     const gameAreas = document.querySelectorAll('.game-area');
     gameAreas.forEach(area => {
         if (area.id === areaId) {
@@ -408,6 +415,7 @@ function showGameArea(areaId) {
             console.log(`Zone ${areaId} affichée`);
         } else {
             area.style.display = 'none';
+            console.log(`Zone ${area.id} masquée`);
         }
     });
 }
@@ -449,124 +457,137 @@ function initializeAdditionalFeatures() {
 
 function updateLeaderboard() {
     console.log("Mise à jour du classement");
-    const leaderboardData = [
-        { name: "Joueur1", level: 10, score: 1000 },
-        { name: "Joueur2", level: 9, score: 950 },
-        { name: "Joueur3", level: 8, score: 900 },
-    ];
-
-    const leaderboardElement = document.getElementById('leaderboard');
-    if (leaderboardElement) {
-        leaderboardElement.innerHTML = '<h3>Classement</h3>';
-        leaderboardData.forEach((player, index) => {
-            const playerElement = document.createElement('div');
-            playerElement.textContent = `${index + 1}. ${player.name} (Niveau ${player.level}) - Score: ${player.score}`;
-            leaderboardElement.appendChild(playerElement);
-        });
-    }
+    // Implémentez cette fonction pour mettre à jour le classement
 }
 
 function initializeGroupQuests() {
     console.log("Initialisation des quêtes de groupe");
-    const groupQuestsElement = document.getElementById('group-quests');
-    if (groupQuestsElement) {
-        const quests = [
-            { id: 1, name: "Vaincre le dragon ancien", minPlayers: 3, reward: "1000 or et une arme légendaire" },
-            { id: 2, name: "Explorer le donjon maudit", minPlayers: 2, reward: "500 or et un grimoire rare" },
-            { id: 3, name: "Défendre le village contre une horde de gobelins", minPlayers: 4, reward: "750 or et une armure d'élite" }
-        ];
-
-        quests.forEach(quest => {
-            const questElement = document.createElement('div');
-            questElement.innerHTML = `
-                <h4>${quest.name}</h4>
-                <p>Joueurs requis: ${quest.minPlayers}</p>
-                <p>Récompense: ${quest.reward}</p>
-                <button onclick="window.gameActions.joinGroupQuest(${quest.id})">Rejoindre</button>
-            `;
-            groupQuestsElement.appendChild(questElement);
-        });
-    }
+    // Implémentez cette fonction pour initialiser les quêtes de groupe
 }
 
 function updateGuildsList() {
     console.log("Mise à jour de la liste des guildes");
-    const guilds = [
-        { id: 1, name: "Les Chevaliers de l'Aube", members: 10 },
-        { id: 2, name: "La Confrérie des Ombres", members: 8 },
-        { id: 3, name: "Les Gardiens de la Nature", members: 12 }
-    ];
-
-    const guildsListElement = document.getElementById('guilds-list');
-    if (guildsListElement) {
-        guildsListElement.innerHTML = '<h3>Guildes</h3>';
-        guilds.forEach(guild => {
-            const guildElement = document.createElement('div');
-            guildElement.innerHTML = `
-                <h4>${guild.name}</h4>
-                <p>Membres: ${guild.members}</p>
-                <button onclick="window.gameActions.joinGuild(${guild.id})">Rejoindre</button>
-            `;
-            guildsListElement.appendChild(guildElement);
-        });
-    }
+    // Implémentez cette fonction pour mettre à jour la liste des guildes
 }
 
 function initializeCraftingSystem() {
     console.log("Initialisation du système d'artisanat");
-    const craftingRecipes = [
-        { id: 1, name: "Épée en acier", materials: { iron: 5, wood: 2 }, result: "sword" },
-        { id: 2, name: "Potion de soin", materials: { herb: 3, water: 1 }, result: "healingPotion" },
-        { id: 3, name: "Arc elfique", materials: { wood: 4, magicEssence: 2 }, result: "elfBow" }
-    ];
-
-    const craftingElement = document.getElementById('crafting-recipes');
-    if (craftingElement) {
-        craftingRecipes.forEach(recipe => {
-            const recipeElement = document.createElement('div');
-            recipeElement.innerHTML = `
-                <h4>${recipe.name}</h4>
-                <p>Matériaux requis: ${Object.entries(recipe.materials).map(([item, count]) => `${count} ${item}`).join(', ')}</p>
-                <button onclick="window.gameActions.craftItem(${recipe.id})">Fabriquer</button>
-            `;
-            craftingElement.appendChild(recipeElement);
-        });
-    }
+    // Implémentez cette fonction pour initialiser le système d'artisanat
 }
 
 function startWorldEvent() {
     console.log("Démarrage d'un événement mondial");
-    const worldEvents = [
-        { id: 1, name: "Invasion de démons", duration: 3600, reward: "Équipement démoniaque" },
-        { id: 2, name: "Festival de la moisson", duration: 7200, reward: "Potions de buff rares" },
-        { id: 3, name: "Chasse au trésor royale", duration: 5400, reward: "Or et objets précieux" }
-    ];
+    // Implémentez cette fonction pour démarrer un événement mondial
+}
 
-    const event = worldEvents[Math.floor(Math.random() * worldEvents.length)];
-    if (socket) {
-        socket.emit('startWorldEvent', event);
+function getOtherPlayerId() {
+    console.log("Récupération de l'ID de l'autre joueur");
+    const playersList = document.getElementById('players-list');
+    if (playersList && player) {
+        const playerElements = playersList.children;
+        for (let playerElement of playerElements) {
+            const playerId = playerElement.dataset.playerId;
+            if (playerId && playerId !== player.id) {
+                return playerId;
+            }
+        }
+    }
+    return null;
+}
+
+function updatePlayersList(players) {
+    console.log("Mise à jour de la liste des joueurs");
+    const playersList = document.getElementById('players-list');
+    if (playersList) {
+        playersList.innerHTML = '';
+        players.forEach(p => {
+            const playerElement = document.createElement('div');
+            playerElement.textContent = `${p.name} (Niveau ${p.level})`;
+            playerElement.dataset.playerId = p.id;
+            playersList.appendChild(playerElement);
+        });
     }
 }
 
-// Fonctions exportées pour être utilisées dans le HTML
-export {
-    playerAttack,
-    playerDefend,
-    playerUseSpecial,
-    equipItem,
-    unequipItem,
-    useItem,
-    buyItem,
-    sellItem,
-    joinRoom,
-    sendChatMessage,
-    initiateChallenge,
-    acceptChallenge,
-    initiateTradeRequest,
-    acceptTradeRequest,
-    confirmTrade,
-    cancelTrade
-};
+function addChatMessage(message) {
+    console.log("Ajout d'un message au chat");
+    const chatMessages = document.getElementById('chat-messages');
+    if (chatMessages) {
+        const messageElement = document.createElement('div');
+        messageElement.textContent = `${message.sender}: ${message.content}`;
+        chatMessages.appendChild(messageElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+}
+
+function startMultiplayerBattle(challengerId, accepterId) {
+    console.log("Début d'un combat multijoueur");
+    showGameArea('battle-area');
+    initializeCombat(player, null, { name: "Adversaire", hp: 100, attack: 10, defense: 5 }, null);
+    updateBattleInfo();
+}
+
+function handleOpponentAction(action) {
+    console.log("Gestion de l'action de l'adversaire");
+    if (action.type === 'attack' && player) {
+        const damage = calculateDamage(action.attacker, player);
+        player.hp -= damage;
+        showGameMessage(`L'adversaire vous inflige ${damage} dégâts.`);
+        updateBattleInfo();
+    }
+}
+
+function startTrade(fromId, toId) {
+    console.log("Début d'un échange");
+    showGameArea('trade-area');
+    displayTradeInventory();
+}
+
+function displayTradeInventory() {
+    console.log("Affichage de l'inventaire d'échange");
+    // Implémentation de l'affichage de l'inventaire pour l'échange
+    // Cette fonction doit être implémentée en fonction de votre logique de jeu
+}
+
+function showOfferedItem(itemId) {
+    console.log("Affichage d'un objet offert");
+    const item = items.find(i => i.id === itemId);
+    if (item) {
+        const offeredItemsElement = document.getElementById('offered-items');
+        if (offeredItemsElement) {
+            const itemElement = document.createElement('div');
+            itemElement.textContent = item.name;
+            offeredItemsElement.appendChild(itemElement);
+        }
+    }
+}
+
+function closeTrade() {
+    console.log("Fermeture de l'échange");
+    showGameArea('multiplayer-area');
+}
+
+function updateChatMessages(messages) {
+    console.log("Mise à jour des messages du chat");
+    const chatMessagesElement = document.getElementById('chat-messages');
+    if (chatMessagesElement) {
+        // Vider le contenu actuel
+        chatMessagesElement.innerHTML = '';
+        
+        // Ajouter chaque message
+        messages.forEach(message => {
+            const messageElement = document.createElement('div');
+            messageElement.className = 'chat-message';
+            messageElement.innerHTML = `<strong>${message.sender}:</strong> ${message.content}`;
+            chatMessagesElement.appendChild(messageElement);
+        });
+
+        // Faire défiler jusqu'au dernier message
+        chatMessagesElement.scrollTop = chatMessagesElement.scrollHeight;
+    } else {
+        console.error("Élément 'chat-messages' non trouvé");
+    }
+}
 
 // Rendre certaines fonctions disponibles globalement si nécessaire
 window.gameActions = {
@@ -579,44 +600,126 @@ window.gameActions = {
     acceptTradeRequest,
     confirmTrade,
     cancelTrade,
-    joinGroupQuest: (questId) => {
-        console.log(`Rejoindre la quête de groupe ${questId}`);
-        if (socket && currentRoom && player) {
-            socket.emit('joinGroupQuest', { roomId: currentRoom, questId, playerId: player.id });
-            showGameMessage(`Vous avez rejoint la quête de groupe ${questId}. En attente d'autres joueurs...`);
-        } else {
-            showGameMessage("Impossible de rejoindre la quête pour le moment.");
-        }
-    },
-    createGuild: () => {
-        console.log("Créer une guilde");
-        const guildNameInput = document.getElementById('guild-name-input');
-        if (guildNameInput && socket && player) {
-            const guildName = guildNameInput.value.trim();
-            if (guildName) {
-                socket.emit('createGuild', { name: guildName, founderId: player.id });
-                showGameMessage(`Vous avez créé la guilde "${guildName}".`);
-            } else {
-                showGameMessage("Veuillez entrer un nom de guilde valide.");
-            }
-        } else {
-            console.error("Éléments nécessaires pour créer une guilde non trouvés.");
-        }
-    },
-    joinGuild: (guildId) => {
-        console.log(`Rejoindre la guilde ${guildId}`);
-        if (socket && player) {
-            socket.emit('joinGuild', { guildId, playerId: player.id });
-            showGameMessage(`Demande d'adhésion à la guilde envoyée.`);
-        } else {
-            showGameMessage("Impossible de rejoindre la guilde pour le moment.");
-        }
-    },
-    craftItem: (recipeId) => {
-        console.log(`Fabriquer l'objet avec la recette ${recipeId}`);
-        showGameMessage(`Tentative de fabrication de l'objet avec la recette ${recipeId}.`);
-        // Ici, vous pouvez ajouter la logique réelle de fabrication
-    }
+    startAdventure,
+    startDonjon,
+    openMultiplayer,
+    openShop,
+    openInventory,
+    manageCompanions,
+    openGuilds,
+    openCrafting,
+    saveGame,
+    loadGame
 };
 
+// Initialisation des écouteurs d'événements socket
+function initializeSocketListeners() {
+    socket.on('roomJoined', ({ roomId, players, messages }) => {
+        currentRoom = roomId;
+        updatePlayersList(players);
+        updateChatMessages(messages);
+        showGameArea('multiplayer-area');
+    });
+
+    socket.on('playerJoined', (players) => {
+        updatePlayersList(players);
+    });
+
+    socket.on('newMessage', (message) => {
+        addChatMessage(message);
+    });
+
+    socket.on('challengeReceived', ({ challengerId }) => {
+        if (player && challengerId !== player.id) {
+            showGameMessage(`${challengerId} vous défie en duel !`);
+            document.getElementById('accept-challenge').style.display = 'block';
+        }
+    });
+
+    socket.on('battleStart', ({ challengerId, accepterId }) => {
+        if (player && (player.id === challengerId || player.id === accepterId)) {
+            startMultiplayerBattle(challengerId, accepterId);
+        }
+    });
+
+    socket.on('opponentAction', (action) => {
+        handleOpponentAction(action);
+    });
+
+    socket.on('tradeRequestReceived', ({ fromId, toId }) => {
+        if (player && player.id === toId) {
+            showGameMessage(`${fromId} vous propose un échange !`);
+            document.getElementById('accept-trade').style.display = 'block';
+        }
+    });
+
+    socket.on('tradeStart', ({ fromId, toId }) => {
+        if (player && (player.id === fromId || player.id === toId)) {
+            startTrade(fromId, toId);
+        }
+    });
+
+    socket.on('itemOffered', ({ fromId, itemId }) => {
+        if (player && fromId !== player.id) {
+            showOfferedItem(itemId);
+        }
+    });
+
+    socket.on('tradeConfirmed', ({ playerId }) => {
+        if (player && playerId !== player.id) {
+            showGameMessage("L'autre joueur a confirmé l'échange.");
+        }
+    });
+
+    socket.on('tradeCancelled', ({ playerId }) => {
+        showGameMessage("L'échange a été annulé.");
+        closeTrade();
+    });
+
+    socket.on('playerLeft', (playerId) => {
+        showGameMessage(`Le joueur ${playerId} a quitté la partie.`);
+        if (currentRoom) {
+            socket.emit('getRoomPlayers', currentRoom);
+        }
+    });
+}
+
+// Appel de la fonction d'initialisation des écouteurs socket
+initializeSocketListeners();
+
 console.log("Module de jeu multijoueur chargé");
+
+// Exportations
+export {
+    initializeGame,
+    createCharacter,
+    startAdventure,
+    startDonjon,
+    openMultiplayer,
+    openShop,
+    openInventory,
+    manageCompanions,
+    openGuilds,
+    openCrafting,
+    saveGame,
+    loadGame,
+    joinRoom,
+    sendChatMessage,
+    initiateChallenge,
+    acceptChallenge,
+    initiateTradeRequest,
+    acceptTradeRequest,
+    confirmTrade,
+    cancelTrade,
+    playerAttack,
+    playerDefend,
+    playerUseSpecial,
+    showGameArea,
+    showGameMessage,
+    updatePlayerInfo,
+    updateLeaderboard,
+    initializeGroupQuests,
+    updateGuildsList,
+    initializeCraftingSystem,
+    startWorldEvent
+};
