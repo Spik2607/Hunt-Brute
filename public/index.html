@@ -75,7 +75,7 @@
 
         <div id="game-messages"></div>
 
-        <div id="mission-area" class="game-area">
+        <div id="mission-area" class="game-area" style="display: none;">
             <h2><i class="fas fa-scroll"></i> Missions disponibles</h2>
             <div class="mission-grid">
                 <!-- Les missions seront ajoutées dynamiquement ici -->
@@ -104,12 +104,12 @@
                     </div>
                 </div>
             </div>
+            <div id="battle-log"></div>
             <div id="combat-actions">
                 <button id="attack-button" class="action-button"><i class="fas fa-fist-raised"></i> Attaque</button>
                 <button id="defend-button" class="action-button"><i class="fas fa-shield-alt"></i> Défense</button>
                 <button id="special-button" class="action-button"><i class="fas fa-bolt"></i> Attaque Spéciale</button>
             </div>
-            <div id="battle-log"></div>
         </div>
 
         <div id="inventory-area" class="game-area" style="display: none;">
@@ -165,16 +165,16 @@
             <div id="donjon-event"></div>
             <button id="next-donjon-event"><i class="fas fa-step-forward"></i> Continuer</button>
         </div>
+    </div>
 
-        <div id="victory-modal" class="modal">
-            <div class="modal-content">
-                <h2>Victoire !</h2>
-                <p>Expérience gagnée : <span id="exp-gained"></span></p>
-                <p>Or gagné : <span id="gold-gained"></span></p>
-                <h3>Objets trouvés :</h3>
-                <ul id="loot-list"></ul>
-                <button id="continue-button" class="action-button">Continuer</button>
-            </div>
+    <div id="victory-modal" class="modal">
+        <div class="modal-content">
+            <h2>Victoire !</h2>
+            <p>Expérience gagnée : <span id="exp-gained"></span></p>
+            <p>Or gagné : <span id="gold-gained"></span></p>
+            <h3>Objets trouvés :</h3>
+            <ul id="loot-list"></ul>
+            <button id="continue-button" class="action-button">Continuer</button>
         </div>
     </div>
 
@@ -207,6 +207,7 @@
             document.getElementById('confirm-trade').addEventListener('click', () => window.gameActions.confirmTrade());
             document.getElementById('cancel-trade').addEventListener('click', () => window.gameActions.cancelTrade());
             document.getElementById('next-donjon-event').addEventListener('click', () => window.gameActions.nextDonjonEvent());
+            document.getElementById('continue-button').addEventListener('click', () => window.gameActions.continueAfterVictory());
 
             // Gestionnaires d'événements pour la navigation
             document.getElementById('nav-home').addEventListener('click', () => window.gameActions.showGameArea('main-menu'));
