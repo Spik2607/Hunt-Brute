@@ -18,16 +18,16 @@
         <div id="game-messages"></div>
 
         <nav id="main-menu">
-            <button id="start-adventure">Mode Aventure</button>
-            <button id="start-donjon">Donjon</button>
-            <button id="open-multiplayer">Mode Multijoueur</button>
-            <button id="open-shop">Boutique</button>
-            <button id="open-inventory">Inventaire</button>
-            <button id="manage-companions">Compagnons</button>
-            <button id="open-guilds">Guildes</button>
-            <button id="open-crafting">Artisanat</button>
-            <button id="save-game">Sauvegarder</button>
-            <button id="load-game">Charger</button>
+            <button id="start-adventure" onclick="window.gameActions.startAdventure()">Mode Aventure</button>
+            <button id="start-donjon" onclick="window.gameActions.startDonjon()">Donjon</button>
+            <button id="open-multiplayer" onclick="window.gameActions.openMultiplayer()">Mode Multijoueur</button>
+            <button id="open-shop" onclick="window.gameActions.openShop()">Boutique</button>
+            <button id="open-inventory" onclick="window.gameActions.openInventory()">Inventaire</button>
+            <button id="manage-companions" onclick="window.gameActions.manageCompanions()">Compagnons</button>
+            <button id="open-guilds" onclick="window.gameActions.openGuilds()">Guildes</button>
+            <button id="open-crafting" onclick="window.gameActions.openCrafting()">Artisanat</button>
+            <button id="save-game" onclick="window.gameActions.saveGame()">Sauvegarder</button>
+            <button id="load-game" onclick="window.gameActions.loadGame()">Charger</button>
         </nav>
 
         <main id="game-content">
@@ -35,25 +35,30 @@
                 <h2>Création du Personnage</h2>
                 <label for="hero-name">Nom du héros:</label>
                 <input type="text" id="hero-name" placeholder="Entrez le nom de votre héros">
-                <button id="create-character">Créer le personnage</button>
+                <button id="create-character" onclick="window.gameActions.createCharacter(document.getElementById('hero-name').value)">Créer le personnage</button>
+            </section>
+
+            <section id="mission-area" class="game-area">
+                <h2>Missions disponibles</h2>
+                <!-- Le contenu des missions sera inséré ici dynamiquement -->
             </section>
 
             <section id="multiplayer-area" class="game-area">
                 <h2>Mode Multijoueur</h2>
                 <div id="room-join">
                     <input type="text" id="room-id" placeholder="ID de la salle">
-                    <button id="join-room">Rejoindre une salle</button>
+                    <button id="join-room" onclick="window.gameActions.joinRoom()">Rejoindre une salle</button>
                 </div>
                 <div id="players-list"></div>
                 <div id="chat-area">
                     <div id="chat-messages"></div>
                     <input type="text" id="chat-input" placeholder="Entrez votre message">
-                    <button id="send-message">Envoyer</button>
+                    <button id="send-message" onclick="window.gameActions.sendChatMessage()">Envoyer</button>
                 </div>
-                <button id="challenge-player">Défier un joueur</button>
-                <button id="accept-challenge" style="display:none;">Accepter le défi</button>
-                <button id="trade-request">Demander un échange</button>
-                <button id="accept-trade" style="display:none;">Accepter l'échange</button>
+                <button id="challenge-player" onclick="window.gameActions.initiateChallenge()">Défier un joueur</button>
+                <button id="accept-challenge" onclick="window.gameActions.acceptChallenge()" style="display:none;">Accepter le défi</button>
+                <button id="trade-request" onclick="window.gameActions.initiateTradeRequest()">Demander un échange</button>
+                <button id="accept-trade" onclick="window.gameActions.acceptTradeRequest()" style="display:none;">Accepter l'échange</button>
                 <div id="leaderboard"></div>
             </section>
 
@@ -65,9 +70,9 @@
                 </div>
                 <div id="battle-log"></div>
                 <div id="combat-actions">
-                    <button id="attack-button">Attaque</button>
-                    <button id="defend-button">Défense</button>
-                    <button id="special-button">Spécial</button>
+                    <button id="attack-button" onclick="window.gameActions.playerAttack()">Attaque</button>
+                    <button id="defend-button" onclick="window.gameActions.playerDefend()">Défense</button>
+                    <button id="special-button" onclick="window.gameActions.playerUseSpecial()">Spécial</button>
                 </div>
             </section>
 
@@ -108,8 +113,8 @@
                 <div id="player-trade-items"></div>
                 <div id="other-player-trade-items"></div>
                 <div id="offered-items"></div>
-                <button id="confirm-trade">Confirmer l'échange</button>
-                <button id="cancel-trade">Annuler l'échange</button>
+                <button id="confirm-trade" onclick="window.gameActions.confirmTrade()">Confirmer l'échange</button>
+                <button id="cancel-trade" onclick="window.gameActions.cancelTrade()">Annuler l'échange</button>
             </section>
         </main>
     </div>
