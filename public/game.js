@@ -260,11 +260,6 @@ function openMultiplayer() {
     showGameArea('multiplayer-area');
 }
 
-function openShop() {
-    console.log("Ouverture de la boutique");
-    updateShopInventory();
-    showGameArea('shop-area');
-}
 
 function openInventory() {
     console.log("Ouverture de l'inventaire");
