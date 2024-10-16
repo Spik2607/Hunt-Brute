@@ -381,3 +381,46 @@ input[type="text"], select {
         margin-bottom: 10px;
     }
 }
+
+#player-info {
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+#player-info .stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+#player-info .stat {
+    flex: 1;
+    text-align: center;
+}
+
+.experience-bar {
+    width: 100%;
+    height: 20px;
+    background-color: #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.experience-fill {
+    height: 100%;
+    background-color: #4CAF50;
+    width: 0%; /* Sera mis à jour dynamiquement */
+}
+
+.experience-text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    top: 50%;
+    transform: translateY(-50%);
+    color: black;
+    font-weight: bold;
+}
