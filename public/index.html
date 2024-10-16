@@ -3,141 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hunt Brute - Multijoueur V3.0</title>
-    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <title>Hunt-Brute - Jeu de RPG</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div id="game-container">
-        <header>
-            <h1>Hunt Brute - Multijoueur</h1>
-            <div id="player-info"></div>
-        </header>
+        <h1>Hunt-Brute</h1>
         
-        <div id="game-messages"></div>
+        <div id="character-creation" class="game-area">
+            <h2>Création de Personnage</h2>
+            <input type="text" id="hero-name" placeholder="Nom du héros">
+            <button id="create-character">Créer le personnage</button>
+        </div>
 
-        <nav id="main-menu">
-            <button id="start-adventure" onclick="window.gameActions.startAdventure()">Mode Aventure</button>
-            <button id="start-donjon" onclick="window.gameActions.startDonjon()">Donjon</button>
-            <button id="open-multiplayer" onclick="window.gameActions.openMultiplayer()">Mode Multijoueur</button>
-            <button id="open-shop" onclick="window.gameActions.openShop()">Boutique</button>
-            <button id="open-inventory" onclick="window.gameActions.openInventory()">Inventaire</button>
-            <button id="manage-companions" onclick="window.gameActions.manageCompanions()">Compagnons</button>
-            <button id="open-guilds" onclick="window.gameActions.openGuilds()">Guildes</button>
-            <button id="open-crafting" onclick="window.gameActions.openCrafting()">Artisanat</button>
-            <button id="save-game" onclick="window.gameActions.saveGame()">Sauvegarder</button>
-            <button id="load-game" onclick="window.gameActions.loadGame()">Charger</button>
-        </nav>
+        <div id="main-menu" class="game-area" style="display: none;">
+            <button id="start-adventure">Commencer l'aventure</button>
+            <button id="start-donjon">Entrer dans le donjon</button>
+            <button id="open-multiplayer">Mode multijoueur</button>
+            <button id="open-inventory">Inventaire</button>
+            <button id="open-shop">Boutique</button>
+            <button id="manage-companions">Gérer les compagnons</button>
+            <button id="open-guilds">Guildes</button>
+            <button id="open-crafting">Artisanat</button>
+            <button id="save-game">Sauvegarder</button>
+            <button id="load-game">Charger</button>
+        </div>
 
         <div id="player-info">
-    <h2><span id="player-name"></span> - Niveau <span id="player-level"></span></h2>
-    <div class="stats">
-        <div class="stat"><i class="fas fa-heart"></i> PV: <span id="player-hp"></span>/<span id="player-max-hp"></span></div>
-        <div class="stat"><i class="fas fa-fist-raised"></i> Attaque: <span id="player-attack"></span></div>
-        <div class="stat"><i class="fas fa-shield-alt"></i> Défense: <span id="player-defense"></span></div>
-        <div class="stat"><i class="fas fa-coins"></i> Or: <span id="player-gold"></span></div>
-    </div>
-    <div class="experience-bar">
-        <div class="experience-fill"></div>
-        <span class="experience-text">EXP: <span id="player-exp"></span>/<span id="player-next-level-exp"></span></span>
-    </div>
-</div>
-        
-        <main id="game-content">
-            <section id="character-creation" class="game-area">
-                <h2>Création du Personnage</h2>
-                <label for="hero-name">Nom du héros:</label>
-                <input type="text" id="hero-name" placeholder="Entrez le nom de votre héros">
-                <button id="create-character" onclick="window.gameActions.createCharacter(document.getElementById('hero-name').value)">Créer le personnage</button>
-            </section>
+            <h3>Informations du joueur</h3>
+            <p>Nom: <span id="player-name"></span></p>
+            <p>Niveau: <span id="player-level"></span></p>
+            <p>PV: <span id="player-hp"></span>/<span id="player-max-hp"></span></p>
+            <p>Attaque: <span id="player-attack"></span></p>
+            <p>Défense: <span id="player-defense"></span></p>
+            <p>Or: <span id="player-gold"></span></p>
+            <div class="experience-bar">
+                <div class="experience-fill"></div>
+            </div>
+            <p>Expérience: <span id="player-exp"></span>/<span id="player-next-level-exp"></span></p>
+        </div>
 
-            <section id="mission-area" class="game-area">
-                <h2>Missions disponibles</h2>
-                <!-- Le contenu des missions sera inséré ici dynamiquement -->
-            </section>
+        <div id="game-messages"></div>
 
-            <section id="multiplayer-area" class="game-area">
-                <h2>Mode Multijoueur</h2>
-                <div id="room-join">
-                    <input type="text" id="room-id" placeholder="ID de la salle">
-                    <button id="join-room" onclick="window.gameActions.joinRoom()">Rejoindre une salle</button>
-                </div>
-                <div id="players-list"></div>
-                <div id="chat-area">
-                    <div id="chat-messages"></div>
-                    <input type="text" id="chat-input" placeholder="Entrez votre message">
-                    <button id="send-message" onclick="window.gameActions.sendChatMessage()">Envoyer</button>
-                </div>
-                <button id="challenge-player" onclick="window.gameActions.initiateChallenge()">Défier un joueur</button>
-                <button id="accept-challenge" onclick="window.gameActions.acceptChallenge()" style="display:none;">Accepter le défi</button>
-                <button id="trade-request" onclick="window.gameActions.initiateTradeRequest()">Demander un échange</button>
-                <button id="accept-trade" onclick="window.gameActions.acceptTradeRequest()" style="display:none;">Accepter l'échange</button>
-                <div id="leaderboard"></div>
-            </section>
+        <div id="mission-area" class="game-area" style="display: none;">
+            <h2>Missions disponibles</h2>
+            <!-- Les missions seront ajoutées dynamiquement ici -->
+        </div>
 
-            <section id="battle-area" class="game-area">
-                <h2>Combat</h2>
-                <div id="combatants">
-                    <div id="player-combat-info" class="combatant"></div>
-                    <div id="enemy-combat-info" class="combatant"></div>
-                </div>
-                <div id="battle-log"></div>
-                <div id="combat-actions">
-                    <button id="attack-button" onclick="window.gameActions.playerAttack()">Attaque</button>
-                    <button id="defend-button" onclick="window.gameActions.playerDefend()">Défense</button>
-                    <button id="special-button" onclick="window.gameActions.playerUseSpecial()">Spécial</button>
-                </div>
-            </section>
+        <div id="battle-area" class="game-area" style="display: none;">
+            <h2>Combat</h2>
+            <div id="player-combat-info"></div>
+            <div id="enemy-combat-info"></div>
+            <div id="companion-combat-info"></div>
+            <button id="attack-button">Attaque</button>
+            <button id="defend-button">Défense</button>
+            <button id="special-button">Attaque Spéciale</button>
+            <div id="battle-log"></div>
+        </div>
 
-            <section id="inventory-area" class="game-area">
-                <h2>Inventaire</h2>
-                <div id="equipped-items"></div>
-                <div id="inventory-items"></div>
-            </section>
+        <div id="inventory-area" class="game-area" style="display: none;">
+            <h2>Inventaire</h2>
+            <div id="inventory-items"></div>
+            <div id="equipped-items"></div>
+        </div>
 
-            <section id="shop-area" class="game-area">
-                <h2>Boutique</h2>
-                <div id="shop-items"></div>
-            </section>
+        <div id="shop-area" class="game-area" style="display: none;">
+            <h2>Boutique</h2>
+            <div id="shop-items"></div>
+        </div>
 
-            <section id="companions-area" class="game-area">
-                <h2>Compagnons</h2>
-                <div id="companions-list"></div>
-            </section>
+        <div id="companions-area" class="game-area" style="display: none;">
+            <h2>Gestion des Compagnons</h2>
+            <!-- Les compagnons seront ajoutés dynamiquement ici -->
+        </div>
 
-            <section id="guild-area" class="game-area">
-                <h2>Guildes</h2>
-                <div id="guilds-list"></div>
-                <div id="player-guild-info"></div>
-            </section>
+        <div id="guild-area" class="game-area" style="display: none;">
+            <h2>Guildes</h2>
+            <!-- Les informations sur les guildes seront ajoutées dynamiquement ici -->
+        </div>
 
-            <section id="crafting-area" class="game-area">
-                <h2>Artisanat</h2>
-                <div id="crafting-recipes"></div>
-            </section>
+        <div id="crafting-area" class="game-area" style="display: none;">
+            <h2>Artisanat</h2>
+            <!-- Les recettes d'artisanat seront ajoutées dynamiquement ici -->
+        </div>
 
-            <section id="donjon-area" class="game-area">
-                <h2>Donjon</h2>
-                <div id="donjon-event"></div>
-            </section>
+        <div id="multiplayer-area" class="game-area" style="display: none;">
+            <h2>Mode Multijoueur</h2>
+            <input type="text" id="room-id" placeholder="ID de la salle">
+            <button id="join-room">Rejoindre la salle</button>
+            <div id="players-list"></div>
+            <div id="chat-messages"></div>
+            <input type="text" id="chat-input" placeholder="Votre message">
+            <button id="send-message">Envoyer</button>
+            <button id="challenge-player">Défier un joueur</button>
+            <button id="trade-request">Demander un échange</button>
+        </div>
 
-            <section id="trade-area" class="game-area">
-                <h2>Échange</h2>
-                <div id="player-trade-items"></div>
-                <div id="other-player-trade-items"></div>
-                <div id="offered-items"></div>
-                <button id="confirm-trade" onclick="window.gameActions.confirmTrade()">Confirmer l'échange</button>
-                <button id="cancel-trade" onclick="window.gameActions.cancelTrade()">Annuler l'échange</button>
-            </section>
-        </main>
+        <div id="trade-area" class="game-area" style="display: none;">
+            <h2>Échange</h2>
+            <div id="trade-inventory"></div>
+            <div id="offered-items"></div>
+            <button id="confirm-trade">Confirmer l'échange</button>
+            <button id="cancel-trade">Annuler l'échange</button>
+        </div>
+
+        <div id="donjon-area" class="game-area" style="display: none;">
+            <h2>Donjon</h2>
+            <div id="donjon-event"></div>
+            <button id="next-donjon-event">Continuer</button>
+        </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
-    <script src="gameData.js" type="module"></script>
-    <script src="inventory.js" type="module"></script>
-    <script src="combat.js" type="module"></script>
-    <script src="donjon.js" type="module"></script>
-    <script src="game.js" type="module"></script>
+    <script type="module">
+        import { initializeGame } from './game.js';
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeGame();
+            
+            // Gestionnaires d'événements pour les boutons
+            document.getElementById('create-character').addEventListener('click', () => window.gameActions.createCharacter());
+            document.getElementById('start-adventure').addEventListener('click', () => window.gameActions.startAdventure());
+            document.getElementById('start-donjon').addEventListener('click', () => window.gameActions.startDonjon());
+            document.getElementById('open-multiplayer').addEventListener('click', () => window.gameActions.openMultiplayer());
+            document.getElementById('open-inventory').addEventListener('click', () => window.gameActions.openInventory());
+            document.getElementById('open-shop').addEventListener('click', () => window.gameActions.openShop());
+            document.getElementById('manage-companions').addEventListener('click', () => window.gameActions.manageCompanions());
+            document.getElementById('open-guilds').addEventListener('click', () => window.gameActions.openGuilds());
+            document.getElementById('open-crafting').addEventListener('click', () => window.gameActions.openCrafting());
+            document.getElementById('save-game').addEventListener('click', () => window.gameActions.saveGame());
+            document.getElementById('load-game').addEventListener('click', () => window.gameActions.loadGame());
+            document.getElementById('attack-button').addEventListener('click', () => window.gameActions.playerAttack());
+            document.getElementById('defend-button').addEventListener('click', () => window.gameActions.playerDefend());
+            document.getElementById('special-button').addEventListener('click', () => window.gameActions.playerUseSpecial());
+            document.getElementById('join-room').addEventListener('click', () => window.gameActions.joinRoom());
+            document.getElementById('send-message').addEventListener('click', () => window.gameActions.sendChatMessage());
+            document.getElementById('challenge-player').addEventListener('click', () => window.gameActions.initiateChallenge());
+            document.getElementById('trade-request').addEventListener('click', () => window.gameActions.initiateTradeRequest());
+            document.getElementById('confirm-trade').addEventListener('click', () => window.gameActions.confirmTrade());
+            document.getElementById('cancel-trade').addEventListener('click', () => window.gameActions.cancelTrade());
+            document.getElementById('next-donjon-event').addEventListener('click', () => window.gameActions.nextDonjonEvent());
+        });
+    </script>
 </body>
 </html>
