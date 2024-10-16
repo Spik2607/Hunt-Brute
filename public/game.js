@@ -1,6 +1,3 @@
-Voici une version mise à jour et complète du fichier game.js, incluant les imports nécessaires, les fonctions mises à jour, et les exports :
-
-```javascript
 // game.js
 import { Character, items, missions, getAvailableMissions, createEnemyForMission, calculateDamage, generateRandomLoot, getRandomCompanion } from './gameData.js';
 import { equipItem, unequipItem, useItem, updateInventoryDisplay, updateEquippedItemsDisplay, openShop, buyItem, sellItem, addItemToInventory } from './inventory.js';
