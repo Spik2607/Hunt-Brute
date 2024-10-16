@@ -1,5 +1,6 @@
 // combat.js
 import { createEnemyForMission, generateUniqueEnemy, calculateDamage } from './gameData.js';
+import { calculateDamage } from './gameData.js';
 
 let player, companion, enemy, currentMission;
 let currentCombat = false;
@@ -10,10 +11,10 @@ export function initializeCombat(playerCharacter, companionCharacter, enemyData,
     
     if (mission) {
         // Mode mission : utiliser l'ennemi de niveau fixe de la mission
-        enemy = createEnemyForMission(mission);
+        enemy = enemyData;
     } else {
         // Mode donjon : utiliser l'ennemi généré aléatoirement
-        enemy = generateUniqueEnemy(enemyData.level);
+        enemy = enemyData;
     }
     
     currentMission = mission;
@@ -24,33 +25,37 @@ export function initializeCombat(playerCharacter, companionCharacter, enemyData,
 }
 
 export function updateBattleInfo() {
+    if (!player || !enemy) {
+        console.error("Joueur ou ennemi non défini dans updateBattleInfo");
+        return;
+    }
+
     const playerStats = document.getElementById('player-combat-info');
     const companionStats = document.getElementById('companion-combat-info');
     const enemyStats = document.getElementById('enemy-combat-info');
 
-    if (playerStats && player) {
-        playerStats.querySelector('h3').textContent = player.name;
-        playerStats.querySelector('.health-text').textContent = `${player.hp}/${player.maxHp} PV`;
-        playerStats.querySelector('.health-bar-fill').style.width = `${(player.hp / player.maxHp) * 100}%`;
-        playerStats.querySelector('.energy-text').textContent = `${player.energy}/${player.maxEnergy} Énergie`;
-        playerStats.querySelector('.energy-bar-fill').style.width = `${(player.energy / player.maxEnergy) * 100}%`;
+    if (playerStats) {
+        playerStats.innerHTML = `
+            <h3>${player.name}</h3>
+            <p>PV: ${player.hp}/${player.maxHp}</p>
+            <p>Énergie: ${player.energy}/${player.maxEnergy}</p>
+        `;
     }
-    
-    if (companionStats) {
-        if (companion) {
-            companionStats.style.display = 'block';
-            companionStats.querySelector('h3').textContent = companion.name;
-            companionStats.querySelector('.health-text').textContent = `${companion.hp}/${companion.maxHp} PV`;
-            companionStats.querySelector('.health-bar-fill').style.width = `${(companion.hp / companion.maxHp) * 100}%`;
-        } else {
-            companionStats.style.display = 'none';
-        }
+
+    if (companionStats && companion) {
+        companionStats.innerHTML = `
+            <h3>${companion.name}</h3>
+            <p>PV: ${companion.hp}/${companion.maxHp}</p>
+        `;
+    } else if (companionStats) {
+        companionStats.style.display = 'none';
     }
-    
-    if (enemyStats && enemy) {
-        enemyStats.querySelector('h3').textContent = enemy.name;
-        enemyStats.querySelector('.health-text').textContent = `${enemy.hp}/${enemy.maxHp} PV`;
-        enemyStats.querySelector('.health-bar-fill').style.width = `${(enemy.hp / enemy.maxHp) * 100}%`;
+
+    if (enemyStats) {
+        enemyStats.innerHTML = `
+            <h3>${enemy.name}</h3>
+            <p>PV: ${enemy.hp}/${enemy.maxHp}</p>
+        `;
     }
 }
 
@@ -135,10 +140,12 @@ function endCombat(victory) {
         player.hp = Math.max(player.hp, Math.floor(player.maxHp * 0.1));
     }
     
-    window.dispatchEvent(new CustomEvent('combatEnd', { detail: { victory } }));
+    if (typeof window.onCombatEnd === 'function') {
+        window.onCombatEnd(victory);
+    }
 }
 
-export function updateBattleLog(message) {
+function updateBattleLog(message) {
     const battleLog = document.getElementById('battle-log');
     if (battleLog) {
         const messageElement = document.createElement('p');
