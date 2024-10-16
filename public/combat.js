@@ -127,20 +127,26 @@ function checkBattleEnd() {
 }
 
 function endCombat(victory) {
-    currentCombat = false;
-    if (victory) {
-        const expGain = currentMission ? currentMission.expReward : enemy.level * 10;
-        const goldGain = currentMission ? currentMission.goldReward : enemy.level * 5;
-        player.gainExperience(expGain);
-        player.gold += goldGain;
-        
-        showCombatSummary({
-            result: "Victoire !",
-            expGained: expGain,
-            goldGained: goldGain,
-            itemsFound: generateRandomLoot(enemy.level)
-        });
+  currentCombat = false;
+  if (victory) {
+    const expGain = currentMission ? currentMission.expReward : enemy.level * 10;
+    const goldGain = currentMission ? currentMission.goldReward : enemy.level * 5;
+    
+    if (typeof player.gainExperience === 'function') {
+      player.gainExperience(expGain);
     } else {
+      console.error("La méthode gainExperience n'existe pas sur l'objet player");
+    }
+    
+    player.gold += goldGain;
+    
+    showCombatSummary({
+      result: "Victoire !",
+      expGained: expGain,
+      goldGained: goldGain,
+      itemsFound: generateRandomLoot(enemy.level)
+    });
+  } else {
         showCombatSummary({
             result: "Défaite",
             expGained: 0,
