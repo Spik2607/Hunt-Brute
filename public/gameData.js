@@ -205,6 +205,21 @@ export const companionTypes = [
     { type: 'shinigami', names: ['Faucheur', 'Shinigami', 'Ombre'] }
 ];
 
+export function generateBossReward(bossLevel) {
+    // Implémentez la logique pour générer une récompense de boss ici
+    // Par exemple :
+    const goldReward = bossLevel * 100;
+    const expReward = bossLevel * 50;
+    const itemReward = getRandomRareItem(bossLevel);
+
+    return {
+        gold: goldReward,
+        experience: expReward,
+        item: itemReward
+    };
+}
+
+
 export function getItemStats(item) {
     let stats = `${item.name} (${item.type}) :`;
     
