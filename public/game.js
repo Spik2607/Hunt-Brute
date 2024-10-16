@@ -14,32 +14,32 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initializeEventListeners() {
-    const elements = [
-        { id: 'create-character', event: 'click', handler: createCharacter },
-        { id: 'join-room', event: 'click', handler: joinRoom },
-        { id: 'send-message', event: 'click', handler: sendChatMessage },
-        { id: 'challenge-player', event: 'click', handler: initiateChallenge },
-        { id: 'accept-challenge', event: 'click', handler: acceptChallenge },
-        { id: 'trade-request', event: 'click', handler: initiateTradeRequest },
-        { id: 'accept-trade', event: 'click', handler: acceptTradeRequest },
-        { id: 'confirm-trade', event: 'click', handler: confirmTrade },
-        { id: 'cancel-trade', event: 'click', handler: cancelTrade },
-        { id: 'attack-button', event: 'click', handler: playerAttack },
-        { id: 'defend-button', event: 'click', handler: playerDefend },
-        { id: 'special-button', event: 'click', handler: playerUseSpecial }
+    const buttons = [
+        { id: 'create-character', handler: createCharacter },
+        { id: 'join-room', handler: joinRoom },
+        { id: 'send-message', handler: sendChatMessage },
+        { id: 'challenge-player', handler: initiateChallenge },
+        { id: 'accept-challenge', handler: acceptChallenge },
+        { id: 'trade-request', handler: initiateTradeRequest },
+        { id: 'accept-trade', handler: acceptTradeRequest },
+        { id: 'confirm-trade', handler: confirmTrade },
+        { id: 'cancel-trade', handler: cancelTrade },
+        { id: 'attack-button', handler: playerAttack },
+        { id: 'defend-button', handler: playerDefend },
+        { id: 'special-button', handler: playerUseSpecial }
     ];
 
-    elements.forEach(({ id, event, handler }) => {
+    buttons.forEach(({ id, handler }) => {
         const element = document.getElementById(id);
         if (element) {
-            element.addEventListener(event, handler);
+            element.addEventListener('click', handler);
+            console.log(`Event listener added to ${id}`);
         } else {
             console.warn(`Element with id '${id}' not found`);
         }
     });
 }
 
-// Ajoutez cette fonction qui manquait
 function updateChatMessages(messages) {
     const chatMessages = document.getElementById('chat-messages');
     if (chatMessages) {
@@ -541,10 +541,14 @@ export {
     useItem,
     buyItem,
     sellItem,
-    joinGroupQuest,
-    createGuild,
-    joinGuild,
-    craftItem
+    joinRoom,
+    sendChatMessage,
+    initiateChallenge,
+    acceptChallenge,
+    initiateTradeRequest,
+    acceptTradeRequest,
+    confirmTrade,
+    cancelTrade
 };
 
 // Rendre certaines fonctions disponibles globalement si nécessaire
