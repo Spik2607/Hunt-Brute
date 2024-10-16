@@ -5,126 +5,148 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hunt-Brute - Jeu de RPG</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
 </head>
 <body>
-    <nav>
-        <ul>
-            <li><a href="#" id="nav-home">Accueil</a></li>
-            <li><a href="#" id="nav-adventure">Aventure</a></li>
-            <li><a href="#" id="nav-donjon">Donjon</a></li>
-            <li><a href="#" id="nav-multiplayer">Multijoueur</a></li>
-            <li><a href="#" id="nav-inventory">Inventaire</a></li>
-            <li><a href="#" id="nav-shop">Boutique</a></li>
-            <li><a href="#" id="nav-companions">Compagnons</a></li>
-            <li><a href="#" id="nav-guilds">Guildes</a></li>
-            <li><a href="#" id="nav-crafting">Artisanat</a></li>
-        </ul>
-    </nav>
-
     <div id="game-container">
-        <h1>Hunt-Brute</h1>
-        
+        <header>
+            <h1><i class="fas fa-dragon"></i> Hunt-Brute</h1>
+        </header>
+
+        <nav>
+            <button id="nav-home"><i class="fas fa-home"></i> Accueil</button>
+            <button id="nav-adventure"><i class="fas fa-map-marked-alt"></i> Aventure</button>
+            <button id="nav-donjon"><i class="fas fa-dungeon"></i> Donjon</button>
+            <button id="nav-multiplayer"><i class="fas fa-users"></i> Multijoueur</button>
+            <button id="nav-inventory"><i class="fas fa-backpack"></i> Inventaire</button>
+            <button id="nav-shop"><i class="fas fa-store"></i> Boutique</button>
+            <button id="nav-companions"><i class="fas fa-user-friends"></i> Compagnons</button>
+            <button id="nav-guilds"><i class="fas fa-flag"></i> Guildes</button>
+            <button id="nav-crafting"><i class="fas fa-hammer"></i> Artisanat</button>
+        </nav>
+
         <div id="player-info">
-            <h3>Informations du joueur</h3>
-            <p>Nom: <span id="player-name"></span></p>
-            <p>Niveau: <span id="player-level"></span></p>
-            <p>PV: <span id="player-hp"></span>/<span id="player-max-hp"></span></p>
-            <p>Attaque: <span id="player-attack"></span></p>
-            <p>Défense: <span id="player-defense"></span></p>
-            <p>Or: <span id="player-gold"></span></p>
+            <h3><i class="fas fa-user-circle"></i> Informations du joueur</h3>
+            <div class="stats">
+                <div class="stat">
+                    <i class="fas fa-user"></i> Nom: <span id="player-name"></span>
+                </div>
+                <div class="stat">
+                    <i class="fas fa-star"></i> Niveau: <span id="player-level"></span>
+                </div>
+                <div class="stat">
+                    <i class="fas fa-heart"></i> PV: <span id="player-hp"></span>/<span id="player-max-hp"></span>
+                </div>
+                <div class="stat">
+                    <i class="fas fa-fist-raised"></i> Attaque: <span id="player-attack"></span>
+                </div>
+                <div class="stat">
+                    <i class="fas fa-shield-alt"></i> Défense: <span id="player-defense"></span>
+                </div>
+                <div class="stat">
+                    <i class="fas fa-coins"></i> Or: <span id="player-gold"></span>
+                </div>
+            </div>
             <div class="experience-bar">
                 <div class="experience-fill"></div>
+                <div class="experience-text">Expérience: <span id="player-exp"></span>/<span id="player-next-level-exp"></span></div>
             </div>
-            <p>Expérience: <span id="player-exp"></span>/<span id="player-next-level-exp"></span></p>
         </div>
 
         <div id="character-creation" class="game-area">
-            <h2>Création de Personnage</h2>
+            <h2><i class="fas fa-user-plus"></i> Création de Personnage</h2>
             <input type="text" id="hero-name" placeholder="Nom du héros">
-            <button id="create-character">Créer le personnage</button>
+            <button id="create-character"><i class="fas fa-check"></i> Créer le personnage</button>
         </div>
 
         <div id="main-menu" class="game-area" style="display: none;">
-            <button id="start-adventure">Commencer l'aventure</button>
-            <button id="start-donjon">Entrer dans le donjon</button>
-            <button id="open-multiplayer">Mode multijoueur</button>
-            <button id="open-inventory">Inventaire</button>
-            <button id="open-shop">Boutique</button>
-            <button id="manage-companions">Gérer les compagnons</button>
-            <button id="open-guilds">Guildes</button>
-            <button id="open-crafting">Artisanat</button>
-            <button id="save-game">Sauvegarder</button>
-            <button id="load-game">Charger</button>
+            <button id="start-adventure"><i class="fas fa-hiking"></i> Commencer l'aventure</button>
+            <button id="start-donjon"><i class="fas fa-dungeon"></i> Entrer dans le donjon</button>
+            <button id="open-multiplayer"><i class="fas fa-users"></i> Mode multijoueur</button>
+            <button id="open-inventory"><i class="fas fa-backpack"></i> Inventaire</button>
+            <button id="open-shop"><i class="fas fa-store"></i> Boutique</button>
+            <button id="manage-companions"><i class="fas fa-user-friends"></i> Gérer les compagnons</button>
+            <button id="open-guilds"><i class="fas fa-flag"></i> Guildes</button>
+            <button id="open-crafting"><i class="fas fa-hammer"></i> Artisanat</button>
+            <button id="save-game"><i class="fas fa-save"></i> Sauvegarder</button>
+            <button id="load-game"><i class="fas fa-folder-open"></i> Charger</button>
         </div>
 
         <div id="game-messages"></div>
 
         <div id="mission-area" class="game-area" style="display: none;">
-            <h2>Missions disponibles</h2>
-            <!-- Les missions seront ajoutées dynamiquement ici -->
+            <h2><i class="fas fa-scroll"></i> Missions disponibles</h2>
+            <div id="mission-list"></div>
         </div>
 
         <div id="battle-area" class="game-area" style="display: none;">
-            <h2>Combat</h2>
-            <div id="player-combat-info"></div>
-            <div id="enemy-combat-info"></div>
-            <div id="companion-combat-info"></div>
-            <button id="attack-button">Attaque</button>
-            <button id="defend-button">Défense</button>
-            <button id="special-button">Attaque Spéciale</button>
+            <h2><i class="fas fa-swords"></i> Combat</h2>
+            <div id="combatants">
+                <div id="player-combat-info" class="combatant"></div>
+                <div id="enemy-combat-info" class="combatant"></div>
+                <div id="companion-combat-info" class="combatant"></div>
+            </div>
+            <div id="combat-actions">
+                <button id="attack-button"><i class="fas fa-fist-raised"></i> Attaque</button>
+                <button id="defend-button"><i class="fas fa-shield-alt"></i> Défense</button>
+                <button id="special-button"><i class="fas fa-bolt"></i> Attaque Spéciale</button>
+            </div>
             <div id="battle-log"></div>
         </div>
 
         <div id="inventory-area" class="game-area" style="display: none;">
-            <h2>Inventaire</h2>
-            <div id="inventory-items"></div>
+            <h2><i class="fas fa-backpack"></i> Inventaire</h2>
+            <div id="inventory-items" class="inventory-grid"></div>
             <div id="equipped-items"></div>
         </div>
 
         <div id="shop-area" class="game-area" style="display: none;">
-            <h2>Boutique</h2>
+            <h2><i class="fas fa-store"></i> Boutique</h2>
             <div id="shop-items"></div>
         </div>
 
         <div id="companions-area" class="game-area" style="display: none;">
-            <h2>Gestion des Compagnons</h2>
-            <!-- Les compagnons seront ajoutés dynamiquement ici -->
+            <h2><i class="fas fa-user-friends"></i> Gestion des Compagnons</h2>
+            <div id="companions-list"></div>
         </div>
 
         <div id="guild-area" class="game-area" style="display: none;">
-            <h2>Guildes</h2>
-            <!-- Les informations sur les guildes seront ajoutées dynamiquement ici -->
+            <h2><i class="fas fa-flag"></i> Guildes</h2>
+            <div id="guilds-list"></div>
         </div>
 
         <div id="crafting-area" class="game-area" style="display: none;">
-            <h2>Artisanat</h2>
-            <!-- Les recettes d'artisanat seront ajoutées dynamiquement ici -->
+            <h2><i class="fas fa-hammer"></i> Artisanat</h2>
+            <div id="crafting-recipes"></div>
         </div>
 
         <div id="multiplayer-area" class="game-area" style="display: none;">
-            <h2>Mode Multijoueur</h2>
+            <h2><i class="fas fa-users"></i> Mode Multijoueur</h2>
             <input type="text" id="room-id" placeholder="ID de la salle">
-            <button id="join-room">Rejoindre la salle</button>
+            <button id="join-room"><i class="fas fa-sign-in-alt"></i> Rejoindre la salle</button>
             <div id="players-list"></div>
-            <div id="chat-messages"></div>
-            <input type="text" id="chat-input" placeholder="Votre message">
-            <button id="send-message">Envoyer</button>
-            <button id="challenge-player">Défier un joueur</button>
-            <button id="trade-request">Demander un échange</button>
+            <div id="chat-area">
+                <div id="chat-messages"></div>
+                <input type="text" id="chat-input" placeholder="Votre message">
+                <button id="send-message"><i class="fas fa-paper-plane"></i> Envoyer</button>
+            </div>
+            <button id="challenge-player"><i class="fas fa-fist-raised"></i> Défier un joueur</button>
+            <button id="trade-request"><i class="fas fa-exchange-alt"></i> Demander un échange</button>
         </div>
 
         <div id="trade-area" class="game-area" style="display: none;">
-            <h2>Échange</h2>
+            <h2><i class="fas fa-exchange-alt"></i> Échange</h2>
             <div id="trade-inventory"></div>
             <div id="offered-items"></div>
-            <button id="confirm-trade">Confirmer l'échange</button>
-            <button id="cancel-trade">Annuler l'échange</button>
+            <button id="confirm-trade"><i class="fas fa-check"></i> Confirmer l'échange</button>
+            <button id="cancel-trade"><i class="fas fa-times"></i> Annuler l'échange</button>
         </div>
 
         <div id="donjon-area" class="game-area" style="display: none;">
-            <h2>Donjon</h2>
+            <h2><i class="fas fa-dungeon"></i> Donjon</h2>
             <div id="donjon-event"></div>
-            <button id="next-donjon-event">Continuer</button>
+            <button id="next-donjon-event"><i class="fas fa-step-forward"></i> Continuer</button>
         </div>
     </div>
 
