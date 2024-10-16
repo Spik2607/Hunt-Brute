@@ -154,13 +154,24 @@ socket.on('connect', () => {
     }
 }
 
+function handleOpenShop() {
+    console.log("Ouverture de la boutique");
+    if (player) {
+        openShop(player);
+        showGameArea('shop-area');
+    } else {
+        console.error("Impossible d'ouvrir la boutique : joueur non défini");
+        showGameMessage("Vous devez d'abord créer un personnage.");
+    }
+}
+
 function initializeEventListeners() {
     console.log("Initialisation des écouteurs d'événements");
     const buttons = [
         { id: 'start-adventure', handler: startAdventure },
         { id: 'start-donjon', handler: startDonjon },
         { id: 'open-multiplayer', handler: openMultiplayer },
-        { id: 'open-shop', handler: openShop },
+        { id: 'open-shop', handler: handleOpenShop },
         { id: 'open-inventory', handler: openInventory },
         { id: 'manage-companions', handler: manageCompanions },
         { id: 'open-guilds', handler: openGuilds },
@@ -623,7 +634,7 @@ window.gameActions = {
     startAdventure,
     startDonjon,
     openMultiplayer,
-    openShop,
+    openShop: handleOpenShop,
     openInventory,
     manageCompanions,
     openGuilds,
