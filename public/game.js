@@ -596,6 +596,17 @@ function closeTrade() {
     showGameArea('multiplayer-area');
 }
 
+function initializeCraftingSystem() {
+    console.log("Initialisation du système d'artisanat");
+    // Implémentation à faire
+    // Par exemple :
+    const craftingArea = document.getElementById('crafting-area');
+    if (craftingArea) {
+        craftingArea.innerHTML = '<h2>Système d'artisanat</h2>';
+        // Ajouter ici la logique pour initialiser le système d'artisanat
+    }
+}
+
 // Objet gameActions pour les actions accessibles globalement
 window.gameActions = {
     startAdventure: startAdventure,
