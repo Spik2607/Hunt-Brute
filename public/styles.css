@@ -70,7 +70,7 @@ nav button:hover {
 }
 
 /* General game area styles */
-.game-area {
+.game-section {
     background-color: rgba(255, 253, 240, 0.9);
     border: 2px solid #8B4513;
     border-radius: 8px;
@@ -105,35 +105,51 @@ input[type="text"], select {
 
 /* Player info styles */
 #player-info {
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: rgba(255, 255, 255, 0.8);
     padding: 10px;
     border-radius: 5px;
-    margin-bottom: 15px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
 }
 
-/* Multiplayer area styles */
-#multiplayer-area {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-}
-
-#players-list, #chat-area {
-    background-color: #f0e6d2;
-    border-radius: 5px;
-    padding: 10px;
-}
-
-#chat-messages {
-    height: 200px;
-    overflow-y: auto;
-    border: 1px solid #8B4513;
-    padding: 10px;
+.player-stats {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
     margin-bottom: 10px;
 }
 
+.player-stats span {
+    flex: 1;
+    min-width: 150px;
+    margin: 5px;
+}
 
+.experience-bar {
+    width: 100%;
+    height: 20px;
+    background-color: #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.experience-fill {
+    height: 100%;
+    background-color: #4CAF50;
+    width: 0%; /* Sera mis à jour dynamiquement */
+}
+
+.experience-text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    top: 50%;
+    transform: translateY(-50%);
+    color: black;
+    font-weight: bold;
+}
+
+/* Mission styles */
 .mission-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -175,76 +191,11 @@ input[type="text"], select {
 .difficulty-meter span {
     display: block;
     height: 100%;
-    background-color: #4CAF50;
 }
 
-.easy .difficulty-meter span { background-color: #4CAF50; }
-.medium .difficulty-meter span { background-color: #FFA500; }
-.hard .difficulty-meter span { background-color: #FF4500; }
-
-.mission-button {
-    background-color: #8B4513;
-    color: #FFF8DC;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: 10px;
-}
-
-.mission-button:hover {
-    background-color: #A0522D;
-}
-
-/* Leaderboard styles */
-#leaderboard {
-    background-color: #f0e6d2;
-    border-radius: 5px;
-    padding: 10px;
-}
-
-#leaderboard h3 {
-    text-align: center;
-    margin-bottom: 10px;
-}
-
-/* Guild area styles */
-#guild-area {
-    background-color: #f0e6d2;
-    border-radius: 5px;
-    padding: 20px;
-}
-
-#create-guild, #guilds-list, #player-guild-info {
-    margin-bottom: 20px;
-}
-
-/* Crafting area styles */
-#crafting-area {
-    background-color: #f0e6d2;
-    border-radius: 5px;
-    padding: 20px;
-}
-
-#crafting-recipes {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 15px;
-}
-
-/* World events styles */
-#world-events {
-    background-color: #f0e6d2;
-    border-radius: 5px;
-    padding: 20px;
-}
-
-#current-world-event {
-    border: 1px solid #8B4513;
-    padding: 10px;
-    border-radius: 5px;
-}
+.easy .difficulty-meter span { background-color: #4CAF50; width: 33%; }
+.medium .difficulty-meter span { background-color: #FFA500; width: 66%; }
+.hard .difficulty-meter span { background-color: #FF4500; width: 100%; }
 
 /* Combat styles */
 #battle-area {
@@ -265,7 +216,7 @@ input[type="text"], select {
     background-color: rgba(0, 0, 0, 0.7);
     padding: 10px;
     border-radius: 5px;
-    width: 30%;
+    width: 45%;
 }
 
 .health-bar, .energy-bar {
@@ -316,51 +267,6 @@ input[type="text"], select {
     justify-content: space-between;
 }
 
-/* Inventory and Shop styles */
-#inventory-area, #shop-area {
-    background-color: #f0e6d2;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.inventory-grid, #inventory-items, #shop-items {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 15px;
-    max-height: 500px;
-    overflow-y: auto;
-    padding-right: 10px;
-}
-
-.inventory-item, .shop-item {
-    background-color: #fff;
-    border: 2px solid #4a4a4a;
-    border-radius: 5px;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    transition: all 0.3s ease;
-}
-
-.inventory-item:hover, .shop-item:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-
-/* Trade area styles */
-#trade-area {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-}
-
-#player-trade-items, #other-player-trade-items {
-    background-color: #f0e6d2;
-    border-radius: 5px;
-    padding: 10px;
-}
-
 /* Modal styles */
 .modal {
     display: none;
@@ -385,58 +291,9 @@ input[type="text"], select {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Animations */
-@keyframes damageShake {
-    0% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    50% { transform: translateX(5px); }
-    75% { transform: translateX(-5px); }
-    100% { transform: translateX(0); }
-}
-
-.damage-shake {
-    animation: damageShake 0.5s;
-}
-
-@keyframes healPulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-}
-
-.heal-pulse {
-    animation: healPulse 0.5s;
-}
-
 /* Responsive design */
 @media (max-width: 768px) {
-    nav {
-        flex-direction: column;
-    }
-    
-    #multiplayer-area, #trade-area {
-        grid-template-columns: 1fr;
-    }
-    
-    #mission-list, #inventory-items, #shop-items, #crafting-recipes {
-        grid-template-columns: 1fr;
-    }
-    
-    #inventory-filters, #combat-actions {
-        flex-direction: column;
-    }
-    
-    #inventory-search, #inventory-sort, .action-button {
-        width: 100%;
-        margin-right: 0;
-        margin-bottom: 10px;
-    }
-    
-    .modal-content {
-        width: 95%;
-    }
-    
-    #combatants {
+    nav, #combat-actions {
         flex-direction: column;
     }
     
@@ -444,47 +301,12 @@ input[type="text"], select {
         width: 100%;
         margin-bottom: 10px;
     }
-}
 
-#player-info {
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 20px;
-}
+    .mission-grid {
+        grid-template-columns: 1fr;
+    }
 
-#player-info .stats {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-}
-
-#player-info .stat {
-    flex: 1;
-    text-align: center;
-}
-
-.experience-bar {
-    width: 100%;
-    height: 20px;
-    background-color: #ddd;
-    border-radius: 10px;
-    overflow: hidden;
-    position: relative;
-}
-
-.experience-fill {
-    height: 100%;
-    background-color: #4CAF50;
-    width: 0%; /* Sera mis à jour dynamiquement */
-}
-
-.experience-text {
-    position: absolute;
-    width: 100%;
-    text-align: center;
-    top: 50%;
-    transform: translateY(-50%);
-    color: black;
-    font-weight: bold;
+    .modal-content {
+        width: 95%;
+    }
 }
