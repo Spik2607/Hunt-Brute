@@ -33,38 +33,49 @@ function initializeGame() {
 }
 
 function initializeEventListeners() {
-    console.log("Initialisation des écouteurs d'événements...");
-    const buttons = [
-        { id: 'create-character', handler: createCharacter },
-        { id: 'join-room', handler: joinRoom },
-        { id: 'send-message', handler: sendChatMessage },
-        { id: 'challenge-player', handler: initiateChallenge },
-        { id: 'accept-challenge', handler: acceptChallenge },
-        { id: 'trade-request', handler: initiateTradeRequest },
-        { id: 'accept-trade', handler: acceptTradeRequest },
-        { id: 'confirm-trade', handler: confirmTrade },
-        { id: 'cancel-trade', handler: cancelTrade },
-        { id: 'attack-button', handler: playerAttack },
-        { id: 'defend-button', handler: playerDefend },
-        { id: 'special-button', handler: playerUseSpecial }
-        const testButton = document.getElementById('test-button');
-if (testButton) {
-    testButton.addEventListener('click', () => {
-        console.log("Bouton de test cliqué");
-        alert("Le bouton de test fonctionne !");
-    });
-}
+    console.log("Début de l'initialisation des écouteurs d'événements...");
+
+    const eventListeners = [
+        { id: 'create-character', event: 'click', handler: createCharacter },
+        { id: 'join-room', event: 'click', handler: joinRoom },
+        { id: 'send-message', event: 'click', handler: sendChatMessage },
+        { id: 'challenge-player', event: 'click', handler: initiateChallenge },
+        { id: 'accept-challenge', event: 'click', handler: acceptChallenge },
+        { id: 'trade-request', event: 'click', handler: initiateTradeRequest },
+        { id: 'accept-trade', event: 'click', handler: acceptTradeRequest },
+        { id: 'confirm-trade', event: 'click', handler: confirmTrade },
+        { id: 'cancel-trade', event: 'click', handler: cancelTrade },
+        { id: 'attack-button', event: 'click', handler: playerAttack },
+        { id: 'defend-button', event: 'click', handler: playerDefend },
+        { id: 'special-button', event: 'click', handler: playerUseSpecial },
+        { id: 'test-button', event: 'click', handler: testButtonClick }
     ];
 
-    buttons.forEach(({ id, handler }) => {
+    eventListeners.forEach(({ id, event, handler }) => {
         const element = document.getElementById(id);
         if (element) {
-            element.addEventListener('click', handler);
-            console.log(`Écouteur d'événement ajouté à ${id}`);
+            element.addEventListener(event, (e) => {
+                console.log(`Événement '${event}' déclenché sur l'élément '${id}'`);
+                handler(e);
+            });
+            console.log(`Écouteur d'événement '${event}' ajouté à l'élément '${id}'`);
         } else {
-            console.warn(`Élément avec l'id '${id}' non trouvé`);
+            console.warn(`Élément avec l'id '${id}' non trouvé. L'écouteur n'a pas pu être ajouté.`);
         }
     });
+
+    // Ajout d'un écouteur global pour les clics
+    document.addEventListener('click', (e) => {
+        console.log(`Clic détecté sur l'élément:`, e.target);
+    });
+
+    console.log("Fin de l'initialisation des écouteurs d'événements.");
+}
+
+// Fonction de test pour le bouton de test
+function testButtonClick() {
+    console.log("Bouton de test cliqué");
+    alert("Le bouton de test fonctionne !");
 }
 
 function initializeSocket() {
