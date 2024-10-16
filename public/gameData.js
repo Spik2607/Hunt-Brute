@@ -113,11 +113,7 @@ export class Character {
 }
 
 export function getAvailableMissions(playerLevel) {
-    // Filtrer les missions en fonction du niveau du joueur
-    return missions.filter(mission => {
-        // Par exemple, on peut rendre disponibles les missions jusqu'à 2 niveaux au-dessus du joueur
-        return mission.enemyLevel <= playerLevel + 2;
-    });
+    return missions.filter(mission => mission.enemyLevel <= playerLevel + 2);
 }
 
 export const items = [
@@ -204,21 +200,6 @@ export const companionTypes = [
     { type: 'spirit', names: ['Esprit du feu', "Esprit de l'eau", "Esprit de l'air", 'Esprit de la terre'] },
     { type: 'shinigami', names: ['Faucheur', 'Shinigami', 'Ombre'] }
 ];
-
-export function generateBossReward(bossLevel) {
-    // Implémentez la logique pour générer une récompense de boss ici
-    // Par exemple :
-    const goldReward = bossLevel * 100;
-    const expReward = bossLevel * 50;
-    const itemReward = getRandomRareItem(bossLevel);
-
-    return {
-        gold: goldReward,
-        experience: expReward,
-        item: itemReward
-    };
-}
-
 
 export function getItemStats(item) {
     let stats = `${item.name} (${item.type}) :`;
@@ -331,18 +312,6 @@ export function calculateDamage(attacker, defender) {
     };
 }
 
-export function levelUpCharacter(character) {
-    character.level++;
-    character.maxHp += 10;
-    character.hp = character.maxHp;
-    character.attack += 2;
-    character.defense += 1;
-    character.skillPoints += 3;
-    
-    console.log(`${character.name} a atteint le niveau ${character.level}!`);
-    console.log(`PV max: +10, Attaque: +2, Défense: +1, Points de compétence: +3`);
-}
-
 export function createEnemyForMission(mission) {
     const enemyBase = enemies.find(e => e.name === mission.enemy);
     if (!enemyBase) return null;
@@ -367,6 +336,48 @@ export function generateUniqueEnemy(floor) {
         hp: Math.round(baseEnemy.hp * levelMultiplier),
         attack: Math.round(baseEnemy.attack * levelMultiplier),
         defense: Math.round(baseEnemy.defense * levelMultiplier)
+    };
+}
+
+export function generateDonjonEvent(level) {
+    const eventTypes = ['combat', 'treasure', 'trap'];
+    const eventType = eventTypes[Math.floor(Math.random() * eventTypes.length)];
+
+    switch (eventType) {
+        case 'combat':
+            return {
+                type: 'combat',
+                enemy: createEnemyForMission({ enemy: enemies[Math.floor(Math.random() * enemies.length)].name, enemyLevel: level })
+            };
+        case 'treasure':
+            return {
+                type: 'treasure',
+                item: generateRandomLoot(level)
+            };
+        case 'trap':
+            return {
+                type: 'trap',
+                damage: level * 5
+            };
+    }
+}
+
+export function generateDonjonBoss(level) {
+    const baseBoss = enemies[enemies.length - 1]; // Utilise le dernier ennemi comme base pour le boss
+    return {
+        name: `Boss ${baseBoss.name}`,
+        level: level,
+        hp: baseBoss.hp * 2,
+        attack: baseBoss.attack * 1.5,
+        defense: baseBoss.defense * 1.5
+    };
+}
+
+export function generateBossReward(bossLevel) {
+    return {
+        gold: bossLevel * 100,
+        experience: bossLevel * 50,
+        item: generateRandomLoot(bossLevel + 2) // Un objet plus rare que le niveau du boss
     };
 }
 
