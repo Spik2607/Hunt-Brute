@@ -234,11 +234,6 @@ function createCharacter() {
     }
 }
 
-function startAdventure() {
-    console.log("Démarrage du mode Aventure");
-    const availableMissions = getAvailableMissions(); // Fonction à créer dans gameData.js
-    displayMissionMenu(availableMissions); // Nouvelle fonction à créer
-}
 
 function startAdventure() {
     console.log("Démarrage du mode Aventure");
