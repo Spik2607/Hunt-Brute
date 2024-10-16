@@ -474,18 +474,22 @@ function showGameMessage(message) {
 }
 
 function updatePlayerInfo() {
-    console.log("Mise à jour des informations du joueur");
-    const playerInfoElement = document.getElementById('player-info');
-    if (playerInfoElement && player) {
-        playerInfoElement.innerHTML = `
-            <p>Nom: ${player.name}</p>
-            <p>Niveau: ${player.level}</p>
-            <p>PV: ${player.hp}/${player.maxHp}</p>
-            <p>Attaque: ${player.attack}</p>
-            <p>Défense: ${player.defense}</p>
-            <p>Or: ${player.gold}</p>
-        `;
-    }
+    if (!player) return;
+
+    document.getElementById('player-name').textContent = player.name;
+    document.getElementById('player-level').textContent = player.level;
+    document.getElementById('player-hp').textContent = player.hp;
+    document.getElementById('player-max-hp').textContent = player.maxHp;
+    document.getElementById('player-attack').textContent = player.attack;
+    document.getElementById('player-defense').textContent = player.defense;
+    document.getElementById('player-gold').textContent = player.gold;
+
+    const expToNextLevel = player.level * 100;
+    document.getElementById('player-exp').textContent = player.experience;
+    document.getElementById('player-next-level-exp').textContent = expToNextLevel;
+    
+    const expPercentage = (player.experience / expToNextLevel) * 100;
+    document.querySelector('.experience-fill').style.width = `${expPercentage}%`;
 }
 
 function initializeAdditionalFeatures() {
