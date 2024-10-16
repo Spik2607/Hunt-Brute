@@ -75,10 +75,41 @@
 
         <div id="game-messages"></div>
 
-        <div id="mission-area" class="game-area" style="display: none;">
-            <h2><i class="fas fa-scroll"></i> Missions disponibles</h2>
-            <div id="mission-list"></div>
+       <div id="mission-area" class="game-area">
+    <h2><i class="fas fa-scroll"></i> Missions disponibles</h2>
+    <div class="mission-grid">
+        <div class="mission-card">
+            <i class="fas fa-skull mission-icon"></i>
+            <h3>Éliminer des gobelins</h3>
+            <div class="difficulty easy">
+                <span>Difficulté: Facile</span>
+                <div class="difficulty-meter"><span style="width: 33%;"></span></div>
+            </div>
+            <p>Récompense: 15 or, 20 XP</p>
+            <button class="mission-button" title="Éliminez une bande de gobelins qui terrorisent un village proche.">Commencer la mission</button>
         </div>
+        <div class="mission-card">
+            <i class="fas fa-paw mission-icon"></i>
+            <h3>Chasser un loup géant</h3>
+            <div class="difficulty medium">
+                <span>Difficulté: Moyenne</span>
+                <div class="difficulty-meter"><span style="width: 66%;"></span></div>
+            </div>
+            <p>Récompense: 30 or, 40 XP</p>
+            <button class="mission-button" title="Traquez et éliminez un loup géant qui menace les troupeaux locaux.">Commencer la mission</button>
+        </div>
+        <div class="mission-card">
+            <i class="fas fa-user-ninja mission-icon"></i>
+            <h3>Vaincre un bandit</h3>
+            <div class="difficulty medium">
+                <span>Difficulté: Moyenne</span>
+                <div class="difficulty-meter"><span style="width: 66%;"></span></div>
+            </div>
+            <p>Récompense: 50 or, 60 XP</p>
+            <button class="mission-button" title="Affrontez un bandit notoire qui pille les marchands sur la route principale.">Commencer la mission</button>
+        </div>
+    </div>
+</div>
 
         <div id="battle-area" class="game-area" style="display: none;">
             <h2><i class="fas fa-swords"></i> Combat</h2>
