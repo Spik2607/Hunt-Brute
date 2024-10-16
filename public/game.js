@@ -236,15 +236,31 @@ function createCharacter() {
 
 function startAdventure() {
     console.log("Démarrage du mode Aventure");
-    const mission = getRandomMission();
-    if (mission) {
-        currentMission = mission;
-        const enemy = createEnemyForMission(mission);
-        initializeCombat(player, null, enemy, mission);
-        showGameArea('battle-area');
-    } else {
-        showGameMessage("Aucune mission disponible pour le moment.");
-    }
+    const availableMissions = getAvailableMissions(); // Fonction à créer dans gameData.js
+    displayMissionMenu(availableMissions); // Nouvelle fonction à créer
+}
+
+function displayMissionMenu(missions) {
+    const missionArea = document.getElementById('mission-area');
+    missionArea.innerHTML = '<h2>Missions disponibles</h2>';
+    missions.forEach(mission => {
+        const missionElement = document.createElement('div');
+        missionElement.innerHTML = `
+            <h3>${mission.name}</h3>
+            <p>Difficulté: ${mission.difficulty}</p>
+            <p>Récompense: ${mission.reward} or</p>
+            <button onclick="selectMission(${mission.id})">Commencer la mission</button>
+        `;
+        missionArea.appendChild(missionElement);
+    });
+    showGameArea('mission-area');
+}
+
+function selectMission(missionId) {
+    const mission = getMissionById(missionId); // Fonction à créer dans gameData.js
+    const enemy = createEnemyForMission(mission);
+    initializeCombat(player, null, enemy, mission);
+    showGameArea('battle-area');
 }
 
 function startDonjon() {
