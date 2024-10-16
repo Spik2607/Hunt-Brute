@@ -7,9 +7,37 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <nav>
+        <ul>
+            <li><a href="#" id="nav-home">Accueil</a></li>
+            <li><a href="#" id="nav-adventure">Aventure</a></li>
+            <li><a href="#" id="nav-donjon">Donjon</a></li>
+            <li><a href="#" id="nav-multiplayer">Multijoueur</a></li>
+            <li><a href="#" id="nav-inventory">Inventaire</a></li>
+            <li><a href="#" id="nav-shop">Boutique</a></li>
+            <li><a href="#" id="nav-companions">Compagnons</a></li>
+            <li><a href="#" id="nav-guilds">Guildes</a></li>
+            <li><a href="#" id="nav-crafting">Artisanat</a></li>
+        </ul>
+    </nav>
+
     <div id="game-container">
         <h1>Hunt-Brute</h1>
         
+        <div id="player-info">
+            <h3>Informations du joueur</h3>
+            <p>Nom: <span id="player-name"></span></p>
+            <p>Niveau: <span id="player-level"></span></p>
+            <p>PV: <span id="player-hp"></span>/<span id="player-max-hp"></span></p>
+            <p>Attaque: <span id="player-attack"></span></p>
+            <p>Défense: <span id="player-defense"></span></p>
+            <p>Or: <span id="player-gold"></span></p>
+            <div class="experience-bar">
+                <div class="experience-fill"></div>
+            </div>
+            <p>Expérience: <span id="player-exp"></span>/<span id="player-next-level-exp"></span></p>
+        </div>
+
         <div id="character-creation" class="game-area">
             <h2>Création de Personnage</h2>
             <input type="text" id="hero-name" placeholder="Nom du héros">
@@ -27,20 +55,6 @@
             <button id="open-crafting">Artisanat</button>
             <button id="save-game">Sauvegarder</button>
             <button id="load-game">Charger</button>
-        </div>
-
-        <div id="player-info">
-            <h3>Informations du joueur</h3>
-            <p>Nom: <span id="player-name"></span></p>
-            <p>Niveau: <span id="player-level"></span></p>
-            <p>PV: <span id="player-hp"></span>/<span id="player-max-hp"></span></p>
-            <p>Attaque: <span id="player-attack"></span></p>
-            <p>Défense: <span id="player-defense"></span></p>
-            <p>Or: <span id="player-gold"></span></p>
-            <div class="experience-bar">
-                <div class="experience-fill"></div>
-            </div>
-            <p>Expérience: <span id="player-exp"></span>/<span id="player-next-level-exp"></span></p>
         </div>
 
         <div id="game-messages"></div>
@@ -143,6 +157,17 @@
             document.getElementById('confirm-trade').addEventListener('click', () => window.gameActions.confirmTrade());
             document.getElementById('cancel-trade').addEventListener('click', () => window.gameActions.cancelTrade());
             document.getElementById('next-donjon-event').addEventListener('click', () => window.gameActions.nextDonjonEvent());
+
+            // Gestionnaires d'événements pour la navigation
+            document.getElementById('nav-home').addEventListener('click', () => window.gameActions.showGameArea('main-menu'));
+            document.getElementById('nav-adventure').addEventListener('click', () => window.gameActions.startAdventure());
+            document.getElementById('nav-donjon').addEventListener('click', () => window.gameActions.startDonjon());
+            document.getElementById('nav-multiplayer').addEventListener('click', () => window.gameActions.openMultiplayer());
+            document.getElementById('nav-inventory').addEventListener('click', () => window.gameActions.openInventory());
+            document.getElementById('nav-shop').addEventListener('click', () => window.gameActions.openShop());
+            document.getElementById('nav-companions').addEventListener('click', () => window.gameActions.manageCompanions());
+            document.getElementById('nav-guilds').addEventListener('click', () => window.gameActions.openGuilds());
+            document.getElementById('nav-crafting').addEventListener('click', () => window.gameActions.openCrafting());
         });
     </script>
 </body>
