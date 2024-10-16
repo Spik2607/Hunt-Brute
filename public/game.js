@@ -271,7 +271,7 @@ function selectMission(missionIndex) {
     } else {
         console.error("Mission non trouvée");
     }
-
+} // Ajoutez cette accolade fermante
 function startDonjon() {
     console.log("Démarrage du mode Donjon");
     currentDonjonLevel = 1;
