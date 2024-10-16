@@ -480,6 +480,19 @@ function updateCraftingRecipes() {
 
 // Objet gameActions pour les actions accessibles globalement
 window.gameActions = {
+    // Fonctions principales du jeu
+    startAdventure: startAdventure,
+    startDonjon: startDonjon,
+    openMultiplayer: openMultiplayer,
+    openShop: handleOpenShop,
+    openInventory: openInventory,
+    manageCompanions: manageCompanions,
+    openGuilds: openGuilds,
+    openCrafting: openCrafting,
+    saveGame: saveGame,
+    loadGame: loadGame,
+
+    // Fonctions de gestion des missions
     selectMission: (index) => {
         if (!player) {
             console.error("Player not initialized");
@@ -497,6 +510,8 @@ window.gameActions = {
             showGameMessage("Erreur : Mission non trouvée.");
         }
     },
+
+    // Fonctions de combat
     playerAttack: () => {
         if (isCombatActive()) {
             playerAttack();
@@ -518,6 +533,8 @@ window.gameActions = {
             showGameMessage("Vous n'êtes pas en combat.");
         }
     },
+
+    // Fonctions de gestion de l'inventaire
     equipItem: (index) => {
         if (player) {
             equipItem(player, index);
@@ -545,7 +562,25 @@ window.gameActions = {
         } else {
             showGameMessage("Vous devez d'abord créer un personnage.");
         }
-    }
+    },
+
+    // Fonctions multijoueur
+    joinRoom: joinRoom,
+    sendChatMessage: sendChatMessage,
+    initiateChallenge: initiateChallenge,
+    acceptChallenge: acceptChallenge,
+    initiateTradeRequest: initiateTradeRequest,
+    acceptTradeRequest: acceptTradeRequest,
+    confirmTrade: confirmTrade,
+    cancelTrade: cancelTrade,
+
+    // Fonction de création de personnage
+    createCharacter: createCharacter,
+
+    // Autres fonctions utilitaires
+    showGameArea: showGameArea,
+    showGameMessage: showGameMessage,
+    updatePlayerInfo: updatePlayerInfo
 };
 
 // Exports
