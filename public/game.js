@@ -14,7 +14,16 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log("DOM chargé, initialisation du jeu...");
     initializeGame();
     initializeEventListeners();
+    console.log("Initialisation terminée, tentative de lancement du jeu");
+    launchGame();  // Ajoutez cette fonction
 });
+
+function launchGame() {
+    console.log("Tentative de lancement du jeu");
+    // Ajoutez ici le code pour lancer effectivement votre jeu
+    showGameArea('character-creation');  // ou 'multiplayer-area' selon votre logique
+    console.log("Zone de jeu affichée");
+}
 
 function initializeGame() {
     console.log("Initialisation du jeu...");
@@ -38,6 +47,13 @@ function initializeEventListeners() {
         { id: 'attack-button', handler: playerAttack },
         { id: 'defend-button', handler: playerDefend },
         { id: 'special-button', handler: playerUseSpecial }
+        const testButton = document.getElementById('test-button');
+if (testButton) {
+    testButton.addEventListener('click', () => {
+        console.log("Bouton de test cliqué");
+        alert("Le bouton de test fonctionne !");
+    });
+}
     ];
 
     buttons.forEach(({ id, handler }) => {
@@ -163,6 +179,13 @@ function initializeSocket() {
         socket.on('worldEventStarted', (event) => {
             showGameMessage(`Un événement mondial a commencé: ${event.name}. Durée: ${event.duration / 60} minutes. Récompense: ${event.reward}`);
         });
+
+socket.on('connect', () => {
+    console.log('Connecté au serveur');
+    initializeAdditionalFeatures();
+    console.log("Fonctionnalités supplémentaires initialisées après connexion");
+});
+
 
     } catch (error) {
         console.error("Erreur lors de l'initialisation de Socket.IO:", error);
@@ -366,10 +389,15 @@ function getOtherPlayerId() {
 }
 
 function showGameArea(areaId) {
-    console.log(`Affichage de la zone de jeu : ${areaId}`);
+    console.log(`Tentative d'affichage de la zone : ${areaId}`);
     const gameAreas = document.querySelectorAll('.game-area');
     gameAreas.forEach(area => {
-        area.style.display = area.id === areaId ? 'block' : 'none';
+        if (area.id === areaId) {
+            area.style.display = 'block';
+            console.log(`Zone ${areaId} affichée`);
+        } else {
+            area.style.display = 'none';
+        }
     });
 }
 
