@@ -41,36 +41,54 @@
             <section id="multiplayer-area" class="game-area">
                 <h2>Mode Multijoueur</h2>
                 <div id="room-join">
-                    <label for="room-id">ID de la salle:</label>
                     <input type="text" id="room-id" placeholder="ID de la salle">
                     <button id="join-room">Rejoindre une salle</button>
                 </div>
                 <div id="players-list"></div>
                 <div id="chat-area">
                     <div id="chat-messages"></div>
-                    <label for="chat-input">Message:</label>
                     <input type="text" id="chat-input" placeholder="Entrez votre message">
                     <button id="send-message">Envoyer</button>
                 </div>
                 <button id="challenge-player">Défier un joueur</button>
-                <button id="accept-challenge">Accepter le défi</button>
+                <button id="accept-challenge" style="display:none;">Accepter le défi</button>
                 <button id="trade-request">Demander un échange</button>
-                <button id="accept-trade">Accepter l'échange</button>
+                <button id="accept-trade" style="display:none;">Accepter l'échange</button>
                 <div id="leaderboard"></div>
             </section>
 
-            <section id="group-quests" class="game-area">
-                <h2>Quêtes de Groupe</h2>
-                <!-- Les quêtes de groupe seront ajoutées ici dynamiquement -->
+            <section id="battle-area" class="game-area">
+                <h2>Combat</h2>
+                <div id="combatants">
+                    <div id="player-combat-info" class="combatant"></div>
+                    <div id="enemy-combat-info" class="combatant"></div>
+                </div>
+                <div id="battle-log"></div>
+                <div id="combat-actions">
+                    <button id="attack-button">Attaque</button>
+                    <button id="defend-button">Défense</button>
+                    <button id="special-button">Spécial</button>
+                </div>
+            </section>
+
+            <section id="inventory-area" class="game-area">
+                <h2>Inventaire</h2>
+                <div id="equipped-items"></div>
+                <div id="inventory-items"></div>
+            </section>
+
+            <section id="shop-area" class="game-area">
+                <h2>Boutique</h2>
+                <div id="shop-items"></div>
+            </section>
+
+            <section id="companions-area" class="game-area">
+                <h2>Compagnons</h2>
+                <div id="companions-list"></div>
             </section>
 
             <section id="guild-area" class="game-area">
                 <h2>Guildes</h2>
-                <div id="create-guild">
-                    <label for="guild-name-input">Nom de la guilde:</label>
-                    <input type="text" id="guild-name-input" placeholder="Nom de la guilde">
-                    <button id="create-guild-button">Créer une guilde</button>
-                </div>
                 <div id="guilds-list"></div>
                 <div id="player-guild-info"></div>
             </section>
@@ -80,74 +98,9 @@
                 <div id="crafting-recipes"></div>
             </section>
 
-            <section id="world-events" class="game-area">
-                <h2>Événements Mondiaux</h2>
-                <div id="current-world-event"></div>
-            </section>
-
-            <section id="battle-area" class="game-area">
-                <h2>Combat</h2>
-                <div id="combatants">
-                    <div id="player-combat-info" class="combatant">
-                        <h3></h3>
-                        <div class="health-bar">
-                            <div class="health-bar-fill"></div>
-                            <span class="health-text"></span>
-                        </div>
-                        <div class="energy-bar">
-                            <div class="energy-bar-fill"></div>
-                            <span class="energy-text"></span>
-                        </div>
-                    </div>
-                    <div id="companion-combat-info" class="combatant">
-                        <h3></h3>
-                        <div class="health-bar">
-                            <div class="health-bar-fill"></div>
-                            <span class="health-text"></span>
-                        </div>
-                    </div>
-                    <div id="enemy-combat-info" class="combatant">
-                        <h3></h3>
-                        <div class="health-bar">
-                            <div class="health-bar-fill"></div>
-                            <span class="health-text"></span>
-                        </div>
-                    </div>
-                </div>
-                <div id="battle-log"></div>
-                <div id="combat-actions">
-                    <button id="attack-button">Attaque normale</button>
-                    <button id="defend-button">Se défendre</button>
-                    <button id="special-button">Attaque spéciale</button>
-                    <button id="use-item-button">Utiliser un objet</button>
-                </div>
-            </section>
-
-            <section id="inventory-area" class="game-area">
-                <h2>Inventaire</h2>
-                <div id="equipped-items">
-                    <h3>Objets équipés</h3>
-                    <!-- Les objets équipés seront affichés ici -->
-                </div>
-                <div id="inventory-items">
-                    <h3>Objets dans l'inventaire</h3>
-                    <!-- Les objets de l'inventaire seront affichés ici -->
-                </div>
-                <button id="close-inventory">Fermer l'inventaire</button>
-            </section>
-
-            <section id="shop-area" class="game-area">
-                <h2>Boutique</h2>
-                <div id="shop-items">
-                    <!-- Les objets de la boutique seront affichés ici -->
-                </div>
-                <button id="leave-shop">Quitter la boutique</button>
-            </section>
-
-            <section id="companions-area" class="game-area">
-                <h2>Compagnons</h2>
-                <div id="companions-list"></div>
-                <div id="active-companion"></div>
+            <section id="donjon-area" class="game-area">
+                <h2>Donjon</h2>
+                <div id="donjon-event"></div>
             </section>
 
             <section id="trade-area" class="game-area">
@@ -159,36 +112,7 @@
                 <button id="cancel-trade">Annuler l'échange</button>
             </section>
         </main>
-
-        <div id="level-up-modal" class="modal">
-            <div class="modal-content">
-                <h2>Niveau supérieur !</h2>
-                <p>Vous avez atteint le niveau <span id="new-level"></span></p>
-                <p>Points de compétence disponibles : <span id="skill-points"></span></p>
-                <div class="skill-distribution">
-                    <div>
-                        <label for="strength-skill">Force :</label>
-                        <input type="text" id="strength-skill" readonly>
-                        <button id="increase-strength">+</button>
-                    </div>
-                    <div>
-                        <label for="agility-skill">Agilité :</label>
-                        <input type="text" id="agility-skill" readonly>
-                        <button id="increase-agility">+</button>
-                    </div>
-                    <div>
-                        <label for="intelligence-skill">Intelligence :</label>
-                        <input type="text" id="intelligence-skill" readonly>
-                        <button id="increase-intelligence">+</button>
-                    </div>
-                </div>
-                <button id="confirm-level-up">Confirmer</button>
-            </div>
-        </div>
     </div>
-
-    <button id="reset-game" style="position: fixed; bottom: 10px; right: 10px;">Effacer le personnage</button>
-    <button id="test-button">Test Button</button>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="gameData.js" type="module"></script>
