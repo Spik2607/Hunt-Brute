@@ -633,6 +633,7 @@ function updateChatMessages(messages) {
 
 // Rendre certaines fonctions disponibles globalement si nécessaire
 window.gameActions = {
+    // Fonctions existantes
     createCharacter,
     joinRoom,
     sendChatMessage,
@@ -651,7 +652,69 @@ window.gameActions = {
     openGuilds,
     openCrafting,
     saveGame,
-    loadGame
+    loadGame,
+
+    // Nouvelles fonctions à ajouter
+    selectMission: (index) => {
+        const availableMissions = getAvailableMissions(player.level);
+        const selectedMission = availableMissions[index];
+        if (selectedMission) {
+            const enemy = createEnemyForMission(selectedMission);
+            initializeCombat(player, null, enemy, selectedMission);
+            showGameArea('battle-area');
+        } else {
+            console.error("Mission non trouvée");
+        }
+    },
+    playerAttack: () => {
+        if (isCombatActive()) {
+            playerAttack();
+        } else {
+            showGameMessage("Vous n'êtes pas en combat.");
+        }
+    },
+    playerDefend: () => {
+        if (isCombatActive()) {
+            playerDefend();
+        } else {
+            showGameMessage("Vous n'êtes pas en combat.");
+        }
+    },
+    playerUseSpecial: () => {
+        if (isCombatActive()) {
+            playerUseSpecial();
+        } else {
+            showGameMessage("Vous n'êtes pas en combat.");
+        }
+    },
+    equipItem: (index) => {
+        if (player) {
+            equipItem(player, index);
+        } else {
+            showGameMessage("Vous devez d'abord créer un personnage.");
+        }
+    },
+    useItem: (index) => {
+        if (player) {
+            useItem(player, index);
+        } else {
+            showGameMessage("Vous devez d'abord créer un personnage.");
+        }
+    },
+    sellItem: (index) => {
+        if (player) {
+            sellItem(player, index);
+        } else {
+            showGameMessage("Vous devez d'abord créer un personnage.");
+        }
+    },
+    buyItem: (itemId) => {
+        if (player) {
+            buyItem(player, itemId);
+        } else {
+            showGameMessage("Vous devez d'abord créer un personnage.");
+        }
+    }
 };
 
 // Initialisation des écouteurs d'événements socket
