@@ -128,67 +128,49 @@ function checkBattleEnd() {
 
 function endCombat(victory) {
     currentCombat = false;
-    
     if (victory) {
         const expGain = currentMission ? currentMission.expReward : enemy.level * 10;
         const goldGain = currentMission ? currentMission.goldReward : enemy.level * 5;
-        
         player.gainExperience(expGain);
         player.gold += goldGain;
         
-        updateBattleLog(`Victoire ! Vous avez vaincu ${enemy.name} !`);
-        updateBattleLog(`Vous gagnez ${expGain} XP et ${goldGain} or.`);
-        
-        // Vérifier si un objet a été obtenu
-        const loot = generateRandomLoot(enemy.level);
-        if (loot) {
-            player.inventory.push(loot);
-            updateBattleLog(`Vous avez obtenu : ${loot.name}`);
-        }
-        
-        // Vérifier si le joueur a monté de niveau
-        if (player.checkLevelUp()) {
-            updateBattleLog(`Félicitations ! Vous avez atteint le niveau ${player.level} !`);
-            // Afficher une fenêtre modale pour la distribution des points de compétence
-            showLevelUpModal();
-        }
-        
-        // Attendre un peu avant de retourner au menu principal
-        setTimeout(() => {
-            showGameArea('main-menu');
-            updatePlayerInfo();
-        }, 3000);
+        showCombatSummary({
+            result: "Victoire !",
+            expGained: expGain,
+            goldGained: goldGain,
+            itemsFound: generateRandomLoot(enemy.level)
+        });
     } else {
-        updateBattleLog("Défaite ! Vous avez perdu le combat.");
-        
-        // Réduire l'or du joueur (par exemple, perte de 10% de l'or)
-        const goldLoss = Math.floor(player.gold * 0.1);
-        player.gold -= goldLoss;
-        updateBattleLog(`Vous avez perdu ${goldLoss} or.`);
-        
-        // Restaurer une partie des PV du joueur
-        player.hp = Math.max(player.hp, Math.floor(player.maxHp * 0.1));
-        updateBattleLog("Vous avez été soigné partiellement.");
-        
-        // Attendre un peu avant de retourner au menu principal
-        setTimeout(() => {
-            showGameArea('main-menu');
-            updatePlayerInfo();
-        }, 3000);
+        showCombatSummary({
+            result: "Défaite",
+            expGained: 0,
+            goldGained: 0,
+            itemsFound: []
+        });
     }
     
-    // Réinitialiser les états de combat
-    player.defending = false;
-    enemy = null;
-    currentMission = null;
-    
-    // Mettre à jour l'affichage
-    updateBattleInfo();
     updatePlayerInfo();
-    
-    // Déclencher un événement personnalisé pour informer le reste de l'application
-    const event = new CustomEvent('combatEnd', { detail: { victory } });
-    window.dispatchEvent(event);
+}
+
+function showCombatSummary(summary) {
+    const summaryElement = document.createElement('div');
+    summaryElement.innerHTML = `
+        <h3>${summary.result}</h3>
+        <p>Expérience gagnée : ${summary.expGained}</p>
+        <p>Or gagné : ${summary.goldGained}</p>
+        <h4>Objets trouvés :</h4>
+        <ul>
+            ${summary.itemsFound.map(item => `<li>${item.name}</li>`).join('')}
+        </ul>
+        <button onclick="closeCombatSummary()">Continuer</button>
+    `;
+    document.body.appendChild(summaryElement);
+}
+
+function closeCombatSummary() {
+    // Retirer l'élément de résumé et retourner au menu principal
+    document.querySelector('.combat-summary').remove();
+    showGameArea('main-menu');
 }
 function updateBattleLog(message) {
     const battleLog = document.getElementById('battle-log');
