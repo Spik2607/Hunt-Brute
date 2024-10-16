@@ -112,6 +112,14 @@ export class Character {
     }
 }
 
+export function getAvailableMissions(playerLevel) {
+    // Filtrer les missions en fonction du niveau du joueur
+    return missions.filter(mission => {
+        // Par exemple, on peut rendre disponibles les missions jusqu'à 2 niveaux au-dessus du joueur
+        return mission.enemyLevel <= playerLevel + 2;
+    });
+}
+
 export const items = [
     // Armes
     { id: 'sword', name: 'Épée en fer', type: 'weapon', attack: 5, cost: 50, rarity: 'common' },
