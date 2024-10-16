@@ -1,5 +1,4 @@
 // inventory.js
-
 import { items, getItemStats } from './gameData.js';
 
 export function equipItem(player, index) {
@@ -83,12 +82,12 @@ export function updateInventoryDisplay(player) {
         itemElement.innerHTML = `
             <span>${item.name}</span>
             ${item.type === 'weapon' || item.type === 'armor' || item.type === 'accessory' 
-                ? `<button onclick="window.inventoryModule.equipItem(window.player, ${index})">Équiper</button>`
+                ? `<button onclick="window.gameActions.equipItem(${index})">Équiper</button>`
                 : ''}
             ${item.type === 'consumable'
-                ? `<button onclick="window.inventoryModule.useItem(window.player, ${index})">Utiliser</button>`
+                ? `<button onclick="window.gameActions.useItem(${index})">Utiliser</button>`
                 : ''}
-            <button onclick="window.inventoryModule.sellItem(window.player, ${index})">Vendre</button>
+            <button onclick="window.gameActions.sellItem(${index})">Vendre</button>
         `;
         itemElement.title = getItemStats(item);
         inventoryElement.appendChild(itemElement);
@@ -106,15 +105,15 @@ export function updateEquippedItemsDisplay(player) {
     equippedItemsElement.innerHTML = `
         <div>
             Arme: ${player.equippedItems.weapon ? player.equippedItems.weapon.name : 'Aucune'}
-            ${player.equippedItems.weapon ? `<button onclick="window.inventoryModule.unequipItem(window.player, 'weapon')">Déséquiper</button>` : ''}
+            ${player.equippedItems.weapon ? `<button onclick="window.gameActions.unequipItem('weapon')">Déséquiper</button>` : ''}
         </div>
         <div>
             Armure: ${player.equippedItems.armor ? player.equippedItems.armor.name : 'Aucune'}
-            ${player.equippedItems.armor ? `<button onclick="window.inventoryModule.unequipItem(window.player, 'armor')">Déséquiper</button>` : ''}
+            ${player.equippedItems.armor ? `<button onclick="window.gameActions.unequipItem('armor')">Déséquiper</button>` : ''}
         </div>
         <div>
             Accessoire: ${player.equippedItems.accessory ? player.equippedItems.accessory.name : 'Aucun'}
-            ${player.equippedItems.accessory ? `<button onclick="window.inventoryModule.unequipItem(window.player, 'accessory')">Déséquiper</button>` : ''}
+            ${player.equippedItems.accessory ? `<button onclick="window.gameActions.unequipItem('accessory')">Déséquiper</button>` : ''}
         </div>
     `;
 }
@@ -125,7 +124,10 @@ export function openShop(player) {
         return;
     }
     const shopElement = document.getElementById('shop-items');
-    if (!shopElement) return;
+    if (!shopElement) {
+        console.error("Élément 'shop-items' non trouvé");
+        return;
+    }
 
     shopElement.innerHTML = '';
     items.forEach(item => {
@@ -133,40 +135,18 @@ export function openShop(player) {
         itemElement.className = 'shop-item';
         itemElement.innerHTML = `
             <span>${item.name} - ${item.cost} or</span>
-            <button onclick="window.inventoryModule.buyItem(window.player, '${item.id}')">Acheter</button>
+            <button onclick="window.gameActions.buyItem('${item.id}')">Acheter</button>
         `;
         itemElement.title = getItemStats(item);
         shopElement.appendChild(itemElement);
     });
 
-    if (Array.isArray(player.inventory)) {
-        player.inventory.forEach((item, index) => {
-            if (item.value) {
-                const itemElement = document.createElement('div');
-                itemElement.className = 'shop-item unique-item';
-                itemElement.innerHTML = `
-                    <span>${item.name} - ${item.value} or</span>
-                    <button onclick="window.inventoryModule.sellUniqueItem(window.player, ${index})">Vendre</button>
-                `;
-                itemElement.title = getItemStats(item);
-                shopElement.appendChild(itemElement);
-            }
-        });
-    }
-
     showGameArea('shop-area');
 }
 
 export function buyItem(player, itemId) {
-    console.log("Tentative d'achat d'item:", itemId);
-    console.log("État du joueur:", player);
-    
     if (!player) {
         console.error("Achat impossible : joueur invalide");
-        return;
-    }
-    if (typeof player !== 'object') {
-        console.error("Achat impossible : le joueur n'est pas un objet valide");
         return;
     }
     const item = items.find(i => i.id === itemId);
@@ -174,20 +154,12 @@ export function buyItem(player, itemId) {
         console.error("Item non trouvé:", itemId);
         return;
     }
-    if (typeof player.gold !== 'number') {
-        console.error("Le joueur n'a pas de propriété 'gold' valide");
-        return;
-    }
     if (player.gold >= item.cost) {
         player.gold -= item.cost;
-        if (Array.isArray(player.inventory)) {
-            player.inventory.push(item);
-            updatePlayerInfo(player);
-            updateInventoryDisplay(player);
-            showGameMessage(`${player.name} a acheté ${item.name}`);
-        } else {
-            console.error("L'inventaire du joueur n'est pas un tableau");
-        }
+        player.inventory.push(item);
+        updatePlayerInfo(player);
+        updateInventoryDisplay(player);
+        showGameMessage(`${player.name} a acheté ${item.name}`);
     } else {
         showGameMessage("Vous n'avez pas assez d'or !");
     }
@@ -200,17 +172,13 @@ export function sellItem(player, index) {
     }
     
     const item = player.inventory[index];
-    const sellPrice = item.value || Math.floor(item.cost * 0.5);
+    const sellPrice = Math.floor(item.cost * 0.5);
     
     player.gold += sellPrice;
     player.inventory.splice(index, 1);
     updatePlayerInfo(player);
     updateInventoryDisplay(player);
     showGameMessage(`${player.name} a vendu ${item.name} pour ${sellPrice} or`);
-}
-
-export function sellUniqueItem(player, index) {
-    sellItem(player, index);
 }
 
 export function addItemToInventory(player, item) {
@@ -228,6 +196,7 @@ export function addItemToInventory(player, item) {
 }
 
 function updatePlayerInfo(player) {
+    // Cette fonction devrait être définie dans game.js et importée ici si nécessaire
     if (typeof window.updatePlayerInfo === 'function') {
         window.updatePlayerInfo(player);
     } else {
@@ -236,14 +205,15 @@ function updatePlayerInfo(player) {
 }
 
 function showGameMessage(message) {
+    // Cette fonction devrait être définie dans game.js et importée ici si nécessaire
     if (typeof window.showGameMessage === 'function') {
-        window.showGameMessage(message);
-    } else {
-        console.log(message);
+        window.showGameMessage(message} else {
+        console.error("La fonction showGameMessage n'est pas définie globalement");
     }
 }
 
 function showGameArea(areaId) {
+    // Cette fonction devrait être définie dans game.js et importée ici si nécessaire
     if (typeof window.showGameArea === 'function') {
         window.showGameArea(areaId);
     } else {
@@ -251,6 +221,7 @@ function showGameArea(areaId) {
     }
 }
 
+// Exporter toutes les fonctions nécessaires
 export const inventoryModule = {
     equipItem,
     unequipItem,
@@ -260,7 +231,6 @@ export const inventoryModule = {
     openShop,
     buyItem,
     sellItem,
-    sellUniqueItem,
     addItemToInventory
 };
 
