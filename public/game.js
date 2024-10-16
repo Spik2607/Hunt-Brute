@@ -255,17 +255,28 @@ function startAdventure() {
 function displayMissionMenu(missions) {
     const missionArea = document.getElementById('mission-area');
     if (!missionArea) {
-        console.error("Élément 'mission-area' non trouvé");
-        return;
+        console.error("Élément 'mission-area' non trouvé. Création d'un nouvel élément.");
+        const mainContent = document.getElementById('game-content'); // Assurez-vous que cet élément existe
+        if (mainContent) {
+            const newMissionArea = document.createElement('section');
+            newMissionArea.id = 'mission-area';
+            newMissionArea.className = 'game-area';
+            mainContent.appendChild(newMissionArea);
+            missionArea = newMissionArea;
+        } else {
+            console.error("Impossible de créer l'élément 'mission-area'. L'élément parent 'game-content' n'existe pas.");
+            return;
+        }
     }
+
     missionArea.innerHTML = '<h2>Missions disponibles</h2>';
-    missions.forEach(mission => {
+    missions.forEach((mission, index) => {
         const missionElement = document.createElement('div');
         missionElement.innerHTML = `
             <h3>${mission.name}</h3>
             <p>Difficulté: ${mission.difficulty}</p>
             <p>Récompense: ${mission.goldReward} or, ${mission.expReward} XP</p>
-            <button onclick="selectMission(${missions.indexOf(mission)})">Commencer la mission</button>
+            <button onclick="window.gameActions.selectMission(${index})">Commencer la mission</button>
         `;
         missionArea.appendChild(missionElement);
     });
