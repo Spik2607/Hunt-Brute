@@ -288,12 +288,17 @@ function selectMission(missionIndex) {
     const selectedMission = availableMissions[missionIndex];
     if (selectedMission) {
         const enemy = createEnemyForMission(selectedMission);
-        initializeCombat(player, null, enemy, selectedMission);
-        showGameArea('battle-area');
+        if (player) {
+            initializeCombat(player, null, enemy, selectedMission);
+            showGameArea('battle-area');
+        } else {
+            console.error("Player not initialized");
+            showGameMessage("Erreur : Personnage non initialisé. Veuillez créer un personnage.");
+        }
     } else {
         console.error("Mission non trouvée");
     }
-} // Ajoutez cette accolade fermante
+}
 function startDonjon() {
     console.log("Démarrage du mode Donjon");
     currentDonjonLevel = 1;
