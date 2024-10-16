@@ -30,6 +30,20 @@
             <button id="load-game" onclick="window.gameActions.loadGame()">Charger</button>
         </nav>
 
+        <div id="player-info">
+    <h2><span id="player-name"></span> - Niveau <span id="player-level"></span></h2>
+    <div class="stats">
+        <div class="stat"><i class="fas fa-heart"></i> PV: <span id="player-hp"></span>/<span id="player-max-hp"></span></div>
+        <div class="stat"><i class="fas fa-fist-raised"></i> Attaque: <span id="player-attack"></span></div>
+        <div class="stat"><i class="fas fa-shield-alt"></i> Défense: <span id="player-defense"></span></div>
+        <div class="stat"><i class="fas fa-coins"></i> Or: <span id="player-gold"></span></div>
+    </div>
+    <div class="experience-bar">
+        <div class="experience-fill"></div>
+        <span class="experience-text">EXP: <span id="player-exp"></span>/<span id="player-next-level-exp"></span></span>
+    </div>
+</div>
+        
         <main id="game-content">
             <section id="character-creation" class="game-area">
                 <h2>Création du Personnage</h2>
