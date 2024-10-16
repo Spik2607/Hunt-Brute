@@ -196,7 +196,6 @@ export function addItemToInventory(player, item) {
 }
 
 function updatePlayerInfo(player) {
-    // Cette fonction devrait être définie dans game.js et importée ici si nécessaire
     if (typeof window.updatePlayerInfo === 'function') {
         window.updatePlayerInfo(player);
     } else {
@@ -205,15 +204,14 @@ function updatePlayerInfo(player) {
 }
 
 function showGameMessage(message) {
-    // Cette fonction devrait être définie dans game.js et importée ici si nécessaire
     if (typeof window.showGameMessage === 'function') {
-        window.showGameMessage(message} else {
+        window.showGameMessage(message);
+    } else {
         console.error("La fonction showGameMessage n'est pas définie globalement");
     }
 }
 
 function showGameArea(areaId) {
-    // Cette fonction devrait être définie dans game.js et importée ici si nécessaire
     if (typeof window.showGameArea === 'function') {
         window.showGameArea(areaId);
     } else {
@@ -221,7 +219,6 @@ function showGameArea(areaId) {
     }
 }
 
-// Exporter toutes les fonctions nécessaires
 export const inventoryModule = {
     equipItem,
     unequipItem,
