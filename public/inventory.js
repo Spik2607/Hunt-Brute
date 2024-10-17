@@ -220,6 +220,16 @@ function showGameArea(areaId) {
     }
 }
 
+// Exportation des fonctions pour les rendre accessibles globalement
+window.gameActions = {
+    ...window.gameActions,
+    equipItem,
+    unequipItem,
+    useItem,
+    buyItem,
+    sellItem
+};
+
 export const inventoryModule = {
     equipItem,
     unequipItem,
