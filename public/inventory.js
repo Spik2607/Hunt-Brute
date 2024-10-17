@@ -68,13 +68,18 @@ export function useItem(player, index) {
 }
 
 export function updateInventoryDisplay(player) {
+    console.log("Mise à jour de l'affichage de l'inventaire", player);
     if (!player || !Array.isArray(player.inventory)) {
         console.error("Mise à jour de l'inventaire impossible : joueur invalide ou inventaire non défini");
         return;
     }
     const inventoryElement = document.getElementById('inventory-items');
-    if (!inventoryElement) return;
+    if (!inventoryElement) {
+        console.error("Élément 'inventory-items' non trouvé");
+        return;
+    }
 
+    console.log("Contenu de l'inventaire:", player.inventory);
     inventoryElement.innerHTML = '';
     player.inventory.forEach((item, index) => {
         const itemElement = document.createElement('div');
