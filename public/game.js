@@ -208,24 +208,20 @@ function startAdventure() {
 }
 
 function displayMissionMenu(missions) {
-    const missionArea = document.getElementById('mission-area');
-    if (!missionArea) {
-        console.error("Élément 'mission-area' non trouvé");
-        return;
-    }
-
-    missionArea.innerHTML = '<h2>Missions disponibles</h2>';
+    const missionGrid = document.querySelector('#mission-area .mission-grid');
+    missionGrid.innerHTML = ''; // Effacer les missions existantes
+    
     missions.forEach((mission, index) => {
-        const missionElement = document.createElement('div');
-        missionElement.innerHTML = `
+        const missionCard = document.createElement('div');
+        missionCard.className = 'mission-card';
+        missionCard.innerHTML = `
             <h3>${mission.name}</h3>
             <p>Difficulté: ${mission.difficulty}</p>
             <p>Récompense: ${mission.goldReward} or, ${mission.expReward} XP</p>
             <button onclick="window.gameActions.selectMission(${index})">Commencer la mission</button>
         `;
-        missionArea.appendChild(missionElement);
+        missionGrid.appendChild(missionCard);
     });
-    showGameArea('mission-area');
 }
 
 function startDonjon() {
