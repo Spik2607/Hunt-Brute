@@ -196,15 +196,15 @@
             document.getElementById('continue-button').addEventListener('click', () => window.gameActions.continueAfterVictory());
 
             // Gestionnaires d'événements pour la navigation
-            document.getElementById('nav-home').addEventListener('click', () => window.gameActions.showGameArea('main-menu'));
-            document.getElementById('nav-adventure').addEventListener('click', () => window.gameActions.startAdventure());
-            document.getElementById('nav-donjon').addEventListener('click', () => window.gameActions.startDonjon());
-            document.getElementById('nav-multiplayer').addEventListener('click', () => window.gameActions.openMultiplayer());
-            document.getElementById('nav-inventory').addEventListener('click', () => window.gameActions.openInventory());
-            document.getElementById('nav-shop').addEventListener('click', () => window.gameActions.openShop());
-            document.getElementById('nav-companions').addEventListener('click', () => window.gameActions.manageCompanions());
-            document.getElementById('nav-guilds').addEventListener('click', () => window.gameActions.openGuilds());
-            document.getElementById('nav-crafting').addEventListener('click', () => window.gameActions.openCrafting());
+        document.getElementById('nav-home').addEventListener('click', () => window.gameActions.showGameArea('main-menu'));
+        document.getElementById('nav-adventure').addEventListener('click', () => window.gameActions.showGameArea('mission-area'));
+        document.getElementById('nav-donjon').addEventListener('click', () => window.gameActions.showGameArea('donjon-area'));
+        document.getElementById('nav-multiplayer').addEventListener('click', () => window.gameActions.showGameArea('multiplayer-area'));
+        document.getElementById('nav-inventory').addEventListener('click', () => window.gameActions.showGameArea('inventory-area'));
+        document.getElementById('nav-shop').addEventListener('click', () => window.gameActions.showGameArea('shop-area'));
+        document.getElementById('nav-companions').addEventListener('click', () => window.gameActions.showGameArea('companions-area'));
+        document.getElementById('nav-guilds').addEventListener('click', () => window.gameActions.showGameArea('guild-area'));
+        document.getElementById('nav-crafting').addEventListener('click', () => window.gameActions.showGameArea('crafting-area'));
         });
     </script>
 </body>
