@@ -69,30 +69,41 @@ export function useItem(player, index) {
 
 export function updateInventoryDisplay(player) {
     console.log("Mise à jour de l'affichage de l'inventaire", player);
-    if (!player || !Array.isArray(player.inventory)) {
-        console.error("Mise à jour de l'inventaire impossible : joueur invalide ou inventaire non défini");
-        return;
-    }
     const inventoryElement = document.getElementById('inventory-items');
     if (!inventoryElement) {
         console.error("Élément 'inventory-items' non trouvé");
         return;
     }
 
-    console.log("Contenu de l'inventaire:", player.inventory);
     inventoryElement.innerHTML = '';
-    player.inventory.forEach((item, index) => {
-        const itemElement = document.createElement('div');
-        itemElement.className = 'inventory-item';
-        itemElement.innerHTML = `
-            <span>${item.name}</span>
-            <button onclick="window.gameActions.equipItem(${index})">Équiper</button>
-            <button onclick="window.gameActions.useItem(${index})">Utiliser</button>
-            <button onclick="window.gameActions.sellItem(${index})">Vendre</button>
+
+    if (!player || !Array.isArray(player.inventory) || player.inventory.length === 0) {
+        inventoryElement.innerHTML = `
+            <div class="empty-inventory">
+                <p>Votre inventaire est vide.</p>
+                <p>Explorez le monde pour trouver des objets à équiper!</p>
+                <p>Types d'objets équipables :</p>
+                <ul>
+                    <li>Armes</li>
+                    <li>Armures</li>
+                    <li>Accessoires</li>
+                </ul>
+            </div>
         `;
-        itemElement.title = getItemStats(item);
-        inventoryElement.appendChild(itemElement);
-    });
+    } else {
+        player.inventory.forEach((item, index) => {
+            const itemElement = document.createElement('div');
+            itemElement.className = 'inventory-item';
+            itemElement.innerHTML = `
+                <span>${item.name}</span>
+                <button onclick="window.gameActions.equipItem(${index})">Équiper</button>
+                <button onclick="window.gameActions.useItem(${index})">Utiliser</button>
+                <button onclick="window.gameActions.sellItem(${index})">Vendre</button>
+            `;
+            itemElement.title = getItemStats(item);
+            inventoryElement.appendChild(itemElement);
+        });
+    }
 }
 
 export function updateEquippedItemsDisplay(player) {
