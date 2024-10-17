@@ -456,6 +456,8 @@ function showGameArea(areaId) {
     gameAreas.forEach(area => {
         area.style.display = area.id === areaId ? 'block' : 'none';
     });
+    // Ajout d'un log pour déboguer
+    console.log(`Élément à afficher:`, document.getElementById(areaId));
 }
 
 function showGameMessage(message) {
