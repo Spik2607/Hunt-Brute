@@ -663,23 +663,28 @@ window.gameActions = {
             area.style.display = area.id === areaId ? 'block' : 'none';
         });
     },
-    selectMission: (index) => {
-        if (!player) {
-            console.error("Player not initialized");
-            showGameMessage("Erreur : Personnage non initialisé. Veuillez créer un personnage.");
-            return;
-        }
-        const availableMissions = getAvailableMissions(player.level);
-        const selectedMission = availableMissions[index];
-        if (selectedMission) {
-            const enemy = createEnemyForMission(selectedMission);
-            initializeCombat(player, null, enemy, selectedMission);
-            showGameArea('battle-area');
-        } else {
-            console.error("Mission non trouvée");
-            showGameMessage("Erreur : Mission non trouvée.");
-        }
-    },
+   selectMission: (index) => {
+  console.log("Tentative de sélection de la mission:", index);
+  try {
+    if (!player) {
+      throw new Error("Joueur non initialisé");
+    }
+    const availableMissions = getAvailableMissions(player.level);
+    const selectedMission = availableMissions[index];
+    if (!selectedMission) {
+      throw new Error("Mission non trouvée");
+    }
+    console.log("Mission sélectionnée:", selectedMission);
+    const enemy = createEnemyForMission(selectedMission);
+    console.log("Ennemi créé:", enemy);
+    initializeCombat(player, null, enemy, selectedMission);
+    console.log("Combat initialisé");
+    showGameArea('battle-area');
+  } catch (error) {
+    console.error("Erreur lors de la sélection de la mission:", error);
+    showGameMessage("Erreur: " + error.message);
+  }
+}
     playerAttack: () => {
         if (isCombatActive()) {
             playerAttack();
