@@ -287,38 +287,125 @@ input[type="text"], select {
     justify-content: space-between;
 }
 
-/* Inventory and Shop styles */
-#inventory-area, #shop-area {
-    display: block;
-    background-color: #f0e6d2;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+/* Styles pour l'inventaire */
+#inventory-area {
+    display: flex;
+    flex-direction: column;
 }
 
-.inventory-grid, #inventory-items, #shop-items {
+#equipped-items {
+    background-color: rgba(139, 69, 19, 0.1);
+    border: 2px solid #8B4513;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+#equipped-items h3 {
+    margin-top: 0;
+    color: #4a4a4a;
+    border-bottom: 1px solid #8B4513;
+    padding-bottom: 5px;
+}
+
+#equipped-items div {
+    margin: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#equipped-items button {
+    background-color: #A0522D;
+    color: #FFF8DC;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#equipped-items button:hover {
+    background-color: #8B4513;
+}
+
+.empty-inventory {
+    text-align: center;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    margin: 20px 0;
+    border: 2px solid #8B4513;
+}
+
+.empty-inventory p {
+    margin-bottom: 10px;
+    color: #4a4a4a;
+    font-size: 1.1em;
+}
+
+.empty-inventory ul {
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.empty-inventory li {
+    display: inline-block;
+    margin: 5px;
+    padding: 5px 10px;
+    background-color: #8B4513;
+    color: #FFF8DC;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.empty-inventory li:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.inventory-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 15px;
-    max-height: 500px;
-    overflow-y: auto;
-    padding-right: 10px;
 }
 
-.inventory-item, .shop-item {
-    background-color: #fff;
-    border: 2px solid #4a4a4a;
+.inventory-item {
+    background-color: #f0e6d2;
+    border: 1px solid #8B4513;
     border-radius: 5px;
     padding: 10px;
     display: flex;
     flex-direction: column;
-    transition: all 0.3s ease;
+    align-items: center;
 }
 
-.inventory-item:hover, .shop-item:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+.inventory-item span {
+    font-weight: bold;
+    color: #4a4a4a;
+    margin-bottom: 5px;
 }
+
+.inventory-item button {
+    margin-top: 5px;
+    padding: 5px 10px;
+    background-color: #8B4513;
+    color: #FFF8DC;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.inventory-item button:hover {
+    background-color: #A0522D;
+}
+
+/* Fin des styles pour l'inventaire */
 
 /* Modal styles */
 .modal {
