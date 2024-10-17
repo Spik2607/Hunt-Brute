@@ -451,7 +451,7 @@ function cancelTrade() {
 
 function showGameArea(areaId) {
     console.log(`Affichage de la zone de jeu : ${areaId}`);
-    const gameAreas = document.querySelectorAll('.game-area');
+    const gameAreas = document.querySelectorAll('.game-section');
     gameAreas.forEach(area => {
         area.style.display = area.id === areaId ? 'block' : 'none';
     });
