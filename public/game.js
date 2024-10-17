@@ -303,11 +303,6 @@ function handleOpenShop() {
     }
 }
 
-function openInventory() {
-    console.log("Ouverture de l'inventaire");
-    updateInventoryDisplay(player);
-    showGameArea('inventory-area');
-}
 
 function manageCompanions() {
     console.log("Gestion des compagnons");
