@@ -81,15 +81,10 @@ export function updateInventoryDisplay(player) {
         itemElement.className = 'inventory-item';
         itemElement.innerHTML = `
             <span>${item.name}</span>
-            ${item.type === 'weapon' || item.type === 'armor' || item.type === 'accessory' 
-                ? `<button onclick="window.gameActions.equipItem(${index})">Équiper</button>`
-                : ''}
-            ${item.type === 'consumable'
-                ? `<button onclick="window.gameActions.useItem(${index})">Utiliser</button>`
-                : ''}
+            <button onclick="window.gameActions.equipItem(${index})">Équiper</button>
+            <button onclick="window.gameActions.useItem(${index})">Utiliser</button>
             <button onclick="window.gameActions.sellItem(${index})">Vendre</button>
         `;
-        itemElement.title = getItemStats(item);
         inventoryElement.appendChild(itemElement);
     });
 }
