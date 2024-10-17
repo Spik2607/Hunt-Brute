@@ -117,6 +117,12 @@ function initializeSocket() {
     }
 }
 
+function openInventory() {
+    console.log("Ouverture de l'inventaire");
+    updateInventoryDisplay(player);
+    showGameArea('inventory-area');
+}
+
 function initializeEventListeners() {
     console.log("Initialisation des écouteurs d'événements");
 
