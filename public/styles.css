@@ -344,6 +344,94 @@ input[type="text"], select {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
+/* Nouveaux styles pour l'inventaire */
+.empty-inventory {
+    text-align: center;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    margin: 20px 0;
+    border: 2px solid #8B4513;
+}
+
+.empty-inventory p {
+    margin-bottom: 10px;
+    color: #4a4a4a;
+    font-size: 1.1em;
+}
+
+.empty-inventory ul {
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.empty-inventory li {
+    display: inline-block;
+    margin: 5px;
+    padding: 5px 10px;
+    background-color: #8B4513;
+    color: #FFF8DC;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.empty-inventory li:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.inventory-item {
+    background-color: #f0e6d2;
+    border: 1px solid #8B4513;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.inventory-item span {
+    font-weight: bold;
+    color: #4a4a4a;
+}
+
+.inventory-item button {
+    margin-left: 5px;
+    padding: 5px 10px;
+    background-color: #8B4513;
+    color: #FFF8DC;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.inventory-item button:hover {
+    background-color: #A0522D;
+}
+
+#equipped-items {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: rgba(139, 69, 19, 0.1);
+    border-radius: 5px;
+}
+
+#equipped-items div {
+    margin-bottom: 10px;
+}
+
+#equipped-items button {
+    margin-left: 10px;
+}
+
+/* Fin des nouveaux styles pour l'inventaire */
+
 /* Responsive design */
 @media (max-width: 768px) {
     nav {
