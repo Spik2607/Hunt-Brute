@@ -4,6 +4,7 @@ import { updatePlayerInfo, showGameArea } from './game.js';
 
 let player, companion, enemy, currentMission;
 let currentCombat = false;
+let playerTurn = true;
 
 export function initializeCombat(playerCharacter, companionCharacter, enemyData, mission) {
     player = playerCharacter;
@@ -11,6 +12,7 @@ export function initializeCombat(playerCharacter, companionCharacter, enemyData,
     enemy = mission ? createEnemyForMission(mission) : enemyData;
     currentMission = mission;
     currentCombat = true;
+    playerTurn = true;
     
     updateBattleInfo();
     console.log("Combat initialisé:", { player, companion, enemy });
@@ -45,25 +47,27 @@ function updateCharacterInfo(elementId, character) {
 }
 
 export function playerAttack() {
-    if (!validateCombatState()) return;
+    if (!validateCombatState() || !playerTurn) return;
     
     const damageResult = calculateDamage(player, enemy);
     applyDamage(enemy, damageResult);
     logAttack(player, enemy, damageResult);
     
+    playerTurn = false;
     checkAndProceedCombat();
 }
 
 export function playerDefend() {
-    if (!validateCombatState()) return;
+    if (!validateCombatState() || !playerTurn) return;
     
     player.defending = true;
     updateBattleLog(`${player.name} se met en position défensive.`);
-    setTimeout(enemyTurn, 1000);
+    playerTurn = false;
+    checkAndProceedCombat();
 }
 
 export function playerUseSpecial() {
-    if (!validateCombatState()) return;
+    if (!validateCombatState() || !playerTurn) return;
     
     const energyCost = 20;
     if (player.energy < energyCost) {
@@ -78,6 +82,7 @@ export function playerUseSpecial() {
     updateBattleLog(`${player.name} utilise une attaque spéciale et inflige ${specialDamage} dégâts à ${enemy.name}.`);
     updateBattleInfo();
     
+    playerTurn = false;
     checkAndProceedCombat();
 }
 
@@ -95,6 +100,7 @@ function enemyTurn() {
     applyDamage(player, { damage, isCritical: damageResult.isCritical });
     logAttack(enemy, player, { damage, isCritical: damageResult.isCritical });
     
+    playerTurn = true;
     checkBattleEnd();
 }
 
@@ -116,7 +122,7 @@ function logAttack(attacker, defender, damageResult) {
 }
 
 function checkAndProceedCombat() {
-    if (enemy.hp > 0) {
+    if (enemy.hp > 0 && !playerTurn) {
         setTimeout(enemyTurn, 1000);
     } else {
         checkBattleEnd();
@@ -130,6 +136,8 @@ function checkBattleEnd() {
     } else if (player.hp <= 0) {
         updateBattleLog(`Vous avez été vaincu par ${enemy.name}.`);
         endCombat(false);
+    } else if (playerTurn) {
+        updateBattleLog("C'est à votre tour.");
     }
 }
 
