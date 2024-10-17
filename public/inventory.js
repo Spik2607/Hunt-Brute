@@ -90,6 +90,7 @@ export function updateInventoryDisplay(player) {
             <button onclick="window.gameActions.useItem(${index})">Utiliser</button>
             <button onclick="window.gameActions.sellItem(${index})">Vendre</button>
         `;
+        itemElement.title = getItemStats(item);
         inventoryElement.appendChild(itemElement);
     });
 }
