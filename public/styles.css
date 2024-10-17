@@ -169,6 +169,14 @@ input[type="text"], select {
     transform: translateY(-5px);
 }
 
+.mission-card h3 {
+    margin-bottom: 10px;
+}
+
+.mission-card button {
+    margin-top: 10px;
+}
+
 .mission-icon {
     font-size: 2em;
     color: #8B4513;
