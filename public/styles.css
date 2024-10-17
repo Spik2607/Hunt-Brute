@@ -43,30 +43,73 @@ h2, h3 {
 }
 
 nav {
+    background: #8B4513;
+    padding: 10px;
+    border-radius: 5px;
     display: flex;
     justify-content: space-around;
     flex-wrap: wrap;
     margin-bottom: 30px;
-    background: linear-gradient(to bottom, #8B4513, #A0522D);
-    padding: 10px;
-    border-radius: 5px;
 }
 
-nav button {
-    font-family: 'MedievalSharp', cursive;
-    font-size: 1em;
+nav a {
     color: #FFF8DC;
-    background: none;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    padding: 10px 15px;
+    text-decoration: none;
+    padding: 5px 10px;
     margin: 5px;
+    transition: all 0.3s ease;
 }
 
-nav button:hover {
+nav a:hover {
     background-color: rgba(255, 255, 255, 0.2);
     transform: translateY(-2px);
+}
+
+/* Player info styles */
+#player-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.player-stats {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.player-stats span {
+    margin-right: 20px;
+    margin-bottom: 5px;
+}
+
+.experience-bar {
+    width: 100%;
+    height: 20px;
+    background-color: #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    margin-top: 10px;
+}
+
+.experience-fill {
+    height: 100%;
+    background-color: #4CAF50;
+    width: 0%; /* Will be updated dynamically */
+}
+
+.experience-text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    top: 50%;
+    transform: translateY(-50%);
+    color: black;
+    font-weight: bold;
 }
 
 /* General game area styles */
@@ -84,7 +127,7 @@ button {
     color: #FFF8DC;
     border: none;
     padding: 8px 15px;
-    border-radius: 3px;
+    border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
     font-size: 1em;
@@ -103,50 +146,14 @@ input[type="text"], select {
     font-size: 1em;
 }
 
-/* Player info styles */
-#player-info {
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 20px;
-}
-
-.player-stats {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    margin-bottom: 10px;
-}
-
-.player-stats span {
-    flex: 1;
-    min-width: 150px;
-    margin: 5px;
-}
-
-.experience-bar {
-    width: 100%;
-    height: 20px;
-    background-color: #ddd;
-    border-radius: 10px;
-    overflow: hidden;
-    position: relative;
-}
-
-.experience-fill {
-    height: 100%;
-    background-color: #4CAF50;
-    width: 0%; /* Sera mis à jour dynamiquement */
-}
-
-.experience-text {
-    position: absolute;
-    width: 100%;
+/* Character creation styles */
+#character-creation {
     text-align: center;
-    top: 50%;
-    transform: translateY(-50%);
-    color: black;
-    font-weight: bold;
+}
+
+#hero-name {
+    max-width: 300px;
+    margin: 0 auto 20px;
 }
 
 /* Mission styles */
@@ -167,14 +174,6 @@ input[type="text"], select {
 
 .mission-card:hover {
     transform: translateY(-5px);
-}
-
-.mission-card h3 {
-    margin-bottom: 10px;
-}
-
-.mission-card button {
-    margin-top: 10px;
 }
 
 .mission-icon {
@@ -275,6 +274,38 @@ input[type="text"], select {
     justify-content: space-between;
 }
 
+/* Inventory and Shop styles */
+#inventory-area, #shop-area {
+    background-color: #f0e6d2;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.inventory-grid, #inventory-items, #shop-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.inventory-item, .shop-item {
+    background-color: #fff;
+    border: 2px solid #4a4a4a;
+    border-radius: 5px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+}
+
+.inventory-item:hover, .shop-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
 /* Modal styles */
 .modal {
     display: none;
@@ -301,7 +332,11 @@ input[type="text"], select {
 
 /* Responsive design */
 @media (max-width: 768px) {
-    nav, #combat-actions {
+    nav {
+        flex-direction: column;
+    }
+    
+    #combatants {
         flex-direction: column;
     }
     
@@ -316,5 +351,13 @@ input[type="text"], select {
 
     .modal-content {
         width: 95%;
+    }
+
+    #combat-actions {
+        flex-direction: column;
+    }
+
+    #combat-actions button {
+        margin-bottom: 10px;
     }
 }
