@@ -119,8 +119,10 @@ function initializeSocket() {
 
 function openInventory() {
     console.log("Ouverture de l'inventaire");
-    updateInventoryDisplay(player);
     showGameArea('inventory-area');
+    updateInventoryDisplay(player);
+    // Ajout d'un log pour vérifier l'état après la mise à jour
+    console.log("État de l'inventaire après mise à jour:", document.getElementById('inventory-items').innerHTML);
 }
 
 function initializeEventListeners() {
