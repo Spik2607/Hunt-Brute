@@ -119,32 +119,33 @@ function initializeSocket() {
 
 function initializeEventListeners() {
     console.log("Initialisation des écouteurs d'événements");
-    const buttons = [
-        { id: 'start-adventure', handler: startAdventure },
-        { id: 'start-donjon', handler: startDonjon },
-        { id: 'open-multiplayer', handler: openMultiplayer },
-        { id: 'open-shop', handler: handleOpenShop },
-        { id: 'open-inventory', handler: openInventory },
-        { id: 'manage-companions', handler: manageCompanions },
-        { id: 'open-guilds', handler: openGuilds },
-        { id: 'open-crafting', handler: openCrafting },
-        { id: 'save-game', handler: saveGame },
-        { id: 'load-game', handler: loadGame },
-        { id: 'join-room', handler: joinRoom },
-        { id: 'send-message', handler: sendChatMessage },
-        { id: 'challenge-player', handler: initiateChallenge },
-        { id: 'accept-challenge', handler: acceptChallenge },
-        { id: 'trade-request', handler: initiateTradeRequest },
-        { id: 'accept-trade', handler: acceptTradeRequest },
-        { id: 'confirm-trade', handler: confirmTrade },
-        { id: 'cancel-trade', handler: cancelTrade },
-        { id: 'attack-button', handler: playerAttack },
-        { id: 'defend-button', handler: playerDefend },
-        { id: 'special-button', handler: playerUseSpecial },
-        { id: 'create-character', handler: createCharacter }
-    ];
 
-    buttons.forEach(({ id, handler }) => {
+    const buttonHandlers = {
+        'start-adventure': startAdventure,
+        'start-donjon': startDonjon,
+        'open-multiplayer': openMultiplayer,
+        'open-shop': handleOpenShop,
+        'open-inventory': openInventory,
+        'manage-companions': manageCompanions,
+        'open-guilds': openGuilds,
+        'open-crafting': openCrafting,
+        'save-game': saveGame,
+        'load-game': loadGame,
+        'join-room': joinRoom,
+        'send-message': sendChatMessage,
+        'challenge-player': initiateChallenge,
+        'accept-challenge': acceptChallenge,
+        'trade-request': initiateTradeRequest,
+        'accept-trade': acceptTradeRequest,
+        'confirm-trade': confirmTrade,
+        'cancel-trade': cancelTrade,
+        'attack-button': () => window.gameActions.playerAttack(),
+        'defend-button': () => window.gameActions.playerDefend(),
+        'special-button': () => window.gameActions.playerUseSpecial(),
+        'create-character': createCharacter
+    };
+
+    for (const [id, handler] of Object.entries(buttonHandlers)) {
         const button = document.getElementById(id);
         if (button) {
             button.addEventListener('click', handler);
@@ -152,7 +153,40 @@ function initializeEventListeners() {
         } else {
             console.warn(`Bouton ${id} non trouvé`);
         }
+    }
+
+    // Gestionnaires d'événements pour la navigation
+    const navHandlers = {
+        'nav-home': () => window.gameActions.showGameArea('main-menu'),
+        'nav-adventure': () => {
+            window.gameActions.showGameArea('mission-area');
+            startAdventure();
+        },
+        'nav-donjon': () => window.gameActions.startDonjon(),
+        'nav-multiplayer': () => window.gameActions.openMultiplayer(),
+        'nav-inventory': () => window.gameActions.openInventory(),
+        'nav-shop': () => window.gameActions.openShop(),
+        'nav-companions': () => window.gameActions.manageCompanions(),
+        'nav-guilds': () => window.gameActions.openGuilds(),
+        'nav-crafting': () => window.gameActions.openCrafting()
+    };
+
+    for (const [id, handler] of Object.entries(navHandlers)) {
+        const navItem = document.getElementById(id);
+        if (navItem) {
+            navItem.addEventListener('click', handler);
+            console.log(`Écouteur de navigation ajouté pour ${id}`);
+        } else {
+            console.warn(`Élément de navigation ${id} non trouvé`);
+        }
+    }
+
+    // Ajout d'un écouteur global pour les clics
+    document.addEventListener('click', (e) => {
+        console.log(`Clic détecté sur l'élément:`, e.target);
     });
+
+    console.log("Initialisation des écouteurs d'événements terminée");
 }
 
 function loadCharacter() {
