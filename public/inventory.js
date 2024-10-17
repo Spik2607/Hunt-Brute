@@ -104,6 +104,8 @@ export function updateInventoryDisplay(player) {
             inventoryElement.appendChild(itemElement);
         });
     }
+
+    updateEquippedItemsDisplay(player);
 }
 
 export function updateEquippedItemsDisplay(player) {
@@ -115,6 +117,7 @@ export function updateEquippedItemsDisplay(player) {
     if (!equippedItemsElement) return;
 
     equippedItemsElement.innerHTML = `
+        <h3>Équipement actuel</h3>
         <div>
             Arme: ${player.equippedItems.weapon ? player.equippedItems.weapon.name : 'Aucune'}
             ${player.equippedItems.weapon ? `<button onclick="window.gameActions.unequipItem('weapon')">Déséquiper</button>` : ''}
