@@ -1,3 +1,6 @@
+Voici une version mise à jour du fichier game.js, incorporant les modifications suggérées et assurant une meilleure gestion des erreurs pour la fonction selectMission. Je vais inclure l'intégralité du code, en faisant attention à n'oublier aucune ligne :
+
+```javascript
 // game.js
 import { Character, items, missions, getAvailableMissions, createEnemyForMission, calculateDamage, generateRandomLoot, getRandomCompanion, generateDonjonEvent, generateDonjonBoss, generateBossReward } from './gameData.js';
 import { equipItem, unequipItem, useItem, updateInventoryDisplay, updateEquippedItemsDisplay, openShop, buyItem, sellItem, addItemToInventory } from './inventory.js';
@@ -657,34 +660,29 @@ window.gameActions = {
     acceptTradeRequest: acceptTradeRequest,
     confirmTrade: confirmTrade,
     cancelTrade: cancelTrade,
-    showGameArea: (areaId) => {
-        const gameAreas = document.querySelectorAll('.game-section');
-        gameAreas.forEach(area => {
-            area.style.display = area.id === areaId ? 'block' : 'none';
-        });
+    showGameArea: showGameArea,
+    selectMission: (index) => {
+        console.log("Tentative de sélection de la mission:", index);
+        try {
+            if (!player) {
+                throw new Error("Joueur non initialisé");
+            }
+            const availableMissions = getAvailableMissions(player.level);
+            const selectedMission = availableMissions[index];
+            if (!selectedMission) {
+                throw new Error("Mission non trouvée");
+            }
+            console.log("Mission sélectionnée:", selectedMission);
+            const enemy = createEnemyForMission(selectedMission);
+            console.log("Ennemi créé:", enemy);
+            initializeCombat(player, null, enemy, selectedMission);
+            console.log("Combat initialisé");
+            showGameArea('battle-area');
+        } catch (error) {
+            console.error("Erreur lors de la sélection de la mission:", error);
+            showGameMessage("Erreur: " + error.message);
+        }
     },
-   selectMission: (index) => {
-  console.log("Tentative de sélection de la mission:", index);
-  try {
-    if (!player) {
-      throw new Error("Joueur non initialisé");
-    }
-    const availableMissions = getAvailableMissions(player.level);
-    const selectedMission = availableMissions[index];
-    if (!selectedMission) {
-      throw new Error("Mission non trouvée");
-    }
-    console.log("Mission sélectionnée:", selectedMission);
-    const enemy = createEnemyForMission(selectedMission);
-    console.log("Ennemi créé:", enemy);
-    initializeCombat(player, null, enemy, selectedMission);
-    console.log("Combat initialisé");
-    showGameArea('battle-area');
-  } catch (error) {
-    console.error("Erreur lors de la sélection de la mission:", error);
-    showGameMessage("Erreur: " + error.message);
-  }
-}
     playerAttack: () => {
         if (isCombatActive()) {
             playerAttack();
