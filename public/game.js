@@ -1,6 +1,3 @@
-Voici une version mise à jour du fichier game.js, incorporant les modifications suggérées et assurant une meilleure gestion des erreurs pour la fonction selectMission. Je vais inclure l'intégralité du code, en faisant attention à n'oublier aucune ligne :
-
-```javascript
 // game.js
 import { Character, items, missions, getAvailableMissions, createEnemyForMission, calculateDamage, generateRandomLoot, getRandomCompanion, generateDonjonEvent, generateDonjonBoss, generateBossReward } from './gameData.js';
 import { equipItem, unequipItem, useItem, updateInventoryDisplay, updateEquippedItemsDisplay, openShop, buyItem, sellItem, addItemToInventory } from './inventory.js';
