@@ -212,10 +212,10 @@ function showGameMessage(message) {
 }
 
 function showGameArea(areaId) {
-    if (typeof window.showGameArea === 'function') {
-        window.showGameArea(areaId);
+    if (typeof window.gameActions.showGameArea === 'function') {
+        window.gameActions.showGameArea(areaId);
     } else {
-        console.error("La fonction showGameArea n'est pas définie globalement");
+        console.error("La fonction showGameArea n'est pas définie dans gameActions");
     }
 }
 
