@@ -627,6 +627,12 @@ window.gameActions = {
     acceptTradeRequest: acceptTradeRequest,
     confirmTrade: confirmTrade,
     cancelTrade: cancelTrade,
+    showGameArea: (areaId) => {
+        const gameAreas = document.querySelectorAll('.game-section');
+        gameAreas.forEach(area => {
+            area.style.display = area.id === areaId ? 'block' : 'none';
+        });
+    },
     selectMission: (index) => {
         if (!player) {
             console.error("Player not initialized");
