@@ -17,6 +17,7 @@ export function equipItem(player, index) {
         }
         player.equippedItems[item.type] = item;
         player.inventory.splice(index, 1);
+        updatePlayerInfo(player);
         updatePlayerStats(player);
         updateInventoryDisplay(player);
         showGameMessage(`${player.name} a équipé ${item.name}`);
@@ -34,6 +35,7 @@ export function unequipItem(player, type) {
     if (item) {
         player.equippedItems[type] = null;
         player.inventory.push(item);
+        updatePlayerInfo(player);
         updatePlayerStats(player);
         updateInventoryDisplay(player);
         showGameMessage(`${player.name} a déséquipé ${item.name}`);
@@ -55,6 +57,7 @@ export function useItem(player, index) {
             player.energy = Math.min(player.energy + item.value, player.maxEnergy);
         }
         player.inventory.splice(index, 1);
+        updatePlayerInfo(player);
         updatePlayerStats(player);
         updateInventoryDisplay(player);
         showGameMessage(`${player.name} a utilisé ${item.name}`);
@@ -178,6 +181,7 @@ function updatePlayerStats(player) {
     player.hp = Math.min(player.hp, player.maxHp);
 
     // Mettre à jour l'affichage du joueur
+    updatePlayerInfo(player);
     updatePlayerInfo(player);
 }
 
