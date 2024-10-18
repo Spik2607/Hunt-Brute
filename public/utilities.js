@@ -43,3 +43,13 @@ export function showGameArea(areaId) {
         area.style.display = area.id === areaId ? 'block' : 'none';
     });
 }
+
+export function formatNumber(number) {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+export function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+console.log("Module utilities chargé");
