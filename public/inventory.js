@@ -36,7 +36,7 @@ export function unequipItem(player, type) {
     if (item) {
         player.equippedItems[type] = null;
         player.inventory.push(item);
-        window.gameActions.updatePlayerStats(player);
+        updatePlayerStats(player);
         updateInventoryDisplay(player);
         updateEquippedItemsDisplay(player);
         showGameMessage(`${player.name} a déséquipé ${item.name}`);
@@ -264,7 +264,7 @@ window.gameActions = {
 
 export const inventoryModule = {
     equipItem,
-    unequipItem,
+    unequipItem: unequipItem,
     useItem,
     updateInventoryDisplay,
     updateEquippedItemsDisplay,
