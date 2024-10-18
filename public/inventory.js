@@ -139,7 +139,7 @@ export function updateEquippedItemsDisplay(player) {
     unequipButtons.forEach(button => {
         button.addEventListener('click', function() {
             const type = this.getAttribute('data-type');
-            window.gameActions.unequipItem(window.player, type);
+            unequipItem(window.player, type);
         });
     });
 }
