@@ -643,7 +643,11 @@ function initializeCraftingSystem() {
 }
 
 // Objet gameActions pour les actions accessibles globalement
+import * as inventoryModule from './inventory.js';
+
 window.gameActions = {
+    ...window.gameActions,
+    ...inventoryModule,
     startAdventure: startAdventure,
     startDonjon: startDonjon,
     openMultiplayer: openMultiplayer,
