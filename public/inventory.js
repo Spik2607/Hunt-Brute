@@ -1,7 +1,7 @@
 // inventory.js
 
-// Importez les fonctions nécessaires de gameData.js
-import { getItemStats } from './gameData.js';
+import { showGameMessage, updatePlayerInfo, showGameArea } from './utilities.js';
+import { getItemStats, items } from './gameData.js';
 
 export function equipItem(player, index) {
     if (!player || !Array.isArray(player.inventory) || index < 0 || index >= player.inventory.length) {
@@ -57,6 +57,7 @@ export function useItem(player, index) {
             player.energy = Math.min(player.energy + item.value, player.maxEnergy);
         }
         player.inventory.splice(index, 1);
+        updatePlayerStats(player);
         updateInventoryDisplay(player);
         showGameMessage(`${player.name} a utilisé ${item.name}`);
     } else {
@@ -75,6 +76,7 @@ export function sellItem(player, index) {
     
     player.gold += sellPrice;
     player.inventory.splice(index, 1);
+    updatePlayerStats(player);
     updateInventoryDisplay(player);
     showGameMessage(`${player.name} a vendu ${item.name} pour ${sellPrice} or`);
 }
@@ -185,19 +187,7 @@ function updatePlayerStats(player) {
     player.hp = Math.min(player.hp, player.maxHp);
 
     // Mettre à jour l'affichage du joueur
-    if (typeof window.updatePlayerInfo === 'function') {
-        window.updatePlayerInfo(player);
-    } else {
-        console.error("La fonction updatePlayerInfo n'est pas définie globalement");
-    }
-}
-
-function showGameMessage(message) {
-    if (typeof window.showGameMessage === 'function') {
-        window.showGameMessage(message);
-    } else {
-        console.error("La fonction showGameMessage n'est pas définie globalement");
-    }
+    updatePlayerInfo(player);
 }
 
 export function addItemToInventory(player, item) {
@@ -227,7 +217,6 @@ export function openShop(player) {
     }
 
     shopElement.innerHTML = '';
-    // Supposons que 'items' soit importé de gameData.js
     items.forEach(item => {
         const itemElement = document.createElement('div');
         itemElement.className = 'shop-item';
@@ -263,14 +252,6 @@ function buyItem(player, itemId) {
         showGameMessage(`${player.name} a acheté ${item.name}`);
     } else {
         showGameMessage("Vous n'avez pas assez d'or !");
-    }
-}
-
-function showGameArea(areaId) {
-    if (typeof window.showGameArea === 'function') {
-        window.showGameArea(areaId);
-    } else {
-        console.error("La fonction showGameArea n'est pas définie globalement");
     }
 }
 
