@@ -21,6 +21,7 @@ function initializeGame() {
     initializeSocket();
     loadCharacter();
     initializePlayer();
+    startRegeneration();
     console.log("Initialisation du jeu terminée");
 }
 
@@ -156,6 +157,30 @@ function initializeEventListeners() {
             console.warn(`Bouton ${id} non trouvé`);
         }
     }
+
+    
+    //regen hp energy
+    let regenerationInterval;
+
+function startRegeneration() {
+    regenerationInterval = setInterval(() => {
+        if (player) {
+            // Régénération HP
+            player.hp = Math.min(player.hp + 1, player.maxHp);
+            
+            // Régénération Énergie
+            if (player.energy !== undefined) {
+                player.energy = Math.min(player.energy + 2, player.maxEnergy);
+            }
+            
+            updatePlayerInfo();
+        }
+    }, 5000); // Régénération toutes les 5 secondes
+}
+
+function stopRegeneration() {
+    clearInterval(regenerationInterval);
+}
 
     // Gestionnaires d'événements pour la navigation
     const navHandlers = {
