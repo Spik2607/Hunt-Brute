@@ -2,7 +2,6 @@
 import { items, getItemStats } from './gameData.js';
 
 export function equipItem(player, index) {
-    console.log("Tentative d'équipement", player, index);
     if (!player || !Array.isArray(player.inventory) || index < 0 || index >= player.inventory.length) {
         console.error("Équipement impossible : joueur ou index invalide");
         return;
@@ -14,6 +13,7 @@ export function equipItem(player, index) {
         if (typeof player.equip === 'function') {
             player.equip(item);
             player.inventory.splice(index, 1);
+            updatePlayerStats(player);  // Nouvelle fonction à ajouter
             updatePlayerInfo(player);
             updateInventoryDisplay(player);
             updateEquippedItemsDisplay(player);
@@ -36,6 +36,7 @@ export function unequipItem(player, type) {
     if (item) {
         if (typeof player.unequip === 'function') {
             player.unequip(type);
+            updatePlayerStats(player);
             updatePlayerInfo(player);
             updateInventoryDisplay(player);
             updateEquippedItemsDisplay(player);
