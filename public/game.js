@@ -39,7 +39,7 @@ function stopRegeneration() {
     clearInterval(regenerationInterval);
 }
 
-function updatePlayerStats(player) {
+export function updatePlayerStats(player) {
     // Réinitialiser les stats du joueur à leurs valeurs de base
     player.attack = player.baseAttack;
     player.defense = player.baseDefense;
@@ -731,6 +731,7 @@ window.gameActions = {
     saveGame,
     loadGame,
     joinRoom,
+    updatePlayerStats: updatePlayerStats,
     nextDonjonEvent: nextDonjonEvent,
     sendChatMessage,
     initiateChallenge,
