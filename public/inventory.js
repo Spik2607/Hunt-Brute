@@ -97,16 +97,56 @@ export function updateInventoryDisplay(player) {
             itemElement.className = 'inventory-item';
             itemElement.innerHTML = `
                 <span>${item.name}</span>
-                <button onclick="window.gameActions.equipItem(window.player, ${index})">Équiper</button>
-                <button onclick="window.gameActions.useItem(window.player, ${index})">Utiliser</button>
-                <button onclick="window.gameActions.sellItem(window.player, ${index})">Vendre</button>
+                <button class="equip-button" data-index="${index}">Équiper</button>
+                <button class="use-button" data-index="${index}">Utiliser</button>
+                <button class="sell-button" data-index="${index}">Vendre</button>
             `;
-            itemElement.title = getItemStats(item);
+            
+            // Ajouter les gestionnaires d'événements pour chaque bouton
+            const equipButton = itemElement.querySelector('.equip-button');
+            equipButton.addEventListener('click', function() {
+                const itemIndex = parseInt(this.getAttribute('data-index'));
+                if (typeof window.gameActions.equipItem === 'function') {
+                    window.gameActions.equipItem(window.player, itemIndex);
+                } else {
+                    console.error("La fonction equipItem n'est pas définie dans gameActions");
+                }
+            });
+
+            const useButton = itemElement.querySelector('.use-button');
+            useButton.addEventListener('click', function() {
+                const itemIndex = parseInt(this.getAttribute('data-index'));
+                if (typeof window.gameActions.useItem === 'function') {
+                    window.gameActions.useItem(window.player, itemIndex);
+                } else {
+                    console.error("La fonction useItem n'est pas définie dans gameActions");
+                }
+            });
+
+            const sellButton = itemElement.querySelector('.sell-button');
+            sellButton.addEventListener('click', function() {
+                const itemIndex = parseInt(this.getAttribute('data-index'));
+                if (typeof window.gameActions.sellItem === 'function') {
+                    window.gameActions.sellItem(window.player, itemIndex);
+                } else {
+                    console.error("La fonction sellItem n'est pas définie dans gameActions");
+                }
+            });
+
+            itemElement.title = typeof window.gameActions.getItemStats === 'function' 
+                ? window.gameActions.getItemStats(item) 
+                : item.name;
+
             inventoryElement.appendChild(itemElement);
         });
     }
 
-    updateEquippedItemsDisplay(player);
+    // Mettre à jour l'affichage des objets équipés
+    if (typeof window.gameActions.updateEquippedItemsDisplay === 'function') {
+        window.gameActions.updateEquippedItemsDisplay(player);
+    } else {
+        console.error("La fonction updateEquippedItemsDisplay n'est pas définie dans gameActions");
+    }
 }
 
 export function updateEquippedItemsDisplay(player) {
