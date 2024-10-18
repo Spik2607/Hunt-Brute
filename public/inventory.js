@@ -1,6 +1,8 @@
 // inventory.js
-import { items, getItemStats } from './gameData.js';
-import { updatePlayerStats } from './game.js';
+
+// Importez les fonctions nécessaires de gameData.js
+import { item, getItemStats } from './gameData.js';
+import { updatePlayerStats } from './game.js' ;
 
 export function equipItem(player, index) {
     if (!player || !Array.isArray(player.inventory) || index < 0 || index >= player.inventory.length) {
@@ -11,24 +13,21 @@ export function equipItem(player, index) {
     const item = player.inventory[index];
     
     if (item.type === 'weapon' || item.type === 'armor' || item.type === 'accessory') {
-        if (typeof player.equip === 'function') {
-            player.equip(item);
-            player.inventory.splice(index, 1);
-            updatePlayerStats(player);  // Nouvelle fonction à ajouter
-            updatePlayerInfo(player);
-            updateInventoryDisplay(player);
-            updateEquippedItemsDisplay(player);
-            showGameMessage(`${player.name} a équipé ${item.name}`);
-        } else {
-            console.error("La méthode 'equip' n'existe pas sur l'objet player");
+        if (player.equippedItems[item.type]) {
+            unequipItem(player, item.type);
         }
+        player.equippedItems[item.type] = item;
+        player.inventory.splice(index, 1);
+        updatePlayerStats(player);
+        updateInventoryDisplay(player);
+        updateEquippedItemsDisplay(player);
+        showGameMessage(`${player.name} a équipé ${item.name}`);
     } else {
         showGameMessage("Cet objet ne peut pas être équipé");
     }
 }
 
 export function unequipItem(player, type) {
-    console.log("Tentative de déséquipement", player, type);
     if (!player || !player.equippedItems) {
         console.error("Déséquipement impossible : joueur invalide");
         return;
@@ -45,7 +44,6 @@ export function unequipItem(player, type) {
 }
 
 export function useItem(player, index) {
-    console.log("Tentative d'utilisation d'item", player, index);
     if (!player || !Array.isArray(player.inventory) || index < 0 || index >= player.inventory.length) {
         console.error("Utilisation impossible : joueur ou index invalide");
         return;
@@ -54,18 +52,32 @@ export function useItem(player, index) {
     const item = player.inventory[index];
     
     if (item.type === 'consumable') {
-        if (typeof player.useItem === 'function') {
-            player.useItem(item);
-            player.inventory.splice(index, 1);
-            updatePlayerInfo(player);
-            updateInventoryDisplay(player);
-            showGameMessage(`${player.name} a utilisé ${item.name}`);
-        } else {
-            console.error("La méthode 'useItem' n'existe pas sur l'objet player");
+        if (item.effect === 'heal') {
+            player.hp = Math.min(player.hp + item.value, player.maxHp);
+        } else if (item.effect === 'energy') {
+            player.energy = Math.min(player.energy + item.value, player.maxEnergy);
         }
+        player.inventory.splice(index, 1);
+        updateInventoryDisplay(player);
+        showGameMessage(`${player.name} a utilisé ${item.name}`);
     } else {
         showGameMessage("Cet objet ne peut pas être utilisé");
     }
+}
+
+export function sellItem(player, index) {
+    if (!player || !Array.isArray(player.inventory) || index < 0 || index >= player.inventory.length) {
+        console.error("Vente impossible : joueur ou index invalide");
+        return;
+    }
+    
+    const item = player.inventory[index];
+    const sellPrice = Math.floor(item.cost * 0.5);
+    
+    player.gold += sellPrice;
+    player.inventory.splice(index, 1);
+    updateInventoryDisplay(player);
+    showGameMessage(`${player.name} a vendu ${item.name} pour ${sellPrice} or`);
 }
 
 export function updateInventoryDisplay(player) {
@@ -102,51 +114,22 @@ export function updateInventoryDisplay(player) {
                 <button class="sell-button" data-index="${index}">Vendre</button>
             `;
             
-            // Ajouter les gestionnaires d'événements pour chaque bouton
             const equipButton = itemElement.querySelector('.equip-button');
-            equipButton.addEventListener('click', function() {
-                const itemIndex = parseInt(this.getAttribute('data-index'));
-                if (typeof window.gameActions.equipItem === 'function') {
-                    window.gameActions.equipItem(window.player, itemIndex);
-                } else {
-                    console.error("La fonction equipItem n'est pas définie dans gameActions");
-                }
-            });
+            equipButton.addEventListener('click', () => equipItem(player, index));
 
             const useButton = itemElement.querySelector('.use-button');
-            useButton.addEventListener('click', function() {
-                const itemIndex = parseInt(this.getAttribute('data-index'));
-                if (typeof window.gameActions.useItem === 'function') {
-                    window.gameActions.useItem(window.player, itemIndex);
-                } else {
-                    console.error("La fonction useItem n'est pas définie dans gameActions");
-                }
-            });
+            useButton.addEventListener('click', () => useItem(player, index));
 
             const sellButton = itemElement.querySelector('.sell-button');
-            sellButton.addEventListener('click', function() {
-                const itemIndex = parseInt(this.getAttribute('data-index'));
-                if (typeof window.gameActions.sellItem === 'function') {
-                    window.gameActions.sellItem(window.player, itemIndex);
-                } else {
-                    console.error("La fonction sellItem n'est pas définie dans gameActions");
-                }
-            });
+            sellButton.addEventListener('click', () => sellItem(player, index));
 
-            itemElement.title = typeof window.gameActions.getItemStats === 'function' 
-                ? window.gameActions.getItemStats(item) 
-                : item.name;
+            itemElement.title = getItemStats(item);
 
             inventoryElement.appendChild(itemElement);
         });
     }
 
-    // Mettre à jour l'affichage des objets équipés
-    if (typeof window.gameActions.updateEquippedItemsDisplay === 'function') {
-        window.gameActions.updateEquippedItemsDisplay(player);
-    } else {
-        console.error("La fonction updateEquippedItemsDisplay n'est pas définie dans gameActions");
-    }
+    updateEquippedItemsDisplay(player);
 }
 
 export function updateEquippedItemsDisplay(player) {
@@ -174,98 +157,35 @@ export function updateEquippedItemsDisplay(player) {
         </div>
     `;
 
-    // Ajouter des gestionnaires d'événements pour les boutons de déséquipement
     const unequipButtons = equippedItemsElement.querySelectorAll('.unequip-button');
     unequipButtons.forEach(button => {
         button.addEventListener('click', function() {
             const type = this.getAttribute('data-type');
-            unequipItem(window.player, type);
+            unequipItem(player, type);
         });
     });
 }
 
-export function openShop(player) {
-    console.log("Ouverture de la boutique", player);
-    if (!player) {
-        console.error("Ouverture de la boutique impossible : joueur invalide");
-        return;
-    }
-    const shopElement = document.getElementById('shop-items');
-    if (!shopElement) {
-        console.error("Élément 'shop-items' non trouvé");
-        return;
+function updatePlayerStats(player) {
+    // Réinitialiser les stats du joueur à leurs valeurs de base
+    player.attack = player.baseAttack;
+    player.defense = player.baseDefense;
+    player.maxHp = player.baseMaxHp;
+
+    // Appliquer les effets des objets équipés
+    for (const slot in player.equippedItems) {
+        const item = player.equippedItems[slot];
+        if (item) {
+            if (item.attack) player.attack += item.attack;
+            if (item.defense) player.defense += item.defense;
+            if (item.maxHp) player.maxHp += item.maxHp;
+        }
     }
 
-    shopElement.innerHTML = '';
-    items.forEach(item => {
-        const itemElement = document.createElement('div');
-        itemElement.className = 'shop-item';
-        itemElement.innerHTML = `
-            <span>${item.name} - ${item.cost} or</span>
-            <button onclick="window.gameActions.buyItem(window.player, '${item.id}')">Acheter</button>
-        `;
-        itemElement.title = getItemStats(item);
-        shopElement.appendChild(itemElement);
-    });
+    // S'assurer que les HP actuels ne dépassent pas le nouveau maxHp
+    player.hp = Math.min(player.hp, player.maxHp);
 
-    showGameArea('shop-area');
-}
-
-export function buyItem(player, itemId) {
-    console.log("Tentative d'achat", player, itemId);
-    if (!player) {
-        console.error("Achat impossible : joueur invalide");
-        return;
-    }
-    const item = items.find(i => i.id === itemId);
-    if (!item) {
-        console.error("Item non trouvé:", itemId);
-        return;
-    }
-    if (player.gold >= item.cost) {
-        player.gold -= item.cost;
-        player.inventory.push(item);
-        updatePlayerInfo(player);
-        updateInventoryDisplay(player);
-        showGameMessage(`${player.name} a acheté ${item.name}`);
-    } else {
-        showGameMessage("Vous n'avez pas assez d'or !");
-    }
-}
-
-export function sellItem(player, index) {
-    console.log("Tentative de vente", player, index);
-    if (!player || !Array.isArray(player.inventory) || index < 0 || index >= player.inventory.length) {
-        console.error("Vente impossible : joueur ou index invalide");
-        return;
-    }
-    
-    const item = player.inventory[index];
-    const sellPrice = Math.floor(item.cost * 0.5);
-    
-    player.gold += sellPrice;
-    player.inventory.splice(index, 1);
-    updatePlayerInfo(player);
-    updateInventoryDisplay(player);
-    showGameMessage(`${player.name} a vendu ${item.name} pour ${sellPrice} or`);
-}
-
-export function addItemToInventory(player, item) {
-    console.log("Ajout d'item à l'inventaire", player, item);
-    if (!player || !item) {
-        console.error("Ajout d'item impossible : joueur ou item invalide");
-        return;
-    }
-    if (Array.isArray(player.inventory)) {
-        player.inventory.push(item);
-        updateInventoryDisplay(player);
-        showGameMessage(`${player.name} a obtenu ${item.name}`);
-    } else {
-        console.error("L'inventaire du joueur n'est pas un tableau");
-    }
-}
-
-function updatePlayerInfo(player) {
+    // Mettre à jour l'affichage du joueur
     if (typeof window.updatePlayerInfo === 'function') {
         window.updatePlayerInfo(player);
     } else {
@@ -281,38 +201,90 @@ function showGameMessage(message) {
     }
 }
 
-function showGameArea(areaId) {
-    if (typeof window.gameActions.showGameArea === 'function') {
-        window.gameActions.showGameArea(areaId);
+export function addItemToInventory(player, item) {
+    if (!player || !item) {
+        console.error("Ajout d'item impossible : joueur ou item invalide");
+        return;
+    }
+    if (Array.isArray(player.inventory)) {
+        player.inventory.push(item);
+        updateInventoryDisplay(player);
+        showGameMessage(`${player.name} a obtenu ${item.name}`);
     } else {
-        console.error("La fonction showGameArea n'est pas définie dans gameActions");
+        console.error("L'inventaire du joueur n'est pas un tableau");
     }
 }
 
-// Exportation des fonctions pour les rendre accessibles globalement
-window.gameActions = {
-    ...window.gameActions,
+export function openShop(player) {
+    console.log("Ouverture de la boutique", player);
+    if (!player) {
+        console.error("Ouverture de la boutique impossible : joueur invalide");
+        return;
+    }
+    const shopElement = document.getElementById('shop-items');
+    if (!shopElement) {
+        console.error("Élément 'shop-items' non trouvé");
+        return;
+    }
+
+    shopElement.innerHTML = '';
+    // Supposons que 'items' soit importé de gameData.js
+    items.forEach(item => {
+        const itemElement = document.createElement('div');
+        itemElement.className = 'shop-item';
+        itemElement.innerHTML = `
+            <span>${item.name} - ${item.cost} or</span>
+            <button class="buy-button" data-id="${item.id}">Acheter</button>
+        `;
+        itemElement.title = getItemStats(item);
+        shopElement.appendChild(itemElement);
+    });
+
+    const buyButtons = shopElement.querySelectorAll('.buy-button');
+    buyButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const itemId = this.getAttribute('data-id');
+            buyItem(player, itemId);
+        });
+    });
+
+    showGameArea('shop-area');
+}
+
+function buyItem(player, itemId) {
+    const item = items.find(i => i.id === itemId);
+    if (!item) {
+        console.error("Item non trouvé:", itemId);
+        return;
+    }
+    if (player.gold >= item.cost) {
+        player.gold -= item.cost;
+        addItemToInventory(player, item);
+        updatePlayerInfo(player);
+        showGameMessage(`${player.name} a acheté ${item.name}`);
+    } else {
+        showGameMessage("Vous n'avez pas assez d'or !");
+    }
+}
+
+function showGameArea(areaId) {
+    if (typeof window.showGameArea === 'function') {
+        window.showGameArea(areaId);
+    } else {
+        console.error("La fonction showGameArea n'est pas définie globalement");
+    }
+}
+
+// Exportez toutes les fonctions nécessaires
+export const inventoryModule = {
     equipItem,
     unequipItem,
     useItem,
-    buyItem,
     sellItem,
+    updateInventoryDisplay,
+    updateEquippedItemsDisplay,
     addItemToInventory,
-    updateInventoryDisplay,
-    updateEquippedItemsDisplay,
     openShop
-};
-
-export const inventoryModule = {
-    equipItem,
-    unequipItem: unequipItem,
-    useItem,
-    updateInventoryDisplay,
-    updateEquippedItemsDisplay,
-    openShop,
-    buyItem,
-    sellItem,
-    addItemToInventory
 };
 
 console.log("Module d'inventaire chargé");
