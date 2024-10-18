@@ -8,7 +8,9 @@ export function showGameMessage(message) {
         messageElement.appendChild(newMessage);
         messageElement.scrollTop = messageElement.scrollHeight;
     } else {
-        console.error("Élément 'game-messages' non trouvé");
+        console.warn("Élément 'game-messages' non trouvé. Message:", message);
+        // Alternative: afficher le message dans la console ou dans un autre élément
+        console.log("Message du jeu:", message);
     }
 }
 
