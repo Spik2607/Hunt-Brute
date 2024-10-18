@@ -75,15 +75,100 @@ function initializeSocket() {
             initializeAdditionalFeatures();
         });
 
-        // ... Autres gestionnaires d'événements socket ...
-
         socket.on('disconnect', () => {
             console.log('Déconnecté du serveur');
             showGameMessage("Vous avez été déconnecté du serveur.");
         });
 
+        socket.on('roomJoined', ({ roomId, players, messages }) => {
+            currentRoom = roomId;
+            updatePlayersList(players);
+            updateChatMessages(messages);
+            showGameArea('multiplayer-area');
+        });
+
+        socket.on('playerJoined', (players) => {
+            updatePlayersList(players);
+        });
+
+        socket.on('playerLeft', (playerId) => {
+            showGameMessage(`Le joueur ${playerId} a quitté la partie.`);
+            if (currentRoom) {
+                socket.emit('getRoomPlayers', currentRoom);
+            }
+        });
+
+        socket.on('newMessage', (message) => {
+            addChatMessage(message);
+        });
+
+        socket.on('challengeReceived', ({ challengerId }) => {
+            if (player && challengerId !== player.id) {
+                showGameMessage(`${challengerId} vous défie en duel !`);
+                document.getElementById('accept-challenge').style.display = 'block';
+            }
+        });
+
+        socket.on('battleStart', ({ challengerId, accepterId }) => {
+            if (player && (player.id === challengerId || player.id === accepterId)) {
+                startMultiplayerBattle(challengerId, accepterId);
+            }
+        });
+
+        socket.on('opponentAction', (action) => {
+            handleOpponentAction(action);
+        });
+
+        socket.on('tradeRequestReceived', ({ fromId, toId }) => {
+            if (player && player.id === toId) {
+                showGameMessage(`${fromId} vous propose un échange !`);
+                document.getElementById('accept-trade').style.display = 'block';
+            }
+        });
+
+        socket.on('tradeStart', ({ fromId, toId }) => {
+            if (player && (player.id === fromId || player.id === toId)) {
+                startTrade(fromId, toId);
+            }
+        });
+
+        socket.on('itemOffered', ({ fromId, itemId }) => {
+            if (player && fromId !== player.id) {
+                showOfferedItem(itemId);
+            }
+        });
+
+        socket.on('tradeConfirmed', ({ playerId }) => {
+            if (player && playerId !== player.id) {
+                showGameMessage("L'autre joueur a confirmé l'échange.");
+            }
+        });
+
+        socket.on('tradeCancelled', ({ playerId }) => {
+            showGameMessage("L'échange a été annulé.");
+            closeTrade();
+        });
+
+        socket.on('worldEvent', (eventData) => {
+            handleWorldEvent(eventData);
+        });
+
+        socket.on('leaderboardUpdate', (leaderboardData) => {
+            updateLeaderboard(leaderboardData);
+        });
+
+        socket.on('groupQuestUpdate', (questData) => {
+            updateGroupQuests(questData);
+        });
+
+        socket.on('error', (error) => {
+            console.error("Erreur Socket.IO:", error);
+            showGameMessage("Une erreur de connexion s'est produite.");
+        });
+
     } catch (error) {
         console.error("Erreur lors de l'initialisation de Socket.IO:", error);
+        showGameMessage("Impossible de se connecter au serveur. Veuillez réessayer plus tard.");
     }
 }
 
@@ -458,6 +543,15 @@ function initializeEventListeners() {
     });
 
     console.log("Initialisation des écouteurs d'événements terminée");
+}
+
+function initializeAdditionalFeatures() {
+    console.log("Initialisation des fonctionnalités supplémentaires");
+    updateLeaderboard();
+    initializeGroupQuests();
+    updateGuildsList();
+    initializeLairBuildingSystem();
+    setTimeout(startWorldEvent, 3600000); // Premier événement après 1 heure
 }
 
 function joinRoom() {
