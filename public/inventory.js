@@ -19,7 +19,6 @@ export function equipItem(player, index) {
         player.inventory.splice(index, 1);
         updatePlayerStats(player);
         updateInventoryDisplay(player);
-        updateEquippedItemsDisplay(player);
         showGameMessage(`${player.name} a équipé ${item.name}`);
     } else {
         showGameMessage("Cet objet ne peut pas être équipé");
@@ -37,7 +36,6 @@ export function unequipItem(player, type) {
         player.inventory.push(item);
         updatePlayerStats(player);
         updateInventoryDisplay(player);
-        updateEquippedItemsDisplay(player);
         showGameMessage(`${player.name} a déséquipé ${item.name}`);
     }
 }
@@ -83,87 +81,80 @@ export function sellItem(player, index) {
 
 export function updateInventoryDisplay(player) {
     console.log("Mise à jour de l'affichage de l'inventaire", player);
-    const inventoryElement = document.getElementById('inventory-items');
+    const inventoryElement = document.getElementById('inventory-area');
     if (!inventoryElement) {
-        console.error("Élément 'inventory-items' non trouvé");
+        console.error("Élément 'inventory-area' non trouvé");
         return;
     }
 
-    inventoryElement.innerHTML = '';
-
-    if (!player || !Array.isArray(player.inventory) || player.inventory.length === 0) {
-        inventoryElement.innerHTML = `
-            <div class="empty-inventory">
-                <p>Votre inventaire est vide.</p>
-                <p>Explorez le monde pour trouver des objets à équiper!</p>
-                <p>Types d'objets équipables :</p>
-                <ul>
-                    <li>Armes</li>
-                    <li>Armures</li>
-                    <li>Accessoires</li>
-                </ul>
+    inventoryElement.innerHTML = `
+        <div class="inventory-container">
+            <div class="equipped-items">
+                <h3>Équipement</h3>
+                <div id="equipped-weapon" class="equipped-slot">
+                    <span class="slot-name">Arme:</span>
+                    <span class="item-name">${player.equippedItems.weapon ? player.equippedItems.weapon.name : 'Aucune'}</span>
+                    ${player.equippedItems.weapon ? `<button class="unequip-button" data-type="weapon">Déséquiper</button>` : ''}
+                </div>
+                <div id="equipped-armor" class="equipped-slot">
+                    <span class="slot-name">Armure:</span>
+                    <span class="item-name">${player.equippedItems.armor ? player.equippedItems.armor.name : 'Aucune'}</span>
+                    ${player.equippedItems.armor ? `<button class="unequip-button" data-type="armor">Déséquiper</button>` : ''}
+                </div>
+                <div id="equipped-accessory" class="equipped-slot">
+                    <span class="slot-name">Accessoire:</span>
+                    <span class="item-name">${player.equippedItems.accessory ? player.equippedItems.accessory.name : 'Aucun'}</span>
+                    ${player.equippedItems.accessory ? `<button class="unequip-button" data-type="accessory">Déséquiper</button>` : ''}
+                </div>
             </div>
-        `;
+            <div class="inventory-items">
+                <h3>Inventaire</h3>
+                <div id="inventory-grid"></div>
+            </div>
+        </div>
+    `;
+
+    const inventoryGrid = document.getElementById('inventory-grid');
+    if (player.inventory.length === 0) {
+        inventoryGrid.innerHTML = '<p class="empty-inventory">Votre inventaire est vide.</p>';
     } else {
         player.inventory.forEach((item, index) => {
             const itemElement = document.createElement('div');
             itemElement.className = 'inventory-item';
             itemElement.innerHTML = `
-                <span>${item.name}</span>
-                <button class="equip-button" data-index="${index}">Équiper</button>
-                <button class="use-button" data-index="${index}">Utiliser</button>
-                <button class="sell-button" data-index="${index}">Vendre</button>
+                <img src="${item.icon || 'default-item-icon.png'}" alt="${item.name}" class="item-icon">
+                <span class="item-name">${item.name}</span>
+                <div class="item-actions">
+                    <button class="equip-button" data-index="${index}">Équiper</button>
+                    <button class="use-button" data-index="${index}">Utiliser</button>
+                    <button class="sell-button" data-index="${index}">Vendre</button>
+                </div>
             `;
-            
-            const equipButton = itemElement.querySelector('.equip-button');
-            equipButton.addEventListener('click', () => equipItem(player, index));
-
-            const useButton = itemElement.querySelector('.use-button');
-            useButton.addEventListener('click', () => useItem(player, index));
-
-            const sellButton = itemElement.querySelector('.sell-button');
-            sellButton.addEventListener('click', () => sellItem(player, index));
-
             itemElement.title = getItemStats(item);
-
-            inventoryElement.appendChild(itemElement);
+            inventoryGrid.appendChild(itemElement);
         });
     }
 
-    updateEquippedItemsDisplay(player);
+    addInventoryEventListeners(player);
 }
 
-export function updateEquippedItemsDisplay(player) {
-    console.log("Mise à jour de l'affichage des objets équipés", player);
-    if (!player || !player.equippedItems) {
-        console.error("Mise à jour des objets équipés impossible : joueur invalide");
-        return;
-    }
-    const equippedItemsElement = document.getElementById('equipped-items');
-    if (!equippedItemsElement) return;
+function addInventoryEventListeners(player) {
+    const inventoryElement = document.getElementById('inventory-area');
+    
+    inventoryElement.querySelectorAll('.equip-button').forEach(button => {
+        button.addEventListener('click', () => equipItem(player, parseInt(button.dataset.index)));
+    });
 
-    equippedItemsElement.innerHTML = `
-        <h3>Équipement actuel</h3>
-        <div id="equipped-weapon">
-            Arme: ${player.equippedItems.weapon ? player.equippedItems.weapon.name : 'Aucune'}
-            ${player.equippedItems.weapon ? `<button class="unequip-button" data-type="weapon">Déséquiper</button>` : ''}
-        </div>
-        <div id="equipped-armor">
-            Armure: ${player.equippedItems.armor ? player.equippedItems.armor.name : 'Aucune'}
-            ${player.equippedItems.armor ? `<button class="unequip-button" data-type="armor">Déséquiper</button>` : ''}
-        </div>
-        <div id="equipped-accessory">
-            Accessoire: ${player.equippedItems.accessory ? player.equippedItems.accessory.name : 'Aucun'}
-            ${player.equippedItems.accessory ? `<button class="unequip-button" data-type="accessory">Déséquiper</button>` : ''}
-        </div>
-    `;
+    inventoryElement.querySelectorAll('.use-button').forEach(button => {
+        button.addEventListener('click', () => useItem(player, parseInt(button.dataset.index)));
+    });
 
-    const unequipButtons = equippedItemsElement.querySelectorAll('.unequip-button');
-    unequipButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const type = this.getAttribute('data-type');
-            unequipItem(player, type);
-        });
+    inventoryElement.querySelectorAll('.sell-button').forEach(button => {
+        button.addEventListener('click', () => sellItem(player, parseInt(button.dataset.index)));
+    });
+
+    inventoryElement.querySelectorAll('.unequip-button').forEach(button => {
+        button.addEventListener('click', () => unequipItem(player, button.dataset.type));
     });
 }
 
@@ -221,7 +212,9 @@ export function openShop(player) {
         const itemElement = document.createElement('div');
         itemElement.className = 'shop-item';
         itemElement.innerHTML = `
-            <span>${item.name} - ${item.cost} or</span>
+            <img src="${item.icon || 'default-item-icon.png'}" alt="${item.name}" class="item-icon">
+            <span class="item-name">${item.name}</span>
+            <span class="item-cost">${item.cost} or</span>
             <button class="buy-button" data-id="${item.id}">Acheter</button>
         `;
         itemElement.title = getItemStats(item);
@@ -262,7 +255,6 @@ export const inventoryModule = {
     useItem,
     sellItem,
     updateInventoryDisplay,
-    updateEquippedItemsDisplay,
     addItemToInventory,
     openShop
 };
