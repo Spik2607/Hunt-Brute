@@ -65,14 +65,32 @@ export function updatePlayerStats(player) {
 // Ajoutez cette fonction à window.gameActions
 window.gameActions.updatePlayerStats = updatePlayerStats;
 
-function initializeGame() {
-    console.log("Initialisation du jeu...");
-    initializeSocket();
-    loadCharacter();
-    initializePlayer();
-    startRegeneration();
-    console.log("Initialisation du jeu terminée");
+function initializePlayer(name) {
+    return {
+        name: name,
+        level: 1,
+        maxHp: 100,
+        hp: 100,
+        attack: 10,
+        defense: 5,
+        gold: 0,
+        experience: 0,
+        inventory: [],
+        equippedItems: {
+            weapon: null,
+            armor: null,
+            accessory: null
+        },
+        baseAttack: 10,
+        baseDefense: 5,
+        baseMaxHp: 100
+    };
 }
+
+// Lors de la création du personnage
+const player = initializePlayer(nameInput.value);
+window.player = player; // Si vous utilisez une variable globale pour le joueur
+updatePlayerInfo(player);
 
 function initializeSocket() {
     console.log("Initialisation de Socket.IO...");
