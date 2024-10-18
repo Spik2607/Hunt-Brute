@@ -34,16 +34,12 @@ export function unequipItem(player, type) {
     }
     const item = player.equippedItems[type];
     if (item) {
-        if (typeof player.unequip === 'function') {
-            player.unequip(type);
-            updatePlayerStats(player);
-            updatePlayerInfo(player);
-            updateInventoryDisplay(player);
-            updateEquippedItemsDisplay(player);
-            showGameMessage(`${player.name} a déséquipé ${item.name}`);
-        } else {
-            console.error("La méthode 'unequip' n'existe pas sur l'objet player");
-        }
+        player.equippedItems[type] = null;
+        player.inventory.push(item);
+        window.gameActions.updatePlayerStats(player);
+        updateInventoryDisplay(player);
+        updateEquippedItemsDisplay(player);
+        showGameMessage(`${player.name} a déséquipé ${item.name}`);
     }
 }
 
