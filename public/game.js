@@ -705,6 +705,7 @@ window.gameActions = {
     saveGame,
     loadGame,
     joinRoom,
+    nextDonjonEvent: nextDonjonEvent,
     sendChatMessage,
     initiateChallenge,
     acceptChallenge,
@@ -795,7 +796,7 @@ export {
     updateGuildsList,
     initializeCraftingSystem,
     startWorldEvent
-    nextDonjonEvent: nextDonjonEvent
+    
 };
 
 console.log("Module de jeu chargé");
