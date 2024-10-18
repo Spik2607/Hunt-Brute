@@ -12,8 +12,13 @@ let currentMission;
 let currentDonjonLevel;
 let regenerationInterval;
 
-function initializePlayer(name) {
-    return new Character(name, 100, 10, 5, 100);
+function initializePlayer() {
+    if (player) {
+        player.inventory = player.inventory || [];
+        player.equippedItems = player.equippedItems || { weapon: null, armor: null, accessory: null };
+        player.companions = player.companions || [];
+        updatePlayerInfo();
+    }
 }
 
 function updatePlayerStats(player) {
@@ -176,14 +181,6 @@ function loadCharacter() {
     window.player = player;
 }
 
-function initializePlayer() {
-    if (player) {
-        player.inventory = player.inventory || [];
-        player.equippedItems = player.equippedItems || { weapon: null, armor: null, accessory: null };
-        player.companions = player.companions || [];
-        updatePlayerInfo();
-    }
-}
 
 function createCharacter() {
     console.log("Tentative de création de personnage");
