@@ -52,15 +52,19 @@ nav {
     margin-bottom: 30px;
 }
 
-nav a {
+nav button {
     color: #FFF8DC;
     text-decoration: none;
     padding: 5px 10px;
     margin: 5px;
     transition: all 0.3s ease;
+    background-color: transparent;
+    border: none;
+    font-size: 1em;
+    cursor: pointer;
 }
 
-nav a:hover {
+nav button:hover {
     background-color: rgba(255, 255, 255, 0.2);
     transform: translateY(-2px);
 }
@@ -126,7 +130,7 @@ nav a:hover {
 
 /* General game area styles */
 .game-section {
-     display: none;
+    display: none;
     background-color: rgba(255, 253, 240, 0.9);
     border: 2px solid #8B4513;
     border-radius: 8px;
@@ -287,125 +291,106 @@ input[type="text"], select {
     justify-content: space-between;
 }
 
-/* Styles pour l'inventaire */
-#inventory-area {
+/* Inventory styles */
+.inventory-container {
     display: flex;
-    flex-direction: column;
+    gap: 20px;
 }
 
-#equipped-items {
-    background-color: rgba(139, 69, 19, 0.1);
-    border: 2px solid #8B4513;
-    border-radius: 10px;
+.equipped-items, .inventory-items {
+    flex: 1;
+    background-color: #f0f0f0;
+    border-radius: 8px;
     padding: 15px;
-    margin-bottom: 20px;
 }
 
-#equipped-items h3 {
-    margin-top: 0;
-    color: #4a4a4a;
-    border-bottom: 1px solid #8B4513;
-    padding-bottom: 5px;
-}
-
-#equipped-items div {
-    margin: 10px 0;
+.equipped-slot {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    margin-bottom: 10px;
 }
 
-#equipped-items button {
-    background-color: #A0522D;
-    color: #FFF8DC;
+.slot-name {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+#inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+}
+
+.inventory-item {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    text-align: center;
+}
+
+.item-icon {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 5px;
+}
+
+.item-actions {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 10px;
+}
+
+.inventory-item button {
+    background-color: #4CAF50;
+    color: white;
     border: none;
     padding: 5px 10px;
-    border-radius: 5px;
+    border-radius: 3px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
 }
 
-#equipped-items button:hover {
-    background-color: #8B4513;
+.inventory-item button:hover {
+    background-color: #45a049;
 }
 
 .empty-inventory {
     text-align: center;
     padding: 20px;
-    background-color: rgba(255, 255, 255, 0.8);
-    border-radius: 10px;
-    margin: 20px 0;
-    border: 2px solid #8B4513;
+    background-color: #f9f9f9;
+    border-radius: 8px;
 }
 
-.empty-inventory p {
-    margin-bottom: 10px;
-    color: #4a4a4a;
-    font-size: 1.1em;
-}
-
-.empty-inventory ul {
-    list-style-type: none;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-.empty-inventory li {
-    display: inline-block;
-    margin: 5px;
-    padding: 5px 10px;
-    background-color: #8B4513;
-    color: #FFF8DC;
-    border-radius: 5px;
-    font-weight: bold;
-    transition: all 0.3s ease;
-}
-
-.empty-inventory li:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-
-.inventory-grid {
+/* Shop styles */
+#shop-items {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 15px;
 }
 
-.inventory-item {
+.shop-item {
     background-color: #f0e6d2;
     border: 1px solid #8B4513;
     border-radius: 5px;
     padding: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    text-align: center;
 }
 
-.inventory-item span {
+.shop-item img {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 10px;
+}
+
+.shop-item .item-name {
     font-weight: bold;
-    color: #4a4a4a;
     margin-bottom: 5px;
 }
 
-.inventory-item button {
-    margin-top: 5px;
-    padding: 5px 10px;
-    background-color: #8B4513;
-    color: #FFF8DC;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+.shop-item .item-cost {
+    color: #4a4a4a;
+    margin-bottom: 10px;
 }
-
-.inventory-item button:hover {
-    background-color: #A0522D;
-}
-
-/* Fin des styles pour l'inventaire */
 
 /* Modal styles */
 .modal {
@@ -430,94 +415,6 @@ input[type="text"], select {
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
-
-/* Nouveaux styles pour l'inventaire */
-.empty-inventory {
-    text-align: center;
-    padding: 20px;
-    background-color: rgba(255, 255, 255, 0.8);
-    border-radius: 10px;
-    margin: 20px 0;
-    border: 2px solid #8B4513;
-}
-
-.empty-inventory p {
-    margin-bottom: 10px;
-    color: #4a4a4a;
-    font-size: 1.1em;
-}
-
-.empty-inventory ul {
-    list-style-type: none;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-.empty-inventory li {
-    display: inline-block;
-    margin: 5px;
-    padding: 5px 10px;
-    background-color: #8B4513;
-    color: #FFF8DC;
-    border-radius: 5px;
-    font-weight: bold;
-    transition: all 0.3s ease;
-}
-
-.empty-inventory li:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-
-.inventory-item {
-    background-color: #f0e6d2;
-    border: 1px solid #8B4513;
-    border-radius: 5px;
-    padding: 10px;
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.inventory-item span {
-    font-weight: bold;
-    color: #4a4a4a;
-}
-
-.inventory-item button {
-    margin-left: 5px;
-    padding: 5px 10px;
-    background-color: #8B4513;
-    color: #FFF8DC;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.inventory-item button:hover {
-    background-color: #A0522D;
-}
-
-#equipped-items {
-    margin-top: 20px;
-    padding: 10px;
-    background-color: rgba(139, 69, 19, 0.1);
-    border-radius: 5px;
-}
-
-#equipped-items div {
-    margin-bottom: 10px;
-}
-
-#equipped-items button {
-    margin-left: 10px;
-}
-
-/* Fin des nouveaux styles pour l'inventaire */
 
 /* Responsive design */
 @media (max-width: 768px) {
@@ -548,5 +445,13 @@ input[type="text"], select {
 
     #combat-actions button {
         margin-bottom: 10px;
+    }
+
+    .inventory-container {
+        flex-direction: column;
+    }
+
+    #inventory-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     }
 }
