@@ -1,8 +1,8 @@
 // game.js
-import { Character, items, missions, getAvailableMissions, createEnemyForMission, calculateDamage, generateRandomLoot, getRandomCompanion, generateDonjonEvent, generateDonjonBoss, generateBossReward } from './gameData.js';
+import { Character, items, missions, getAvailableBuildings, getAvailableMissions, createEnemyForMission, calculateDamage, generateRandomLoot, getRandomCompanion, generateDonjonEvent, generateDonjonBoss, generateBossReward, initializeLairBuildingSystem } from './gameData.js';
 import * as inventoryModule from './inventory.js';
 import { initializeCombat, updateBattleInfo, playerAttack, playerDefend, playerUseSpecial, isCombatActive } from './combat.js';
-import { updatePlayerInfo, showGameMessage, showGameArea } from './utilities.js';
+import { updatePlayerInfo, showGameMessage, showGameArea, formatTime, updateConstructionProgress } from './utilities.js';
 
 let player;
 let companion;
@@ -12,13 +12,8 @@ let currentMission;
 let currentDonjonLevel;
 let regenerationInterval;
 
-function initializePlayer() {
-    if (player) {
-        player.inventory = player.inventory || [];
-        player.equippedItems = player.equippedItems || { weapon: null, armor: null, accessory: null };
-        player.companions = player.companions || [];
-        updatePlayerInfo();
-    }
+function initializePlayer(name) {
+    return new Character(name, 100, 10, 5, 100);
 }
 
 function updatePlayerStats(player) {
@@ -61,6 +56,7 @@ function initializeGame() {
     loadCharacter();
     initializePlayer();
     startRegeneration();
+    initializeLairBuildingSystem();
     console.log("Initialisation du jeu terminée");
 }
 
@@ -79,74 +75,7 @@ function initializeSocket() {
             initializeAdditionalFeatures();
         });
 
-        socket.on('roomJoined', ({ roomId, players, messages }) => {
-            currentRoom = roomId;
-            updatePlayersList(players);
-            updateChatMessages(messages);
-            showGameArea('multiplayer-area');
-        });
-
-        socket.on('playerJoined', (players) => {
-            updatePlayersList(players);
-        });
-
-        socket.on('newMessage', (message) => {
-            addChatMessage(message);
-        });
-
-        socket.on('challengeReceived', ({ challengerId }) => {
-            if (player && challengerId !== player.id) {
-                showGameMessage(`${challengerId} vous défie en duel !`);
-                document.getElementById('accept-challenge').style.display = 'block';
-            }
-        });
-
-        socket.on('battleStart', ({ challengerId, accepterId }) => {
-            if (player && (player.id === challengerId || player.id === accepterId)) {
-                startMultiplayerBattle(challengerId, accepterId);
-            }
-        });
-
-        socket.on('opponentAction', (action) => {
-            handleOpponentAction(action);
-        });
-
-        socket.on('tradeRequestReceived', ({ fromId, toId }) => {
-            if (player && player.id === toId) {
-                showGameMessage(`${fromId} vous propose un échange !`);
-                document.getElementById('accept-trade').style.display = 'block';
-            }
-        });
-
-        socket.on('tradeStart', ({ fromId, toId }) => {
-            if (player && (player.id === fromId || player.id === toId)) {
-                startTrade(fromId, toId);
-            }
-        });
-
-        socket.on('itemOffered', ({ fromId, itemId }) => {
-            if (player && fromId !== player.id) {
-                showOfferedItem(itemId);
-            }
-        });
-
-        socket.on('tradeConfirmed', ({ playerId }) => {
-            if (player && playerId !== player.id) {
-                showGameMessage("L'autre joueur a confirmé l'échange.");
-            }
-        });
-
-        socket.on('tradeCancelled', ({ playerId }) => {
-            showGameMessage("L'échange a été annulé.");
-            closeTrade();
-        });
-
-        socket.on('playerLeft', (playerId) => {
-            showGameMessage(`Le joueur ${playerId} a quitté la partie.`);
-            if (currentRoom) {
-                socket.emit('getRoomPlayers', currentRoom);
-            }
-        });
+        // ... Autres gestionnaires d'événements socket ...
 
         socket.on('disconnect', () => {
             console.log('Déconnecté du serveur');
@@ -181,7 +110,6 @@ function loadCharacter() {
     window.player = player;
 }
 
-
 function createCharacter() {
     console.log("Tentative de création de personnage");
     const nameInput = document.getElementById('hero-name');
@@ -189,6 +117,8 @@ function createCharacter() {
         const name = nameInput.value.trim();
         if (name) {
             player = new Character(name, 100, 10, 5, 100);
+            player.lair = { buildings: {}, currentConstruction: null };
+            player.resources = { bois: 100, pierre: 50, fer: 20 };
             console.log("Nouveau personnage créé :", player);
             localStorage.setItem('playerCharacter', JSON.stringify(player));
             initializePlayer();
@@ -307,6 +237,146 @@ function updateCompanionsList() {
     }
 }
 
+function openLairBuilding() {
+    console.log("Ouverture du système de construction du repaire");
+    
+    showGameArea('lair-building-area');
+
+    const lairBuildingArea = document.getElementById('lair-building-area');
+    if (!lairBuildingArea) {
+        console.error("Élément 'lair-building-area' non trouvé");
+        return;
+    }
+
+    lairBuildingArea.innerHTML = '<h2>Construction du Repaire</h2>';
+
+    const availableBuildings = getAvailableBuildings(player);
+    displayBuildings(availableBuildings);
+
+    displayPlayerResources();
+
+    initializeBuildingEvents();
+}
+
+function displayBuildings(buildings) {
+    const buildingList = document.createElement('div');
+    buildingList.id = 'building-list';
+
+    buildings.forEach(building => {
+        const buildingElement = document.createElement('div');
+        buildingElement.className = 'building';
+        buildingElement.innerHTML = `
+            <h3>${building.name} (Niveau ${building.level})</h3>
+            <p>Matériaux nécessaires :</p>
+            <ul>
+                ${Object.entries(building.materials).map(([material, quantity]) => 
+                    `<li>${material}: ${quantity}</li>`
+                ).join('')}
+            </ul>
+            <p>Temps de construction : ${formatTime(building.time)}</p>
+            <p>Avantages : ${building.benefits}</p>
+            <button class="build-button" data-building-id="${building.id}">
+                ${player.lair.buildings[building.id] ? 'Améliorer' : 'Construire'}
+            </button>
+        `;
+        buildingList.appendChild(buildingElement);
+    });
+
+    document.getElementById('lair-building-area').appendChild(buildingList);
+}
+
+function displayPlayerResources() {
+    const resourceDisplay = document.createElement('div');
+    resourceDisplay.id = 'player-resources';
+    resourceDisplay.innerHTML = `
+        <h3>Vos ressources :</h3>
+        <ul>
+            ${Object.entries(player.resources).map(([resource, quantity]) => 
+                `<li>${resource}: ${quantity}</li>`
+            ).join('')}
+        </ul>
+    `;
+    document.getElementById('lair-building-area').appendChild(resourceDisplay);
+}
+
+function initializeBuildingEvents() {
+    const lairBuildingArea = document.getElementById('lair-building-area');
+    lairBuildingArea.addEventListener('click', (e) => {
+        if (e.target.classList.contains('build-button')) {
+            const buildingId = parseInt(e.target.getAttribute('data-building-id'));
+            startBuilding(buildingId);
+        }
+    });
+}
+
+function startBuilding(buildingId) {
+    const building = getAvailableBuildings(player).find(b => b.id === buildingId);
+    if (!building) {
+        showGameMessage("Bâtiment non trouvé.");
+        return;
+    }
+
+    const canBuild = Object.entries(building.materials).every(([material, quantity]) => 
+        (player.resources[material] || 0) >= quantity
+    );
+
+    if (canBuild) {
+        Object.entries(building.materials).forEach(([material, quantity]) => {
+            player.resources[material] -= quantity;
+        });
+
+        player.lair.currentConstruction = {
+            buildingId: buildingId,
+            endTime: Date.now() + building.time * 1000
+        };
+
+        showGameMessage(`Construction de ${building.name} commencée. Temps estimé : ${formatTime(building.time)}`);
+        updatePlayerInfo(player);
+        displayPlayerResources();
+
+        startConstructionTimer(building.time);
+    } else {
+        showGameMessage("Vous n'avez pas assez de ressources pour construire ce bâtiment.");
+    }
+}
+
+function startConstructionTimer(duration) {
+    const timer = setInterval(() => {
+        const timeLeft = Math.max(0, (player.lair.currentConstruction.endTime - Date.now()) / 1000);
+        updateConstructionProgress(timeLeft, duration);
+
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            completeConstruction();
+        }
+    }, 1000);
+}
+
+function completeConstruction() {
+    const buildingId = player.lair.currentConstruction.buildingId;
+    const building = getAvailableBuildings(player).find(b => b.id === buildingId);
+
+    if (building) {
+        if (!player.lair.buildings[buildingId]) {
+            player.lair.buildings[buildingId] = { level: 1 };
+        } else {
+            player.lair.buildings[buildingId].level++;
+        }
+
+        showGameMessage(`Construction de ${building.name} terminée !`);
+        applyBuildingBenefits(building);
+    }
+
+    player.lair.currentConstruction = null;
+    updatePlayerInfo(player);
+    openLairBuilding(); // Rafraîchir l'affichage
+}
+
+function applyBuildingBenefits(building) {
+    // Logique pour appliquer les avantages du bâtiment
+    console.log(`Avantages appliqués pour ${building.name}`);
+}
+
 function saveGame() {
     console.log("Sauvegarde du jeu");
     localStorage.setItem('playerCharacter', JSON.stringify(player));
@@ -316,6 +386,78 @@ function saveGame() {
 function loadGame() {
     console.log("Chargement du jeu");
     loadCharacter();
+}
+
+function initializeEventListeners() {
+    console.log("Initialisation des écouteurs d'événements");
+
+    const buttonHandlers = {
+        'start-adventure': startAdventure,
+        'start-donjon': startDonjon,
+        'open-multiplayer': openMultiplayer,
+        'open-shop': handleOpenShop,
+        'open-inventory': openInventory,
+        'manage-companions': manageCompanions,
+        'open-lair-building': openLairBuilding,
+        'save-game': saveGame,
+        'load-game': loadGame,
+        'join-room': joinRoom,
+        'send-message': sendChatMessage,
+        'challenge-player': initiateChallenge,
+        'accept-challenge': acceptChallenge,
+        'trade-request': initiateTradeRequest,
+        'accept-trade': acceptTradeRequest,
+        'confirm-trade': confirmTrade,
+        'cancel-trade': cancelTrade,
+        'attack-button': () => window.gameActions.playerAttack(),
+        'defend-button': () => window.gameActions.playerDefend(),
+        'special-button': () => window.gameActions.playerUseSpecial(),
+        'create-character': createCharacter,
+        'next-donjon-event': nextDonjonEvent
+    };
+
+    for (const [id, handler] of Object.entries(buttonHandlers)) {
+        const button = document.getElementById(id);
+        if (button) {
+            button.addEventListener('click', handler);
+            console.log(`Écouteur ajouté pour ${id}`);
+        } else {
+            console.warn(`Bouton ${id} non trouvé`);
+        }
+    }
+
+    const navHandlers = {
+        'nav-home': () => showGameArea('main-menu'),
+        'nav-adventure': () => {
+            showGameArea('mission-area');
+            startAdventure();
+        },
+        'nav-donjon': () => {
+            showGameArea('donjon-area');
+            startDonjon();
+        },
+        'nav-multiplayer': openMultiplayer,
+        'nav-inventory': openInventory,
+        'nav-shop': handleOpenShop,
+        'nav-companions': manageCompanions,
+        'nav-lair-building': openLairBuilding
+    };
+
+    for (const [id, handler] of Object.entries(navHandlers)) {
+        const navItem = document.getElementById(id);
+        if (navItem) {
+            navItem.addEventListener('click', handler);
+            console.log(`Écouteur de navigation ajouté pour ${id}`);
+        } else {
+            console.warn(`Élément de navigation ${id} non trouvé`);
+        }
+    }
+
+    document.addEventListener('click', (e) => {
+        console.log(`Clic détecté sur l'élément:`, e.target);
+    });
+
+    console.log("Initialisation des écouteurs d'événements terminée");
 }
 
 function joinRoom() {
@@ -340,28 +482,6 @@ function sendChatMessage() {
             socket.emit('chatMessage', { roomId: currentRoom, message: { sender: player.name, content: message } });
             messageInput.value = '';
         }
-    }
-}
-
-function updateChatMessages(messages) {
-    console.log("Mise à jour des messages du chat");
-    const chatMessages = document.getElementById('chat-messages');
-    if (chatMessages) {
-        chatMessages.innerHTML = '';
-        messages.forEach(message => {
-            addChatMessage(message);
-        });
-    }
-}
-
-function addChatMessage(message) {
-    console.log("Ajout d'un message au chat");
-    const chatMessages = document.getElementById('chat-messages');
-    if (chatMessages) {
-        const messageElement = document.createElement('div');
-        messageElement.textContent = `${message.sender}: ${message.content}`;
-        chatMessages.appendChild(messageElement);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 }
 
@@ -417,77 +537,6 @@ function cancelTrade() {
     }
 }
 
-function updatePlayersList(players) {
-    console.log("Mise à jour de la liste des joueurs");
-    const playersList = document.getElementById('players-list');
-    if (playersList) {
-        playersList.innerHTML = '';
-        players.forEach(p => {
-            const playerElement = document.createElement('div');
-            playerElement.textContent = `${p.name} (Niveau ${p.level})`;
-            playerElement.dataset.playerId = p.id;
-            playersList.appendChild(playerElement);
-        });
-    }
-}
-
-function startMultiplayerBattle(challengerId, accepterId) {
-    console.log("Début d'un combat multijoueur");
-    showGameArea('battle-area');
-    initializeCombat(player, null, { name: "Adversaire", hp: 100, attack: 10, defense: 5 }, null);
-    updateBattleInfo();
-}
-
-function handleOpponentAction(action) {
-    console.log("Gestion de l'action de l'adversaire");
-    if (action.type === 'attack' && player) {
-        const damage = calculateDamage(action.attacker, player);
-        player.hp -= damage;
-        showGameMessage(`L'adversaire vous inflige ${damage} dégâts.`);
-        updateBattleInfo();
-    }
-}
-
-function startTrade(fromId, toId) {
-    console.log("Début d'un échange");
-    showGameArea('trade-area');
-    displayTradeInventory();
-}
-
-function displayTradeInventory() {
-    console.log("Affichage de l'inventaire d'échange");
-    const tradeInventoryArea = document.getElementById('trade-inventory');
-    if (tradeInventoryArea && player) {
-        tradeInventoryArea.innerHTML = '<h3>Votre inventaire</h3>';
-        player.inventory.forEach((item, index) => {
-            const itemElement = document.createElement('div');
-            itemElement.innerHTML = `
-                <span>${item.name}</span>
-                <button onclick="window.gameActions.offerItem(${index})">Offrir</button>
-            `;
-            tradeInventoryArea.appendChild(itemElement);
-        });
-    }
-}
-
-function showOfferedItem(itemId) {
-    console.log("Affichage d'un objet offert");
-    const item = items.find(i => i.id === itemId);
-    if (item) {
-        const offeredItemsElement = document.getElementById('offered-items');
-        if (offeredItemsElement) {
-            const itemElement = document.createElement('div');
-            itemElement.textContent = item.name;
-            offeredItemsElement.appendChild(itemElement);
-        }
-    }
-}
-
-function closeTrade() {
-    console.log("Fermeture de l'échange");
-    showGameArea('multiplayer-area');
-}
-
 function getOtherPlayerId() {
     console.log("Récupération de l'ID de l'autre joueur");
     const playersList = document.getElementById('players-list');
@@ -497,125 +546,6 @@ function getOtherPlayerId() {
         return otherPlayer ? otherPlayer.dataset.playerId : null;
     }
     return null;
-}
-
-function initializeAdditionalFeatures() {
-    console.log("Initialisation des fonctionnalités supplémentaires");
-    updateLeaderboard();
-    initializeGroupQuests();
-    updateGuildsList();
-    initializeCraftingSystem();
-    setTimeout(startWorldEvent, 3600000); // Premier événement après 1 heure
-}
-
-function updateLeaderboard() {
-    console.log("Mise à jour du classement");
-    const leaderboardArea = document.getElementById('leaderboard-area');
-    if (leaderboardArea) {
-        leaderboardArea.innerHTML = '<h2>Classement</h2>';
-        // Ajouter la logique pour récupérer et afficher le classement
-    }
-}
-
-function initializeGroupQuests() {
-    console.log("Initialisation des quêtes de groupe");
-    const groupQuestsArea = document.getElementById('group-quests-area');
-    if (groupQuestsArea) {
-        groupQuestsArea.innerHTML = '<h2>Quêtes de groupe disponibles</h2>';
-        // Ajouter la logique pour générer et afficher les quêtes de groupe
-    }
-}
-
-function startWorldEvent() {
-    console.log("Démarrage d'un événement mondial");
-    const eventName = "Invasion de dragons";
-    showGameMessage(`Un événement mondial a commencé : ${eventName}`);
-    // Ajouter la logique pour l'événement mondial
-}
-
-function initializeCraftingSystem() {
-    console.log("Initialisation du système d'artisanat");
-    const craftingArea = document.getElementById('crafting-area');
-    if (craftingArea) {
-        craftingArea.innerHTML = '<h2>Système d artisanat</h2>';
-        // Ajouter ici la logique pour initialiser le système d'artisanat
-    }
-}
-
-function initializeEventListeners() {
-    console.log("Initialisation des écouteurs d'événements");
-
-    const buttonHandlers = {
-        'start-adventure': startAdventure,
-        'start-donjon': startDonjon,
-        'open-multiplayer': openMultiplayer,
-        'open-shop': handleOpenShop,
-        'open-inventory': openInventory,
-        'manage-companions': manageCompanions,
-        'open-guilds': openGuilds,
-        'open-crafting': openCrafting,
-        'save-game': saveGame,
-        'load-game': loadGame,
-        'join-room': joinRoom,
-        'send-message': sendChatMessage,
-        'challenge-player': initiateChallenge,
-        'accept-challenge': acceptChallenge,
-        'trade-request': initiateTradeRequest,
-        'accept-trade': acceptTradeRequest,
-        'confirm-trade': confirmTrade,
-        'cancel-trade': cancelTrade,
-        'attack-button': () => window.gameActions.playerAttack(),
-        'defend-button': () => window.gameActions.playerDefend(),
-        'special-button': () => window.gameActions.playerUseSpecial(),
-        'create-character': createCharacter,
-        'next-donjon-event': nextDonjonEvent
-    };
-
-    for (const [id, handler] of Object.entries(buttonHandlers)) {
-        const button = document.getElementById(id);
-        if (button) {
-            button.addEventListener('click', handler);
-            console.log(`Écouteur ajouté pour ${id}`);
-        } else {
-            console.warn(`Bouton ${id} non trouvé`);
-        }
-    }
-
-    // Gestionnaires d'événements pour la navigation
-    const navHandlers = {
-        'nav-home': () => showGameArea('main-menu'),
-        'nav-adventure': () => {
-            showGameArea('mission-area');
-            startAdventure();
-        },
-        'nav-donjon': () => {
-            showGameArea('donjon-area');
-            startDonjon();
-        },
-        'nav-multiplayer': openMultiplayer,
-        'nav-inventory': openInventory,
-        'nav-shop': handleOpenShop,
-        'nav-companions': manageCompanions,
-        'nav-guilds': openGuilds,
-        'nav-crafting': openCrafting
-    };
-
-    for (const [id, handler] of Object.entries(navHandlers)) {
-        const navItem = document.getElementById(id);
-        if (navItem) {
-            navItem.addEventListener('click', handler);
-            console.log(`Écouteur de navigation ajouté pour ${id}`);
-        } else {
-            console.warn(`Élément de navigation ${id} non trouvé`);
-        }
-    }
-
-    // Ajout d'un écouteur global pour les clics
-    document.addEventListener('click', (e) => {
-        console.log(`Clic détecté sur l'élément:`, e.target);
-    });
-
-    console.log("Initialisation des écouteurs d'événements terminée");
 }
 
 // Objet gameActions pour les actions accessibles globalement
@@ -628,8 +558,7 @@ window.gameActions = {
     openShop: handleOpenShop,
     openInventory,
     manageCompanions,
-    openGuilds,
-    openCrafting,
+    openLairBuilding,
     saveGame,
     loadGame,
     joinRoom,
@@ -710,8 +639,7 @@ export {
     handleOpenShop as openShop,
     openInventory,
     manageCompanions,
-    openGuilds,
-    openCrafting,
+    openLairBuilding,
     saveGame,
     loadGame,
     joinRoom,
@@ -727,8 +655,7 @@ export {
     updatePlayerInfo,
     updateLeaderboard,
     initializeGroupQuests,
-    updateGuildsList,
-    initializeCraftingSystem,
+    initializeLairBuildingSystem,
     startWorldEvent
 };
 
