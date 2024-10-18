@@ -645,7 +645,7 @@ function initializeCraftingSystem() {
 // Objet gameActions pour les actions accessibles globalement
 window.gameActions = {
     ...window.gameActions,
-    ...inventoryModule
+    ...inventoryModule,
     startAdventure: startAdventure,
     startDonjon: startDonjon,
     openMultiplayer: openMultiplayer,
