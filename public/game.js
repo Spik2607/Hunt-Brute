@@ -548,6 +548,104 @@ function getOtherPlayerId() {
     return null;
 }
 
+function updatePlayersList(players) {
+    console.log("Mise à jour de la liste des joueurs");
+    const playersList = document.getElementById('players-list');
+    if (playersList) {
+        playersList.innerHTML = '';
+        players.forEach(p => {
+            const playerElement = document.createElement('div');
+            playerElement.textContent = `${p.name} (Niveau ${p.level})`;
+            playerElement.dataset.playerId = p.id;
+            playersList.appendChild(playerElement);
+        });
+    }
+}
+
+function updateChatMessages(messages) {
+    console.log("Mise à jour des messages du chat");
+    const chatMessages = document.getElementById('chat-messages');
+    if (chatMessages) {
+        chatMessages.innerHTML = '';
+        messages.forEach(message => {
+            addChatMessage(message);
+        });
+    }
+}
+
+function addChatMessage(message) {
+    console.log("Ajout d'un message au chat");
+    const chatMessages = document.getElementById('chat-messages');
+    if (chatMessages) {
+        const messageElement = document.createElement('div');
+        messageElement.textContent = `${message.sender}: ${message.content}`;
+        chatMessages.appendChild(messageElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+}
+
+function startMultiplayerBattle(challengerId, accepterId) {
+    console.log("Début d'un combat multijoueur");
+    showGameArea('battle-area');
+    initializeCombat(player, null, { name: "Adversaire", hp: 100, attack: 10, defense: 5 }, null);
+    updateBattleInfo();
+}
+
+function handleOpponentAction(action) {
+    console.log("Gestion de l'action de l'adversaire");
+    if (action.type === 'attack' && player) {
+        const damage = calculateDamage(action.attacker, player);
+        player.hp -= damage;
+        showGameMessage(`L'adversaire vous inflige ${damage} dégâts.`);
+        updateBattleInfo();
+    }
+}
+
+function updateLeaderboard() {
+    console.log("Mise à jour du classement");
+    const leaderboardArea = document.getElementById('leaderboard-area');
+    if (leaderboardArea) {
+        leaderboardArea.innerHTML = '<h2>Classement</h2>';
+        // Vous devrez implémenter la logique pour récupérer et afficher le classement réel ici
+        // Par exemple :
+        // getLeaderboardData().then(data => {
+        //     data.forEach((player, index) => {
+        //         const playerElement = document.createElement('div');
+        //         playerElement.textContent = `${index + 1}. ${player.name} - Niveau ${player.level}`;
+        //         leaderboardArea.appendChild(playerElement);
+        //     });
+        // });
+    }
+}
+
+function initializeGroupQuests() {
+    console.log("Initialisation des quêtes de groupe");
+    const groupQuestsArea = document.getElementById('group-quests-area');
+    if (groupQuestsArea) {
+        groupQuestsArea.innerHTML = '<h2>Quêtes de groupe disponibles</h2>';
+        // Implémentez ici la logique pour générer et afficher les quêtes de groupe
+        // Par exemple :
+        // const groupQuests = getAvailableGroupQuests();
+        // groupQuests.forEach(quest => {
+        //     const questElement = document.createElement('div');
+        //     questElement.innerHTML = `
+        //         <h3>${quest.name}</h3>
+        //         <p>${quest.description}</p>
+        //         <button onclick="joinGroupQuest(${quest.id})">Rejoindre</button>
+        //     `;
+        //     groupQuestsArea.appendChild(questElement);
+        // });
+    }
+}
+
+function startWorldEvent() {
+    console.log("Démarrage d'un événement mondial");
+    const eventName = "Invasion de dragons";
+    showGameMessage(`Un événement mondial a commencé : ${eventName}`);
+    // Implémentez ici la logique pour l'événement mondial
+}
+
+
 // Objet gameActions pour les actions accessibles globalement
 window.gameActions = {
     ...window.gameActions,
@@ -619,15 +717,25 @@ window.gameActions = {
             showGameMessage(`${companion.name} est maintenant votre compagnon actif.`);
             updateCompanionsList();
         }
-    }
+    },
+    startBuilding: (buildingId) => {
+        const building = getAvailableBuildings(player).find(b => b.id === buildingId);
+        if (building) {
+            startBuilding(buildingId);
+        } else {
+            showGameMessage("Bâtiment non disponible.");
+        }
+    },
+    updatePlayersList,
+    updateChatMessages,
+    addChatMessage,
+    startMultiplayerBattle,
+    handleOpponentAction,
+    updateLeaderboard,
+    initializeGroupQuests,
+    startWorldEvent,
+    createCharacter
 };
-
-// Initialisation du jeu au chargement du DOM
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("DOM chargé, initialisation du jeu...");
-    initializeGame();
-    initializeEventListeners();
-});
 
 // Exports
 export {
@@ -656,7 +764,19 @@ export {
     updateLeaderboard,
     initializeGroupQuests,
     initializeLairBuildingSystem,
-    startWorldEvent
+    startWorldEvent,
+    updatePlayersList,
+    updateChatMessages,
+    addChatMessage,
+    startMultiplayerBattle,
+    handleOpponentAction
 };
+
+// Initialisation du jeu au chargement du DOM
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("DOM chargé, initialisation du jeu...");
+    initializeGame();
+    initializeEventListeners();
+});
 
 console.log("Module de jeu chargé");
