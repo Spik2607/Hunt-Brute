@@ -13,7 +13,6 @@
         <header>
             <h1><i class="fas fa-dragon"></i> Hunt-Brute</h1>
         </header>
-         <div id="game-messages"></div>
 
         <nav>
             <button id="nav-home"><i class="fas fa-home"></i> Accueil</button>
@@ -23,8 +22,7 @@
             <button id="nav-inventory"><i class="fas fa-backpack"></i> Inventaire</button>
             <button id="nav-shop"><i class="fas fa-store"></i> Boutique</button>
             <button id="nav-companions"><i class="fas fa-user-friends"></i> Compagnons</button>
-            <button id="nav-guilds"><i class="fas fa-flag"></i> Guildes</button>
-            <button id="nav-crafting"><i class="fas fa-hammer"></i> Artisanat</button>
+            <button id="nav-lair-building"><i class="fas fa-castle"></i> Repaire</button>
         </nav>
 
         <div id="player-info">
@@ -56,8 +54,7 @@
                 <button id="open-inventory"><i class="fas fa-backpack"></i> Inventaire</button>
                 <button id="open-shop"><i class="fas fa-store"></i> Boutique</button>
                 <button id="manage-companions"><i class="fas fa-user-friends"></i> Gérer les compagnons</button>
-                <button id="open-guilds"><i class="fas fa-flag"></i> Guildes</button>
-                <button id="open-crafting"><i class="fas fa-hammer"></i> Artisanat</button>
+                <button id="open-lair-building"><i class="fas fa-castle"></i> Construire le repaire</button>
                 <button id="save-game"><i class="fas fa-save"></i> Sauvegarder</button>
                 <button id="load-game"><i class="fas fa-folder-open"></i> Charger</button>
             </div>
@@ -112,14 +109,11 @@
                 <div id="companions-list"></div>
             </div>
 
-            <div id="guild-area" class="game-section" style="display: none;">
-                <h2><i class="fas fa-flag"></i> Guildes</h2>
-                <div id="guilds-list"></div>
-            </div>
-
-            <div id="crafting-area" class="game-section" style="display: none;">
-                <h2><i class="fas fa-hammer"></i> Artisanat</h2>
-                <div id="crafting-recipes"></div>
+            <div id="lair-building-area" class="game-section" style="display: none;">
+                <h2><i class="fas fa-castle"></i> Construction du Repaire</h2>
+                <div id="available-buildings"></div>
+                <div id="construction-progress"></div>
+                <div id="player-resources"></div>
             </div>
 
             <div id="multiplayer-area" class="game-section" style="display: none;">
@@ -149,7 +143,19 @@
                 <div id="donjon-event"></div>
                 <button id="next-donjon-event"><i class="fas fa-step-forward"></i> Continuer</button>
             </div>
+
+            <div id="leaderboard-area" class="game-section" style="display: none;">
+                <h2><i class="fas fa-trophy"></i> Classement</h2>
+                <div id="leaderboard-list"></div>
+            </div>
+
+            <div id="group-quests-area" class="game-section" style="display: none;">
+                <h2><i class="fas fa-users-cog"></i> Quêtes de Groupe</h2>
+                <div id="available-group-quests"></div>
+            </div>
         </div>
+
+        <div id="game-messages"></div>
     </div>
 
     <div id="victory-modal" class="modal">
@@ -162,12 +168,14 @@
             <button id="continue-button" class="action-button">Continuer</button>
         </div>
     </div>
-<script src="/socket.io/socket.io.js"></script>
-<script type="module" src="utilities.js"></script>
-<script type="module" src="gameData.js"></script>
-<script type="module" src="inventory.js"></script>
-<script type="module" src="game.js"></script>
-<script type="module">
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="module" src="utilities.js"></script>
+    <script type="module" src="gameData.js"></script>
+    <script type="module" src="inventory.js"></script>
+    <script type="module" src="combat.js"></script>
+    <script type="module" src="game.js"></script>
+    <script type="module">
     import { initializeGame } from './game.js';
     
     document.addEventListener('DOMContentLoaded', () => {
