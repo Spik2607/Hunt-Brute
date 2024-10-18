@@ -2,7 +2,6 @@
 
 // Importez les fonctions nécessaires de gameData.js
 import { item, getItemStats } from './gameData.js';
-import { updatePlayerStats } from './game.js' ;
 
 export function equipItem(player, index) {
     if (!player || !Array.isArray(player.inventory) || index < 0 || index >= player.inventory.length) {
