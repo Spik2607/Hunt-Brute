@@ -39,6 +39,32 @@ function stopRegeneration() {
     clearInterval(regenerationInterval);
 }
 
+function updatePlayerStats(player) {
+    // Réinitialiser les stats du joueur à leurs valeurs de base
+    player.attack = player.baseAttack;
+    player.defense = player.baseDefense;
+    player.maxHp = player.baseMaxHp;
+
+    // Appliquer les effets des objets équipés
+    for (const slot in player.equippedItems) {
+        const item = player.equippedItems[slot];
+        if (item) {
+            if (item.attack) player.attack += item.attack;
+            if (item.defense) player.defense += item.defense;
+            if (item.maxHp) player.maxHp += item.maxHp;
+        }
+    }
+
+    // S'assurer que les HP actuels ne dépassent pas le nouveau maxHp
+    player.hp = Math.min(player.hp, player.maxHp);
+
+    // Mettre à jour l'affichage
+    updatePlayerInfo(player);
+}
+
+// Ajoutez cette fonction à window.gameActions
+window.gameActions.updatePlayerStats = updatePlayerStats;
+
 function initializeGame() {
     console.log("Initialisation du jeu...");
     initializeSocket();
