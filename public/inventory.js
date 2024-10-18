@@ -1,5 +1,6 @@
 // inventory.js
 import { items, getItemStats } from './gameData.js';
+import { updatePlayerStats } from './game.js';
 
 export function equipItem(player, index) {
     if (!player || !Array.isArray(player.inventory) || index < 0 || index >= player.inventory.length) {
