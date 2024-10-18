@@ -119,19 +119,28 @@ export function updateEquippedItemsDisplay(player) {
 
     equippedItemsElement.innerHTML = `
         <h3>Équipement actuel</h3>
-        <div>
+        <div id="equipped-weapon">
             Arme: ${player.equippedItems.weapon ? player.equippedItems.weapon.name : 'Aucune'}
-            ${player.equippedItems.weapon ? `<button onclick="window.gameActions.unequipItem(window.player, 'weapon')">Déséquiper</button>` : ''}
+            ${player.equippedItems.weapon ? `<button class="unequip-button" data-type="weapon">Déséquiper</button>` : ''}
         </div>
-        <div>
+        <div id="equipped-armor">
             Armure: ${player.equippedItems.armor ? player.equippedItems.armor.name : 'Aucune'}
-            ${player.equippedItems.armor ? `<button onclick="window.gameActions.unequipItem(window.player, 'armor')">Déséquiper</button>` : ''}
+            ${player.equippedItems.armor ? `<button class="unequip-button" data-type="armor">Déséquiper</button>` : ''}
         </div>
-        <div>
+        <div id="equipped-accessory">
             Accessoire: ${player.equippedItems.accessory ? player.equippedItems.accessory.name : 'Aucun'}
-            ${player.equippedItems.accessory ? `<button onclick="window.gameActions.unequipItem(window.player, 'accessory')">Déséquiper</button>` : ''}
+            ${player.equippedItems.accessory ? `<button class="unequip-button" data-type="accessory">Déséquiper</button>` : ''}
         </div>
     `;
+
+    // Ajouter des gestionnaires d'événements pour les boutons de déséquipement
+    const unequipButtons = equippedItemsElement.querySelectorAll('.unequip-button');
+    unequipButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const type = this.getAttribute('data-type');
+            window.gameActions.unequipItem(window.player, type);
+        });
+    });
 }
 
 export function openShop(player) {
