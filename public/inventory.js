@@ -2,6 +2,7 @@
 import { items, getItemStats } from './gameData.js';
 
 export function equipItem(player, index) {
+    console.log("Tentative d'équipement", player, index);
     if (!player || !Array.isArray(player.inventory) || index < 0 || index >= player.inventory.length) {
         console.error("Équipement impossible : joueur ou index invalide");
         return;
@@ -26,6 +27,7 @@ export function equipItem(player, index) {
 }
 
 export function unequipItem(player, type) {
+    console.log("Tentative de déséquipement", player, type);
     if (!player || !player.equippedItems) {
         console.error("Déséquipement impossible : joueur invalide");
         return;
@@ -45,6 +47,7 @@ export function unequipItem(player, type) {
 }
 
 export function useItem(player, index) {
+    console.log("Tentative d'utilisation d'item", player, index);
     if (!player || !Array.isArray(player.inventory) || index < 0 || index >= player.inventory.length) {
         console.error("Utilisation impossible : joueur ou index invalide");
         return;
@@ -96,9 +99,9 @@ export function updateInventoryDisplay(player) {
             itemElement.className = 'inventory-item';
             itemElement.innerHTML = `
                 <span>${item.name}</span>
-                <button onclick="window.gameActions.equipItem(${index})">Équiper</button>
-                <button onclick="window.gameActions.useItem(${index})">Utiliser</button>
-                <button onclick="window.gameActions.sellItem(${index})">Vendre</button>
+                <button onclick="window.gameActions.equipItem(window.player, ${index})">Équiper</button>
+                <button onclick="window.gameActions.useItem(window.player, ${index})">Utiliser</button>
+                <button onclick="window.gameActions.sellItem(window.player, ${index})">Vendre</button>
             `;
             itemElement.title = getItemStats(item);
             inventoryElement.appendChild(itemElement);
@@ -109,6 +112,7 @@ export function updateInventoryDisplay(player) {
 }
 
 export function updateEquippedItemsDisplay(player) {
+    console.log("Mise à jour de l'affichage des objets équipés", player);
     if (!player || !player.equippedItems) {
         console.error("Mise à jour des objets équipés impossible : joueur invalide");
         return;
@@ -120,20 +124,21 @@ export function updateEquippedItemsDisplay(player) {
         <h3>Équipement actuel</h3>
         <div>
             Arme: ${player.equippedItems.weapon ? player.equippedItems.weapon.name : 'Aucune'}
-            ${player.equippedItems.weapon ? `<button onclick="window.gameActions.unequipItem('weapon')">Déséquiper</button>` : ''}
+            ${player.equippedItems.weapon ? `<button onclick="window.gameActions.unequipItem(window.player, 'weapon')">Déséquiper</button>` : ''}
         </div>
         <div>
             Armure: ${player.equippedItems.armor ? player.equippedItems.armor.name : 'Aucune'}
-            ${player.equippedItems.armor ? `<button onclick="window.gameActions.unequipItem('armor')">Déséquiper</button>` : ''}
+            ${player.equippedItems.armor ? `<button onclick="window.gameActions.unequipItem(window.player, 'armor')">Déséquiper</button>` : ''}
         </div>
         <div>
             Accessoire: ${player.equippedItems.accessory ? player.equippedItems.accessory.name : 'Aucun'}
-            ${player.equippedItems.accessory ? `<button onclick="window.gameActions.unequipItem('accessory')">Déséquiper</button>` : ''}
+            ${player.equippedItems.accessory ? `<button onclick="window.gameActions.unequipItem(window.player, 'accessory')">Déséquiper</button>` : ''}
         </div>
     `;
 }
 
 export function openShop(player) {
+    console.log("Ouverture de la boutique", player);
     if (!player) {
         console.error("Ouverture de la boutique impossible : joueur invalide");
         return;
@@ -150,7 +155,7 @@ export function openShop(player) {
         itemElement.className = 'shop-item';
         itemElement.innerHTML = `
             <span>${item.name} - ${item.cost} or</span>
-            <button onclick="window.gameActions.buyItem('${item.id}')">Acheter</button>
+            <button onclick="window.gameActions.buyItem(window.player, '${item.id}')">Acheter</button>
         `;
         itemElement.title = getItemStats(item);
         shopElement.appendChild(itemElement);
@@ -160,6 +165,7 @@ export function openShop(player) {
 }
 
 export function buyItem(player, itemId) {
+    console.log("Tentative d'achat", player, itemId);
     if (!player) {
         console.error("Achat impossible : joueur invalide");
         return;
@@ -181,6 +187,7 @@ export function buyItem(player, itemId) {
 }
 
 export function sellItem(player, index) {
+    console.log("Tentative de vente", player, index);
     if (!player || !Array.isArray(player.inventory) || index < 0 || index >= player.inventory.length) {
         console.error("Vente impossible : joueur ou index invalide");
         return;
@@ -197,6 +204,7 @@ export function sellItem(player, index) {
 }
 
 export function addItemToInventory(player, item) {
+    console.log("Ajout d'item à l'inventaire", player, item);
     if (!player || !item) {
         console.error("Ajout d'item impossible : joueur ou item invalide");
         return;
@@ -241,7 +249,11 @@ window.gameActions = {
     unequipItem,
     useItem,
     buyItem,
-    sellItem
+    sellItem,
+    addItemToInventory,
+    updateInventoryDisplay,
+    updateEquippedItemsDisplay,
+    openShop
 };
 
 export const inventoryModule = {
