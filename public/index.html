@@ -161,58 +161,57 @@
             <button id="continue-button" class="action-button">Continuer</button>
         </div>
     </div>
-
-    <script src="/socket.io/socket.io.js"></script>
+<script src="/socket.io/socket.io.js"></script>
 <script type="module" src="gameData.js"></script>
 <script type="module" src="inventory.js"></script>
-
-    <script type="module">
-        import { initializeGame } from './game.js';
+<script type="module" src="game.js"></script>
+<script type="module">
+    import { initializeGame } from './game.js';
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        initializeGame();
         
-        document.addEventListener('DOMContentLoaded', () => {
-            initializeGame();
-            
-            // Gestionnaires d'événements pour les boutons
-            document.getElementById('create-character').addEventListener('click', () => window.gameActions.createCharacter());
-            document.getElementById('start-adventure').addEventListener('click', () => window.gameActions.startAdventure());
-            document.getElementById('start-donjon').addEventListener('click', () => window.gameActions.startDonjon());
-            document.getElementById('open-multiplayer').addEventListener('click', () => window.gameActions.openMultiplayer());
-            document.getElementById('open-inventory').addEventListener('click', () => window.gameActions.openInventory());
-            document.getElementById('open-shop').addEventListener('click', () => window.gameActions.openShop());
-            document.getElementById('manage-companions').addEventListener('click', () => window.gameActions.manageCompanions());
-            document.getElementById('open-guilds').addEventListener('click', () => window.gameActions.openGuilds());
-            document.getElementById('open-crafting').addEventListener('click', () => window.gameActions.openCrafting());
-            document.getElementById('save-game').addEventListener('click', () => window.gameActions.saveGame());
-            document.getElementById('load-game').addEventListener('click', () => window.gameActions.loadGame());
-            document.getElementById('attack-button').addEventListener('click', () => window.gameActions.playerAttack());
-            document.getElementById('defend-button').addEventListener('click', () => window.gameActions.playerDefend());
-            document.getElementById('special-button').addEventListener('click', () => window.gameActions.playerUseSpecial());
-            document.getElementById('join-room').addEventListener('click', () => window.gameActions.joinRoom());
-            document.getElementById('send-message').addEventListener('click', () => window.gameActions.sendChatMessage());
-            document.getElementById('challenge-player').addEventListener('click', () => window.gameActions.initiateChallenge());
-            document.getElementById('trade-request').addEventListener('click', () => window.gameActions.initiateTradeRequest());
-            document.getElementById('confirm-trade').addEventListener('click', () => window.gameActions.confirmTrade());
-            document.getElementById('cancel-trade').addEventListener('click', () => window.gameActions.cancelTrade());
-            document.getElementById('next-donjon-event').addEventListener('click', () => window.gameActions.nextDonjonEvent());
-            document.getElementById('continue-button').addEventListener('click', () => window.gameActions.continueAfterVictory());
+        // Gestionnaires d'événements pour les boutons
+        document.getElementById('create-character').addEventListener('click', () => window.gameActions.createCharacter());
+        document.getElementById('start-adventure').addEventListener('click', () => window.gameActions.startAdventure());
+        document.getElementById('start-donjon').addEventListener('click', () => window.gameActions.startDonjon());
+        document.getElementById('open-multiplayer').addEventListener('click', () => window.gameActions.openMultiplayer());
+        document.getElementById('open-inventory').addEventListener('click', () => window.gameActions.openInventory());
+        document.getElementById('open-shop').addEventListener('click', () => window.gameActions.openShop());
+        document.getElementById('manage-companions').addEventListener('click', () => window.gameActions.manageCompanions());
+        document.getElementById('open-guilds').addEventListener('click', () => window.gameActions.openGuilds());
+        document.getElementById('open-crafting').addEventListener('click', () => window.gameActions.openCrafting());
+        document.getElementById('save-game').addEventListener('click', () => window.gameActions.saveGame());
+        document.getElementById('load-game').addEventListener('click', () => window.gameActions.loadGame());
+        document.getElementById('attack-button').addEventListener('click', () => window.gameActions.playerAttack());
+        document.getElementById('defend-button').addEventListener('click', () => window.gameActions.playerDefend());
+        document.getElementById('special-button').addEventListener('click', () => window.gameActions.playerUseSpecial());
+        document.getElementById('join-room').addEventListener('click', () => window.gameActions.joinRoom());
+        document.getElementById('send-message').addEventListener('click', () => window.gameActions.sendChatMessage());
+        document.getElementById('challenge-player').addEventListener('click', () => window.gameActions.initiateChallenge());
+        document.getElementById('trade-request').addEventListener('click', () => window.gameActions.initiateTradeRequest());
+        document.getElementById('confirm-trade').addEventListener('click', () => window.gameActions.confirmTrade());
+        document.getElementById('cancel-trade').addEventListener('click', () => window.gameActions.cancelTrade());
+        document.getElementById('next-donjon-event').addEventListener('click', () => window.gameActions.nextDonjonEvent());
+        document.getElementById('continue-button').addEventListener('click', () => window.gameActions.continueAfterVictory());
 
-            // Gestionnaires d'événements pour la navigation
-            document.getElementById('nav-home').addEventListener('click', () => window.gameActions.showGameArea('main-menu'));
-            document.getElementById('nav-adventure').addEventListener('click', () => {
-                window.gameActions.showGameArea('mission-area');
-                window.gameActions.startAdventure();
-            });
-            document.getElementById('nav-donjon').addEventListener('click', () => {
-                window.gameActions.showGameArea('donjon-area');
-                window.gameActions.startDonjon();
-            });
-            document.getElementById('nav-multiplayer').addEventListener('click', () => window.gameActions.openMultiplayer());
-            document.getElementById('nav-inventory').addEventListener('click', () => window.gameActions.openInventory());
-            document.getElementById('nav-shop').addEventListener('click', () => window.gameActions.openShop());
-            document.getElementById('nav-companions').addEventListener('click', () => window.gameActions.manageCompanions());
-            document.getElementById('nav-guilds').addEventListener('click', () => window.gameActions.openGuilds());
-            document.getElementById('nav-crafting').addEventListener('click', () => window.gameActions.openCrafting());
+        // Gestionnaires d'événements pour la navigation
+        document.getElementById('nav-home').addEventListener('click', () => window.gameActions.showGameArea('main-menu'));
+        document.getElementById('nav-adventure').addEventListener('click', () => {
+            window.gameActions.showGameArea('mission-area');
+            window.gameActions.startAdventure();
         });
-    </script>
+        document.getElementById('nav-donjon').addEventListener('click', () => {
+            window.gameActions.showGameArea('donjon-area');
+            window.gameActions.startDonjon();
+        });
+        document.getElementById('nav-multiplayer').addEventListener('click', () => window.gameActions.openMultiplayer());
+        document.getElementById('nav-inventory').addEventListener('click', () => window.gameActions.openInventory());
+        document.getElementById('nav-shop').addEventListener('click', () => window.gameActions.openShop());
+        document.getElementById('nav-companions').addEventListener('click', () => window.gameActions.manageCompanions());
+        document.getElementById('nav-guilds').addEventListener('click', () => window.gameActions.openGuilds());
+        document.getElementById('nav-crafting').addEventListener('click', () => window.gameActions.openCrafting());
+    });
+</script>
 </body>
 </html>
