@@ -15,28 +15,37 @@ export function showGameMessage(message) {
 }
 
 export function updatePlayerInfo(player) {
-    if (!player) return;
+    if (!player) {
+        console.error("Impossible de mettre à jour les infos du joueur : joueur non défini");
+        return;
+    }
 
     const elements = [
-        { id: 'player-name', value: player.name },
-        { id: 'player-level', value: player.level },
-        { id: 'player-hp', value: player.hp },
-        { id: 'player-max-hp', value: player.maxHp },
-        { id: 'player-attack', value: player.attack },
-        { id: 'player-defense', value: player.defense },
-        { id: 'player-gold', value: player.gold },
-        { id: 'player-exp', value: player.experience },
-        { id: 'player-next-level-exp', value: player.level * 100 }
+        { id: 'player-name', value: player.name || 'Inconnu' },
+        { id: 'player-level', value: player.level || 1 },
+        { id: 'player-hp', value: player.hp || 0 },
+        { id: 'player-max-hp', value: player.maxHp || 100 },
+        { id: 'player-attack', value: player.attack || 0 },
+        { id: 'player-defense', value: player.defense || 0 },
+        { id: 'player-gold', value: player.gold || 0 },
+        { id: 'player-exp', value: player.experience || 0 },
+        { id: 'player-next-level-exp', value: ((player.level || 1) * 100) || 100 }
     ];
 
     elements.forEach(({ id, value }) => {
         const element = document.getElementById(id);
-        if (element) element.textContent = value;
+        if (element) {
+            element.textContent = isNaN(value) ? 'N/A' : value;
+        } else {
+            console.warn(`Élément avec l'ID '${id}' non trouvé`);
+        }
     });
 
-    const expPercentage = (player.experience / (player.level * 100)) * 100;
+    const expPercentage = player.experience ? (player.experience / ((player.level || 1) * 100)) * 100 : 0;
     const expFill = document.querySelector('.experience-fill');
-    if (expFill) expFill.style.width = `${expPercentage}%`;
+    if (expFill) {
+        expFill.style.width = `${expPercentage}%`;
+    }
 }
 
 export function showGameArea(areaId) {
