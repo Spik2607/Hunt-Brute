@@ -63,4 +63,19 @@ export function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+export function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}m ${remainingSeconds}s`;
+}
+
+export function updateConstructionProgress(timeLeft, totalTime) {
+    const progressBar = document.getElementById('construction-progress');
+    if (progressBar) {
+        const percentage = ((totalTime - timeLeft) / totalTime) * 100;
+        progressBar.style.width = `${percentage}%`;
+        progressBar.textContent = `${formatTime(timeLeft)} restant`;
+    }
+}
+
 console.log("Module utilities chargé");
