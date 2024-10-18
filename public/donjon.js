@@ -72,31 +72,30 @@ export function generateDonjonReward(floor) {
     };
 }
 
-export function generateDonjonEvent(floor) {
-    const eventTypes = [
-        { type: 'combat', weight: 70 },
-        { type: 'treasure', weight: 15 },
-        { type: 'trap', weight: 10 },
-        { type: 'rest', weight: 5 }
-    ];
+export function generateDonjonEvent(level) {
+    const eventTypes = ['combat', 'treasure', 'trap'];
+    const eventType = eventTypes[Math.floor(Math.random() * eventTypes.length)];
 
-    const totalWeight = eventTypes.reduce((sum, event) => sum + event.weight, 0);
-    let randomNum = Math.random() * totalWeight;
-
-    for (let event of eventTypes) {
-        if (randomNum < event.weight) {
-            switch (event.type) {
-                case 'combat':
-                    return { type: 'combat', enemy: generateUniqueEnemy(floor) };
-                case 'treasure':
-                    return { type: 'treasure', reward: generateDonjonReward(floor) };
-                case 'trap':
-                    return { type: 'trap', damage: Math.round(10 * (1 + (floor * 0.1))) };
-                case 'rest':
-                    return { type: 'rest', healAmount: Math.round(20 * (1 + (floor * 0.1))) };
+    switch (eventType) {
+        case 'combat':
+            return {
+                type: 'combat',
+                enemy: createEnemyForMission({ enemy: enemies[Math.floor(Math.random() * enemies.length)].name, enemyLevel: level })
+            };
+        case 'treasure':
+            let item = generateRandomLoot(level);
+            while (item === null) {
+                item = generateRandomLoot(level);
             }
-        }
-        randomNum -= event.weight;
+            return {
+                type: 'treasure',
+                item: item
+            };
+        case 'trap':
+            return {
+                type: 'trap',
+                damage: level * 5
+            };
     }
 }
 
