@@ -26,6 +26,10 @@ export class Character {
             agility: 0,
             intelligence: 0
         };
+        this.lair = {
+            buildings: {},
+            currentConstruction: null
+        };
     }
 
     levelUp() {
@@ -112,10 +116,6 @@ export class Character {
     }
 }
 
-export function getAvailableMissions(playerLevel) {
-    return missions.filter(mission => mission.enemyLevel <= playerLevel + 2);
-}
-
 export const items = [
     // Armes
     { id: 'sword', name: 'Épée en fer', type: 'weapon', attack: 5, cost: 50, rarity: 'common' },
@@ -124,34 +124,22 @@ export const items = [
     { id: 'greatsword', name: 'Épée à deux mains', type: 'weapon', attack: 12, speedPenalty: 2, cost: 100, rarity: 'rare' },
     { id: 'flameBlade', name: 'Lame enflammée', type: 'weapon', attack: 10, fireDamage: 3, cost: 150, rarity: 'rare' },
     { id: 'excalibur', name: 'Excalibur', type: 'weapon', attack: 40, holyDamage: 5, critChance: 15, cost: 500, rarity: 'legendary' },
-    { id: 'longbow', name: 'Arc long', type: 'weapon', attack: 8, range: 2, cost: 90, rarity: 'uncommon' },
-    { id: 'frostStaff', name: 'Bâton de givre', type: 'weapon', attack: 6, iceDamage: 4, cost: 130, rarity: 'rare' },
 
     // Armures
-    { id: 'shield', name: 'Bouclier en bois', type: 'armor', defense: 3, cost: 40, rarity: 'common' },
-    { id: 'chainmail', name: 'Cotte de mailles', type: 'armor', defense: 8, cost: 80, rarity: 'common' },
-    { id: 'plateArmor', name: 'Armure de plaques', type: 'armor', defense: 20, speedPenalty: 1, cost: 500, rarity: 'rare' },
-    { id: 'dragonScaleArmor', name: "Armure d'écailles de dragon", type: 'armor', defense: 50, fireResistance: 50, cost: 1000, rarity: 'legendary' },
-    { id: 'leatherArmor', name: 'Armure de cuir', type: 'armor', defense: 15, cost: 60, rarity: 'common' },
+    { id: 'leatherArmor', name: 'Armure de cuir', type: 'armor', defense: 3, cost: 40, rarity: 'common' },
+    { id: 'chainmail', name: 'Cotte de mailles', type: 'armor', defense: 5, cost: 80, rarity: 'common' },
+    { id: 'plateArmor', name: 'Armure de plaques', type: 'armor', defense: 8, speedPenalty: 1, cost: 150, rarity: 'rare' },
+    { id: 'dragonScaleArmor', name: "Armure d'écailles de dragon", type: 'armor', defense: 12, fireResistance: 50, cost: 300, rarity: 'legendary' },
 
     // Accessoires
-    { id: 'ringOfAgility', name: "Anneau d'agilité", type: 'accessory', effect: 'speedBoost', value: 10, cost: 80, rarity: 'uncommon' },
-    { id: 'amuletOfProtection', name: 'Amulette de protection', type: 'accessory', effect: 'damageReduction', value: 10, cost: 500, rarity: 'rare' },
-    { id: 'cloakOfInvisibility', name: "Cape d'invisibilité", type: 'accessory', effect: 'stealth', cost: 1000, rarity: 'legendary' },
-    { id: 'ringOfHealth', name: 'Anneau de santé', type: 'accessory', effect: 'healthBoost', value: 20, cost: 300, rarity: 'uncommon' },
-    { id: 'speedBoots', name: 'Bottes de célérité', type: 'accessory', effect: 'moveSpeed', value: 15, cost: 250, rarity: 'rare' },
+    { id: 'ringOfStrength', name: 'Anneau de force', type: 'accessory', attack: 2, cost: 100, rarity: 'uncommon' },
+    { id: 'amuletOfLife', name: 'Amulette de vie', type: 'accessory', maxHp: 20, cost: 120, rarity: 'uncommon' },
+    { id: 'bootsOfSpeed', name: 'Bottes de célérité', type: 'accessory', speedBoost: 1, cost: 150, rarity: 'rare' },
 
     // Consommables
-    { id: 'healingPotion', name: 'Potion de soin', type: 'consumable', effect: 'heal', value: 30, cost: 20, rarity: 'common' },
-    { id: 'energyDrink', name: 'Boisson énergisante', type: 'consumable', effect: 'energy', value: 50, cost: 25, rarity: 'common' },
-    { id: 'elixirOfVitality', name: 'Élixir de vitalité', type: 'consumable', effect: 'heal', value: 100, cost: 100, rarity: 'rare' },
-    { id: 'manaPotion', name: 'Potion de mana', type: 'consumable', effect: 'mana', value: 40, cost: 30, rarity: 'common' },
-    { id: 'phoenixFeather', name: 'Plume de Phénix', type: 'consumable', effect: 'revive', cost: 900, rarity: 'legendary' },
-    { id: 'throwingKnives', name: 'Couteaux de lancer', type: 'consumable', effect: 'damage', value: 100, cost: 200, rarity: 'common' },
-
-    // Objets spéciaux
-    { id: 'scrollOfFireball', name: 'Parchemin de boule de feu', type: 'special', effect: 'fireball', damage: 25, cost: 70, rarity: 'uncommon' },
-    { id: 'orbOfFrost', name: 'Orbe de givre', type: 'special', effect: 'freeze', freezeDuration: 3, cost: 150, rarity: 'rare' },
+    { id: 'healthPotion', name: 'Potion de soin', type: 'consumable', effect: 'heal', value: 50, cost: 30, rarity: 'common' },
+    { id: 'energyDrink', name: 'Boisson énergisante', type: 'consumable', effect: 'energy', value: 30, cost: 25, rarity: 'common' },
+    { id: 'elixirOfPower', name: 'Élixir de puissance', type: 'consumable', effect: 'attackBoost', value: 5, duration: 3, cost: 100, rarity: 'rare' }
 ];
 
 export const missions = [
@@ -160,46 +148,78 @@ export const missions = [
     { name: "Vaincre un bandit", enemy: "Bandit", enemyLevel: 3, goldReward: 50, expReward: 60, difficulty: 'Moyenne' },
     { name: "Affronter un ogre", enemy: "Ogre", enemyLevel: 4, goldReward: 80, expReward: 90, difficulty: 'Difficile' },
     { name: "Explorer une grotte hantée", enemy: "Fantôme", enemyLevel: 5, goldReward: 120, expReward: 130, difficulty: 'Difficile' },
-    { name: "Combattre un dragon", enemy: "Dragon", enemyLevel: 7, goldReward: 200, expReward: 250, difficulty: 'Très Difficile' },
-    { name: "Infiltrer un repaire de bandits", enemy: "Assassin", enemyLevel: 6, goldReward: 150, expReward: 180, difficulty: 'Difficile' },
-    { name: "Chasser un troll des montagnes", enemy: "Troll", enemyLevel: 6, goldReward: 250, expReward: 300, difficulty: 'Très Difficile' },
-    { name: "Nettoyer les égouts de la ville", enemy: "Gobelin", enemyLevel: 2, goldReward: 40, expReward: 50, difficulty: 'Moyenne' },
-    { name: "Escorter une caravane marchande", enemy: "Bandit", enemyLevel: 3, goldReward: 70, expReward: 80, difficulty: 'Moyenne' },
-    { name: "Détruire un nid de harpies", enemy: "Harpie", enemyLevel: 5, goldReward: 140, expReward: 150, difficulty: 'Difficile' },
-    { name: "Récupérer un artefact dans des ruines anciennes", enemy: "Golem de pierre", enemyLevel: 6, goldReward: 180, expReward: 200, difficulty: 'Difficile' },
-    { name: "Vaincre un géant des tempêtes", enemy: "Géant des tempêtes", enemyLevel: 8, goldReward: 300, expReward: 350, difficulty: 'Très Difficile' },
+    { name: "Combattre un dragon", enemy: "Dragon", enemyLevel: 7, goldReward: 200, expReward: 250, difficulty: 'Très Difficile' }
 ];
 
-export const dropRates = {
-    'Facile': 0.05,
-    'Moyenne': 0.075,
-    'Difficile': 0.2,
-    'Très Difficile': 0.25,
-};
+export const buildings = [
+    { 
+        id: 1, 
+        name: "Cabane de base", 
+        level: 1,
+        maxLevel: 3,
+        materials: { wood: 50, stone: 20 }, 
+        time: 300, // en secondes
+        benefits: "Augmente la capacité de stockage de ressources de 100",
+        upgradeMaterials: { wood: 100, stone: 40, iron: 10 },
+        upgradeTime: 600,
+        upgradeBenefits: "Augmente davantage la capacité de stockage"
+    },
+    { 
+        id: 2, 
+        name: "Tour de guet", 
+        level: 1,
+        maxLevel: 5,
+        materials: { wood: 30, stone: 50, iron: 10 }, 
+        time: 600,
+        benefits: "Améliore la défense du repaire",
+        upgradeMaterials: { wood: 60, stone: 100, iron: 20 },
+        upgradeTime: 900,
+        upgradeBenefits: "Améliore encore plus la défense et permet de voir les ennemis de plus loin"
+    },
+    { 
+        id: 3, 
+        name: "Ferme", 
+        level: 1,
+        maxLevel: 4,
+        materials: { wood: 40, stone: 20, iron: 5 }, 
+        time: 450,
+        benefits: "Produit de la nourriture passivement",
+        upgradeMaterials: { wood: 80, stone: 40, iron: 10 },
+        upgradeTime: 750,
+        upgradeBenefits: "Augmente la production de nourriture"
+    },
+    {
+        id: 4,
+        name: "Forge",
+        level: 1,
+        maxLevel: 5,
+        materials: { wood: 60, stone: 80, iron: 30 },
+        time: 900,
+        benefits: "Permet de créer et d'améliorer des équipements",
+        upgradeMaterials: { wood: 120, stone: 160, iron: 60 },
+        upgradeTime: 1200,
+        upgradeBenefits: "Permet de créer des équipements plus puissants"
+    }
+];
 
 export const enemies = [
-    { name: "Gobelin", level: 1, hp: 70, attack: 7, defense: 4 },
-    { name: "Loup géant", level: 2, hp: 145, attack: 17, defense: 14 },
-    { name: "Bandit", level: 3, hp: 200, attack: 25, defense: 20 },
-    { name: "Ogre", level: 4, hp: 400, attack: 45, defense: 36 },
-    { name: "Fantôme", level: 5, hp: 300, attack: 55, defense: 36 },
-    { name: "Dragon", level: 7, hp: 700, attack: 85, defense: 90 },
-    { name: "Troll", level: 6, hp: 150, attack: 20, defense: 12 },
-    { name: "Sorcier", level: 5, hp: 120, attack: 18, defense: 10 },
-    { name: "Harpie", level: 4, hp: 90, attack: 14, defense: 6 },
-    { name: "Golem de pierre", level: 5, hp: 750, attack: 90, defense: 114 },
-    { name: "Assassin", level: 6, hp: 400, attack: 60, defense: 45 },
-    { name: "Géant des tempêtes", level: 8, hp: 1250, attack: 130, defense: 118 },
-    { name: "Liche", level: 9, hp: 1800, attack: 235, defense: 220 },
+    { name: "Gobelin", level: 1, hp: 30, attack: 5, defense: 2 },
+    { name: "Loup géant", level: 2, hp: 45, attack: 8, defense: 3 },
+    { name: "Bandit", level: 3, hp: 60, attack: 10, defense: 5 },
+    { name: "Ogre", level: 4, hp: 100, attack: 15, defense: 8 },
+    { name: "Fantôme", level: 5, hp: 80, attack: 20, defense: 10 },
+    { name: "Dragon", level: 7, hp: 200, attack: 30, defense: 20 }
 ];
 
 export const companionTypes = [
     { type: 'animal', names: ['Loup', 'Ours', 'Aigle', 'Panthère', 'Tigre', 'Serpent'] },
     { type: 'monster', names: ['Gobelin apprivoisé', 'Petit dragon', 'Golem de pierre'] },
-    { type: 'slave', names: ['Écuyer', 'Porteur', 'Archer', 'Esclave'] },
-    { type: 'spirit', names: ['Esprit du feu', "Esprit de l'eau", "Esprit de l'air", 'Esprit de la terre'] },
-    { type: 'shinigami', names: ['Faucheur', 'Shinigami', 'Ombre'] }
+    { type: 'human', names: ['Écuyer', 'Archer', 'Mage', 'Voleur'] }
 ];
+
+export function getAvailableMissions(playerLevel) {
+    return missions.filter(mission => mission.enemyLevel <= playerLevel + 2);
+}
 
 export function getItemStats(item) {
     let stats = `${item.name} (${item.type}) :`;
@@ -208,9 +228,7 @@ export function getItemStats(item) {
         stats += `\n- Attaque : ${item.attack}`;
         if (item.critChance) stats += `\n- Chance de critique : ${item.critChance}%`;
         if (item.fireDamage) stats += `\n- Dégâts de feu : ${item.fireDamage}`;
-        if (item.iceDamage) stats += `\n- Dégâts de glace : ${item.iceDamage}`;
         if (item.holyDamage) stats += `\n- Dégâts sacrés : ${item.holyDamage}`;
-        if (item.range) stats += `\n- Portée : ${item.range}`;
     }
 
     if (item.type === 'armor') {
@@ -220,17 +238,14 @@ export function getItemStats(item) {
     }
 
     if (item.type === 'accessory') {
-        stats += `\n- Effet : ${item.effect} +${item.value || ''}`;
+        if (item.attack) stats += `\n- Attaque : +${item.attack}`;
+        if (item.maxHp) stats += `\n- PV max : +${item.maxHp}`;
+        if (item.speedBoost) stats += `\n- Bonus de vitesse : +${item.speedBoost}`;
     }
 
     if (item.type === 'consumable') {
         stats += `\n- Effet : ${item.effect} +${item.value}`;
-    }
-
-    if (item.type === 'special') {
-        stats += `\n- Effet spécial : ${item.effect}`;
-        if (item.damage) stats += `\n- Dégâts : ${item.damage}`;
-        if (item.freezeDuration) stats += `\n- Durée de gel : ${item.freezeDuration} tours`;
+        if (item.duration) stats += `\n- Durée : ${item.duration} tours`;
     }
 
     stats += `\n- Coût : ${item.cost} pièces d'or`;
@@ -247,7 +262,7 @@ export function getRandomCompanionName(type) {
 }
 
 export function getRandomCompanion() {
-    const types = ['animal', 'monster', 'slave', 'spirit', 'shinigami'];
+    const types = ['animal', 'monster', 'human'];
     const type = types[Math.floor(Math.random() * types.length)];
     const name = getRandomCompanionName(type);
     return new Character(name, 50, 5, 3, 50); // Nom, HP, Attaque, Défense, Énergie
@@ -340,14 +355,14 @@ export function generateUniqueEnemy(floor) {
 }
 
 export function generateDonjonEvent(level) {
-    const eventTypes = ['combat', 'treasure', 'trap'];
+    const eventTypes = ['combat', 'treasure', 'trap', 'rest'];
     const eventType = eventTypes[Math.floor(Math.random() * eventTypes.length)];
 
     switch (eventType) {
         case 'combat':
             return {
                 type: 'combat',
-                enemy: createEnemyForMission({ enemy: enemies[Math.floor(Math.random() * enemies.length)].name, enemyLevel: level })
+                enemy: generateUniqueEnemy(level)
             };
         case 'treasure':
             return {
@@ -358,6 +373,11 @@ export function generateDonjonEvent(level) {
             return {
                 type: 'trap',
                 damage: level * 5
+            };
+        case 'rest':
+            return {
+                type: 'rest',
+                healAmount: level * 10
             };
     }
 }
@@ -379,6 +399,63 @@ export function generateBossReward(bossLevel) {
         experience: bossLevel * 50,
         item: generateRandomLoot(bossLevel + 2) // Un objet plus rare que le niveau du boss
     };
+}
+
+export function getAvailableBuildings(player) {
+    return buildings.filter(building => 
+        player.level >= building.requiredLevel && 
+        (!player.lair.buildings[building.id] || 
+         (player.lair.buildings[building.id].level < building.maxLevel))
+    );
+}
+
+export function initializeLairBuildingSystem() {
+    console.log("Système de construction de bâtiments initialisé");
+    // Vous pouvez ajouter ici toute logique d'initialisation supplémentaire pour le système de construction
+}
+
+export function applyBuildingEffects(player, buildingId) {
+    const building = buildings.find(b => b.id === buildingId);
+    if (!building) return;
+
+    const buildingLevel = player.lair.buildings[buildingId]?.level || 1;
+
+    switch (buildingId) {
+        case 1: // Cabane de base
+            player.resourceCapacity = 100 * buildingLevel;
+            break;
+        case 2: // Tour de guet
+            player.defense += 2 * buildingLevel;
+            break;
+        case 3: // Ferme
+            player.passiveFoodProduction = 5 * buildingLevel;
+            break;
+        case 4: // Forge
+            player.craftingBonus = 0.1 * buildingLevel; // 10% de bonus par niveau
+            break;
+        // Ajoutez d'autres effets de bâtiments ici
+    }
+}
+
+export function canUpgradeBuilding(player, buildingId) {
+    const building = buildings.find(b => b.id === buildingId);
+    if (!building) return false;
+
+    const currentLevel = player.lair.buildings[buildingId]?.level || 0;
+    if (currentLevel >= building.maxLevel) return false;
+
+    const upgradeMaterials = currentLevel === 0 ? building.materials : building.upgradeMaterials;
+    return Object.entries(upgradeMaterials).every(([resource, amount]) => 
+        player.resources[resource] >= amount
+    );
+}
+
+export function getUpgradeCost(buildingId, currentLevel) {
+    const building = buildings.find(b => b.id === buildingId);
+    if (!building) return null;
+
+    if (currentLevel === 0) return building.materials;
+    return building.upgradeMaterials;
 }
 
 console.log("Module gameData chargé");
