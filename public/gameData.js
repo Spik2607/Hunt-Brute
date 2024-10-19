@@ -1,4 +1,6 @@
 // gameData.js
+import { updatePlayerStats } from './game.js';
+
 
 export class Character {
     constructor(name, hp, attack, defense, energy = 100) {
