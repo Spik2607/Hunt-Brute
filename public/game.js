@@ -12,6 +12,9 @@ let currentMission;
 let currentDonjonLevel;
 let regenerationInterval;
 
+// Initialisation de window.gameActions
+window.gameActions = window.gameActions || {};
+
 function resetGame() {
     console.log("Réinitialisation du jeu");
     localStorage.removeItem('playerCharacter');
@@ -20,24 +23,16 @@ function resetGame() {
     showGameMessage("Le jeu a été réinitialisé. Créez un nouveau personnage.");
 }
 
-// Ajoutez ceci à vos gestionnaires d'événements
-document.getElementById('reset-game').addEventListener('click', resetGame);
-
-// Ajoutez ceci à window.gameActions
-window.gameActions.resetGame = resetGame;
-
 function initializePlayer(name) {
     return new Character(name, 100, 10, 5, 100);
 }
 
 function updatePlayerStats(player) {
-    // Calculer les stats basées sur le niveau
-    const levelBonus = player.level - 1; // Bonus pour chaque niveau au-dessus de 1
-    player.attack = player.baseAttack + (2 * levelBonus); // 2 points d'attaque par niveau
-    player.defense = player.baseDefense + levelBonus; // 1 point de défense par niveau
-    player.maxHp = player.baseMaxHp + (10 * levelBonus); // 10 points de vie par niveau
+    const levelBonus = player.level - 1;
+    player.attack = player.baseAttack + (2 * levelBonus);
+    player.defense = player.baseDefense + levelBonus;
+    player.maxHp = player.baseMaxHp + (10 * levelBonus);
 
-    // Appliquer les effets des objets équipés
     for (const slot in player.equippedItems) {
         const item = player.equippedItems[slot];
         if (item) {
@@ -47,10 +42,7 @@ function updatePlayerStats(player) {
         }
     }
 
-    // S'assurer que les HP actuels ne dépassent pas le nouveau maxHp
     player.hp = Math.min(player.hp, player.maxHp);
-
-    // Mettre à jour l'affichage
     updatePlayerInfo(player);
     console.log("Stats mises à jour:", player);
 }
@@ -519,7 +511,8 @@ function initializeEventListeners() {
         'defend-button': () => window.gameActions.playerDefend(),
         'special-button': () => window.gameActions.playerUseSpecial(),
         'create-character': createCharacter,
-        'next-donjon-event': nextDonjonEvent
+        'next-donjon-event': nextDonjonEvent,
+        'reset-game': resetGame
     };
 
     for (const [id, handler] of Object.entries(buttonHandlers)) {
@@ -548,12 +541,6 @@ function initializeEventListeners() {
         'nav-companions': manageCompanions,
         'nav-lair-building': openLairBuilding
     };
-const resetButton = document.getElementById('reset-game');
-    if (resetButton) {
-        resetButton.addEventListener('click', () => window.gameActions.resetGame());
-    } else {
-        console.warn("Bouton de réinitialisation non trouvé");
-    }
 
     for (const [id, handler] of Object.entries(navHandlers)) {
         const navItem = document.getElementById(id);
@@ -727,15 +714,7 @@ function updateLeaderboard() {
     const leaderboardArea = document.getElementById('leaderboard-area');
     if (leaderboardArea) {
         leaderboardArea.innerHTML = '<h2>Classement</h2>';
-        // Vous devrez implémenter la logique pour récupérer et afficher le classement réel ici
-        // Par exemple :
-        // getLeaderboardData().then(data => {
-        //     data.forEach((player, index) => {
-        //         const playerElement = document.createElement('div');
-        //         playerElement.textContent = `${index + 1}. ${player.name} - Niveau ${player.level}`;
-        //         leaderboardArea.appendChild(playerElement);
-        //     });
-        // });
+        // Implémentez ici la logique pour récupérer et afficher le classement réel
     }
 }
 
@@ -745,17 +724,6 @@ function initializeGroupQuests() {
     if (groupQuestsArea) {
         groupQuestsArea.innerHTML = '<h2>Quêtes de groupe disponibles</h2>';
         // Implémentez ici la logique pour générer et afficher les quêtes de groupe
-        // Par exemple :
-        // const groupQuests = getAvailableGroupQuests();
-        // groupQuests.forEach(quest => {
-        //     const questElement = document.createElement('div');
-        //     questElement.innerHTML = `
-        //         <h3>${quest.name}</h3>
-        //         <p>${quest.description}</p>
-        //         <button onclick="joinGroupQuest(${quest.id})">Rejoindre</button>
-        //     `;
-        //     groupQuestsArea.appendChild(questElement);
-        // });
     }
 }
 
@@ -766,8 +734,37 @@ function startWorldEvent() {
     // Implémentez ici la logique pour l'événement mondial
 }
 
+function updateGuildsList() {
+    console.log("Mise à jour de la liste des guildes");
+    const guildArea = document.getElementById('guild-area');
+    if (guildArea) {
+        guildArea.innerHTML = '<h2>Guildes disponibles</h2>';
+        // Implémentez ici la logique pour récupérer et afficher les guildes
+    }
+}
 
 // Objet gameActions pour les actions accessibles globalement
+window.gameActions = {
+    ...window.gameActions,
+    ...inventoryModule,
+    resetGame,
+    startAdventure,
+    startDonjon,
+    openMultiplayer,
+    openShop: handleOpenShop,
+    openInventory,
+    manageCompanions,
+    openLairBuilding,
+    saveGame,
+    loadGame,
+    joinRoom,
+    sendChatMessage,
+    initiateChallenge,
+    acceptChallenge,
+    initiateTradeRequest,
+    acceptTradeRequest,
+    confirmTrade,
+   // Objet gameActions pour les actions accessibles globalement
 window.gameActions = {
     ...window.gameActions,
     ...inventoryModule,
@@ -856,7 +853,9 @@ window.gameActions = {
     updateLeaderboard,
     initializeGroupQuests,
     startWorldEvent,
-    createCharacter
+    createCharacter,
+    updatePlayerStats,
+    updateGuildsList
 };
 
 // Exports
@@ -891,7 +890,10 @@ export {
     updateChatMessages,
     addChatMessage,
     startMultiplayerBattle,
-    handleOpponentAction
+    handleOpponentAction,
+    updatePlayerStats,
+    resetGame,
+    updateGuildsList
 };
 
 // Initialisation du jeu au chargement du DOM
