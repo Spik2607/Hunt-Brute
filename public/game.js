@@ -743,28 +743,6 @@ function updateGuildsList() {
     }
 }
 
-// Objet gameActions pour les actions accessibles globalement
-window.gameActions = {
-    ...window.gameActions,
-    ...inventoryModule,
-    resetGame,
-    startAdventure,
-    startDonjon,
-    openMultiplayer,
-    openShop: handleOpenShop,
-    openInventory,
-    manageCompanions,
-    openLairBuilding,
-    saveGame,
-    loadGame,
-    joinRoom,
-    sendChatMessage,
-    initiateChallenge,
-    acceptChallenge,
-    initiateTradeRequest,
-    acceptTradeRequest,
-    confirmTrade,
-   // Objet gameActions pour les actions accessibles globalement
 window.gameActions = {
     ...window.gameActions,
     ...inventoryModule,
