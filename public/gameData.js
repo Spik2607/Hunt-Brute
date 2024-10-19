@@ -32,15 +32,17 @@ export class Character {
         };
     }
 
-    levelUp() {
-        this.level++;
-        this.maxHp += 10;
-        this.hp = this.maxHp;
-        this.attack += 2;
-        this.defense += 1;
-        this.skillPoints += 3;
-        console.log(`${this.name} a atteint le niveau ${this.level}!`);
-    }
+   levelUp() {
+    this.level++;
+    this.baseMaxHp += 10;
+    this.baseAttack += 2;
+    this.baseDefense += 1;
+    this.skillPoints += 3;
+    console.log(`${this.name} a atteint le niveau ${this.level}!`);
+    
+    // Mettre à jour les stats après la montée de niveau
+    updatePlayerStats(this);
+}
 
     gainExperience(amount) {
         this.experience += amount;
