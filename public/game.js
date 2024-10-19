@@ -12,6 +12,20 @@ let currentMission;
 let currentDonjonLevel;
 let regenerationInterval;
 
+function resetGame() {
+    console.log("Réinitialisation du jeu");
+    localStorage.removeItem('playerCharacter');
+    player = null;
+    showGameArea('character-creation');
+    showGameMessage("Le jeu a été réinitialisé. Créez un nouveau personnage.");
+}
+
+// Ajoutez ceci à vos gestionnaires d'événements
+document.getElementById('reset-game').addEventListener('click', resetGame);
+
+// Ajoutez ceci à window.gameActions
+window.gameActions.resetGame = resetGame;
+
 function initializePlayer(name) {
     return new Character(name, 100, 10, 5, 100);
 }
