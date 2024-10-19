@@ -548,6 +548,12 @@ function initializeEventListeners() {
         'nav-companions': manageCompanions,
         'nav-lair-building': openLairBuilding
     };
+const resetButton = document.getElementById('reset-game');
+    if (resetButton) {
+        resetButton.addEventListener('click', () => window.gameActions.resetGame());
+    } else {
+        console.warn("Bouton de réinitialisation non trouvé");
+    }
 
     for (const [id, handler] of Object.entries(navHandlers)) {
         const navItem = document.getElementById(id);
