@@ -17,10 +17,13 @@ function initializePlayer(name) {
 }
 
 function updatePlayerStats(player) {
-    player.attack = player.baseAttack;
-    player.defense = player.baseDefense;
-    player.maxHp = player.baseMaxHp;
+    // Calculer les stats basées sur le niveau
+    const levelBonus = player.level - 1; // Bonus pour chaque niveau au-dessus de 1
+    player.attack = player.baseAttack + (2 * levelBonus); // 2 points d'attaque par niveau
+    player.defense = player.baseDefense + levelBonus; // 1 point de défense par niveau
+    player.maxHp = player.baseMaxHp + (10 * levelBonus); // 10 points de vie par niveau
 
+    // Appliquer les effets des objets équipés
     for (const slot in player.equippedItems) {
         const item = player.equippedItems[slot];
         if (item) {
@@ -30,8 +33,12 @@ function updatePlayerStats(player) {
         }
     }
 
+    // S'assurer que les HP actuels ne dépassent pas le nouveau maxHp
     player.hp = Math.min(player.hp, player.maxHp);
+
+    // Mettre à jour l'affichage
     updatePlayerInfo(player);
+    console.log("Stats mises à jour:", player);
 }
 
 function startRegeneration() {
