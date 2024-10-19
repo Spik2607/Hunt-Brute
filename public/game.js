@@ -765,6 +765,7 @@ function startWorldEvent() {
 window.gameActions = {
     ...window.gameActions,
     ...inventoryModule,
+    resetGame,
     startAdventure,
     startDonjon,
     openMultiplayer,
